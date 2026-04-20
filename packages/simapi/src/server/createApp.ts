@@ -6,8 +6,9 @@ import { AppResponse } from "../core/AppResponse.js";
 import type { SimAPIConfig } from "../core/defineConfig.js";
 import type { EndpointDefinition } from "../core/endpoint.js";
 import { ValidationError } from "../core/ValidationErrors.js";
-import type { DbAdapter } from "../db/types.js";
 import { discoverEndpoints } from "./discovery.js";
+import { registerInternalRoutes } from "./internalRoutes.js";
+import type { LogBus } from "./logBus.js";
 
 interface ParsedRequest {
   request: AppRequest;
@@ -19,7 +20,7 @@ interface ParsedRequest {
 export async function createApp(
   config: SimAPIConfig,
   endpointsDir: string,
-  adapter?: DbAdapter
+  bus?: LogBus
 ): Promise<Hono> {
   const app = new Hono();
 
@@ -37,7 +38,11 @@ export async function createApp(
   );
 
   for (const endpoint of endpoints) {
-    registerEndpoint(app, endpoint, config, adapter);
+    registerEndpoint(app, endpoint, config, bus);
+  }
+
+  if (bus) {
+    registerInternalRoutes(app, endpoints, config, bus);
   }
 
   return app;
@@ -47,7 +52,7 @@ function registerEndpoint(
   app: Hono,
   endpoint: EndpointDefinition,
   config: SimAPIConfig,
-  adapter: DbAdapter | undefined
+  bus: LogBus | undefined
 ): void {
   app.on(endpoint.method, endpoint.path, async (c: Context) => {
     const start = Date.now();
@@ -86,8 +91,8 @@ function registerEndpoint(
       }
       throw err;
     } finally {
-      if (adapter && config.logEntries !== false) {
-        adapter
+      if (bus && config.logEntries !== false) {
+        bus
           .log({
             method: endpoint.method,
             path: c.req.path,

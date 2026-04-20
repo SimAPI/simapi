@@ -72,14 +72,16 @@ Drizzle ORM with swappable adapters for request logging.
 
 ---
 
-## Wave 6 — Internal API (pending)
+## Wave 6 — Internal API ✅
 
 `/__simapi/*` routes consumed by the console.
 
-- [ ] `GET /__simapi/endpoints` — list all registered endpoints
-- [ ] `GET /__simapi/logs` — paginated request log
-- [ ] `GET /__simapi/logs/stream` — live log feed via SSE
-- [ ] Versioned contract between core and console
+- [x] `GET /__simapi/health` — server metadata, version, endpoint count, logging flag
+- [x] `GET /__simapi/endpoints` — list all registered endpoints (method, path, type)
+- [x] `GET /__simapi/logs?limit=&offset=` — paginated request log (max 500 per page)
+- [x] `GET /__simapi/logs/stream` — live SSE log feed with 30s heartbeat
+- [x] `LogBus` (`src/server/logBus.ts`) — EventEmitter wrapping `DbAdapter`; emits `"entry"` on every logged request; SSE clients subscribe directly
+- [x] Internal routes only registered when `LogBus` is present (dev server only; no-op if no bus)
 
 ---
 

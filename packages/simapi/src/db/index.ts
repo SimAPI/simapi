@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import type { DatabaseConfig } from "../core/defineConfig.js";
 import { createNoneAdapter } from "./adapters/none.js";
 import { createSqliteAdapter } from "./adapters/sqlite.js";
+import type { DbAdapter } from "./types.js";
 
 export type { DbAdapter, RequestLogEntry } from "./types.js";
 

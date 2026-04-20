@@ -5,6 +5,7 @@ import { tsImport } from "tsx/esm/api";
 import type { SimAPIConfig } from "../core/defineConfig.js";
 import { createAdapter } from "../db/index.js";
 import { createApp } from "../server/createApp.js";
+import { LogBus } from "../server/logBus.js";
 import { startServer } from "../server/startServer.js";
 
 export async function runServe(cwd: string = process.cwd()): Promise<void> {
@@ -22,16 +23,17 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
   }
 
   const adapter = await createAdapter(config.database, cwd);
+  const bus = new LogBus(adapter);
 
   const port = config.port ?? 3000;
-  const app = await createApp(config, endpointsDir, adapter);
+  const app = await createApp(config, endpointsDir, bus);
   startServer(app, port);
 
   for (const signal of ["SIGINT", "SIGTERM"] as const) {
     process.once(signal, () => {
-      adapter
+      bus
         .close()
-        .catch((err) => console.error("[SimAPI] adapter close error:", err));
+        .catch((err) => console.error("[SimAPI] shutdown error:", err));
     });
   }
 }
