@@ -1,6 +1,7 @@
 # SimAPI — Build Plan
 
 ## Wave 1 — Monorepo Tooling ✅
+
 - [x] Remove Prettier
 - [x] Install and configure Biome (lint + format)
 - [x] Install Husky + lint-staged
@@ -10,6 +11,7 @@
 ---
 
 ## Wave 2 — Core Types ✅
+
 `packages/simapi` skeleton with the public API surface users write against.
 
 - [x] Scaffold `packages/simapi` with `package.json`, `tsconfig.json`, `tsdown.config.ts`
@@ -25,6 +27,7 @@
 ---
 
 ## Wave 3 — Dev Server ✅
+
 Hono-based server that auto-discovers endpoints and runs the request lifecycle.
 
 - [x] Hono + `@hono/node-server` setup (`src/server/startServer.ts`)
@@ -39,6 +42,7 @@ Hono-based server that auto-discovers endpoints and runs the request lifecycle.
 ---
 
 ## Wave 4 — CLI ✅
+
 All user-facing commands.
 
 - [x] CLI entry via `cac` + `@clack/prompts`
@@ -52,19 +56,24 @@ All user-facing commands.
 
 ---
 
-## Wave 5 — Database Layer (pending)
+## Wave 5 — Database Layer ✅
+
 Drizzle ORM with swappable adapters for request logging.
 
-- [ ] Drizzle schema for request log entries
-- [ ] SQLite adapter (`better-sqlite3`) — default, zero-config
-- [ ] libSQL adapter (`@libsql/client`) — Turso cloud target
-- [ ] Postgres adapter (`pg`) — team infrastructure target
-- [ ] `type: "none"` — disables logging entirely
-- [ ] Adapter selection driven by `simapi.config.ts`
+- [x] Drizzle schema for request log entries (`src/db/adapters/sqlite.ts`, `postgres.ts`)
+- [x] SQLite adapter via `@libsql/client` (`file:` URL) — zero-config local default
+- [x] libSQL adapter via `@libsql/client` (remote Turso URL + authToken)
+- [x] Postgres adapter via `pg` + `drizzle-orm/node-postgres` — dynamically imported (code-split chunk)
+- [x] `type: "none"` / no config — no-op adapter, zero overhead
+- [x] `createAdapter(config, cwd)` factory in `src/db/index.ts`
+- [x] `createApp()` accepts optional `DbAdapter`; logs all requests (including auth rejections and validation errors) via try/catch/finally
+- [x] `logEntries: false` in config disables logging even when adapter is present
+- [x] `serve.ts` initializes adapter, passes to `createApp`, closes on SIGINT/SIGTERM
 
 ---
 
 ## Wave 6 — Internal API (pending)
+
 `/__simapi/*` routes consumed by the console.
 
 - [ ] `GET /__simapi/endpoints` — list all registered endpoints
@@ -75,6 +84,7 @@ Drizzle ORM with swappable adapters for request logging.
 ---
 
 ## Wave 7 — Console (`@simapi/console`) (pending)
+
 Opt-in React SPA served at `localhost:3000/console`.
 
 - [ ] Scaffold `packages/console` with Vite + React + TypeScript + Tailwind + shadcn/ui
@@ -88,6 +98,7 @@ Opt-in React SPA served at `localhost:3000/console`.
 ---
 
 ## Wave 8 — `create-simapi` + Docs (pending)
+
 - [ ] `packages/create-simapi` — powers `npm create simapi@latest`
 - [ ] `apps/docs` — documentation site
 - [ ] Railway deployment guide (canonical path)
@@ -97,17 +108,17 @@ Opt-in React SPA served at `localhost:3000/console`.
 
 ## Stack Reference
 
-| Concern | Choice |
-|---|---|
-| Runtime | Node.js 20+ |
-| Server | Hono + `@hono/node-server` |
-| TS loading (dev) | `tsx` |
-| Database | Drizzle + `better-sqlite3` / `@libsql/client` / `pg` |
-| CLI | `cac` + `@clack/prompts` |
-| Console UI | Vite + React + Tailwind + shadcn/ui |
-| Live logs | Server-Sent Events |
-| Validation (internal) | Zod |
-| Package build | tsdown |
-| Testing | Vitest |
-| Monorepo | Turborepo + npm workspaces |
-| Lint + Format | Biome |
+| Concern               | Choice                                               |
+| --------------------- | ---------------------------------------------------- |
+| Runtime               | Node.js 20+                                          |
+| Server                | Hono + `@hono/node-server`                           |
+| TS loading (dev)      | `tsx`                                                |
+| Database              | Drizzle + `better-sqlite3` / `@libsql/client` / `pg` |
+| CLI                   | `cac` + `@clack/prompts`                             |
+| Console UI            | Vite + React + Tailwind + shadcn/ui                  |
+| Live logs             | Server-Sent Events                                   |
+| Validation (internal) | Zod                                                  |
+| Package build         | tsdown                                               |
+| Testing               | Vitest                                               |
+| Monorepo              | Turborepo + npm workspaces                           |
+| Lint + Format         | Biome                                                |
