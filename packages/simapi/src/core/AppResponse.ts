@@ -35,11 +35,12 @@ const fake = {
 
   array<T extends Record<string, unknown>>(
     count: number,
-    template: T
+    template: () => T
   ): ResolveTemplate<T>[] {
     return Array.from({ length: count }, () => {
       const item: Record<string, unknown> = {};
-      for (const [key, value] of Object.entries(template)) {
+
+      for (const [key, value] of Object.entries(template())) {
         item[key] = value instanceof FakeDescriptor ? value.resolve() : value;
       }
       return item as ResolveTemplate<T>;
