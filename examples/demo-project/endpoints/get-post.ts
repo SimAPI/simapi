@@ -1,4 +1,4 @@
-import { type AppRequest, AppResponse } from "simapi";
+import { type AppRequest, AppResponse, faker } from "simapi";
 
 export const getPost = {
   path: "/api/posts/:id",
@@ -9,8 +9,8 @@ export const getPost = {
     return AppResponse.success({
       data: {
         id,
-        title: AppResponse.fake.string(6),
-        body: AppResponse.fake.string(20),
+        title: faker.lorem.sentence(),
+        body: faker.lorem.paragraph(),
         published: true,
       },
     });

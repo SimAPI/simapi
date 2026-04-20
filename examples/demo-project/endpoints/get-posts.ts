@@ -1,18 +1,18 @@
-import { AppResponse } from "simapi";
+import { AppResponse, type Endpoint, faker } from "simapi";
 
-export const getPosts = {
+export const getPosts: Endpoint = {
   path: "/api/posts",
   method: "GET",
   type: "open",
   handler: () => {
     return AppResponse.success({
-      data: AppResponse.fake.array(5, () => ({
-        id: AppResponse.fake.uuid(),
-        title: AppResponse.fake.string(),
-        body: AppResponse.fake.string(),
-        published: AppResponse.fake.boolean(),
+      data: AppResponse.array(5, () => ({
+        id: faker.string.ulid(),
+        title: faker.lorem.sentence(),
+        body: faker.lorem.paragraph(),
+        published: faker.boolean(),
       })),
       meta: { total: 5, page: 1, perPage: 20 },
     });
   },
-} as const;
+};

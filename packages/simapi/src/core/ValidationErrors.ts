@@ -23,7 +23,9 @@ export class ValidationErrors {
     this.hasError = this.errorFields.length > 0;
   }
 
-  throwValidationError(format: ValidationFormat = "laravel"): never {
-    throw new ValidationError(this.errorBag, format);
+  throwValidationError(format: ValidationFormat = "laravel"): void {
+    if (this.hasError) {
+      throw new ValidationError(this.errorBag, format);
+    }
   }
 }

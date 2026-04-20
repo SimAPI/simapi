@@ -1,5 +1,6 @@
 import type { AppRequest } from "./AppRequest.js";
 import type { AppResponse } from "./AppResponse.js";
+import type { ValidationFormat } from "./ValidationErrors.js";
 
 export type AuthHandler = (req: AppRequest) => AppResponse | undefined;
 
@@ -16,6 +17,7 @@ export interface SimAPIConfig {
   authHandler?: AuthHandler;
   logEntries?: boolean;
   database?: DatabaseConfig;
+  autoThrowValidationErrors?: ValidationFormat | false | null;
 }
 
 export function defineConfig(config: SimAPIConfig): SimAPIConfig {

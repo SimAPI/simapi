@@ -1,15 +1,47 @@
 {
   "name": "@simapi/console",
-  "version": "0.1.0",
+  "version": "0.0.0",
+  "description": "Optional debug console for SimAPI — inspect requests, view schema, and test endpoints interactively.",
+  "keywords": [
+    "simapi",
+    "mock",
+    "api",
+    "console",
+    "debug",
+    "react",
+    "inspector"
+  ],
+  "license": "MIT",
+  "author": "MayR Labs <info@mayrlabs.com> (https://mayrlabs.com)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimAPI/simapi.git",
+    "directory": "packages/console"
+  },
+  "homepage": "https://github.com/SimAPI/simapi#readme",
+  "bugs": {
+    "url": "https://github.com/SimAPI/simapi/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/youngmayor"
+  },
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "files": [
     "dist"
   ],

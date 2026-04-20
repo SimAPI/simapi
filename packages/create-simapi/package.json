@@ -1,8 +1,38 @@
 {
   "name": "create-simapi",
-  "version": "0.1.0",
+  "version": "0.0.0",
+  "description": "Create a new SimAPI mock-server project with a single command.",
+  "keywords": [
+    "simapi",
+    "scaffold",
+    "create",
+    "mock",
+    "api",
+    "typescript"
+  ],
+  "license": "MIT",
+  "author": "MayR Labs <info@mayrlabs.com> (https://mayrlabs.com)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimAPI/simapi.git",
+    "directory": "packages/create-simapi"
+  },
+  "homepage": "https://github.com/SimAPI/simapi#readme",
+  "bugs": {
+    "url": "https://github.com/SimAPI/simapi/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/youngmayor"
+  },
   "type": "module",
-  "description": "Create a new SimAPI project",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
   "bin": {
     "create-simapi": "bin/create-simapi.js"
   },

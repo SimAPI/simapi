@@ -1,20 +1,21 @@
 import type { Context } from "hono";
 import { Hono } from "hono";
+import { z } from "zod";
 
 import { AppRequest } from "../core/AppRequest.js";
 import { AppResponse } from "../core/AppResponse.js";
 import type { SimAPIConfig } from "../core/defineConfig.js";
 import type { EndpointDefinition } from "../core/endpoint.js";
-import { ValidationError } from "../core/ValidationErrors.js";
+import { ValidationError, ValidationErrors } from "../core/ValidationErrors.js";
 import { discoverEndpoints } from "./discovery.js";
 import { registerInternalRoutes } from "./internalRoutes.js";
 import type { LogBus } from "./logBus.js";
 
-interface ParsedRequest {
-  request: AppRequest;
+interface RawRequest {
   headers: Record<string, string>;
   body: Record<string, unknown>;
   query: Record<string, string>;
+  urlParams: Record<string, string>;
 }
 
 export async function createApp(
@@ -56,7 +57,16 @@ function registerEndpoint(
 ): void {
   app.on(endpoint.method, endpoint.path, async (c: Context) => {
     const start = Date.now();
-    const parsed = await buildRequest(c);
+    const raw = await buildRawRequest(c);
+
+    const errors = runZodValidation(endpoint.validator, raw.body);
+    const request = new AppRequest(
+      raw.headers,
+      raw.body,
+      raw.query,
+      raw.urlParams,
+      errors
+    );
 
     let logStatus = 500;
     let logBody: unknown = {};
@@ -70,7 +80,7 @@ function registerEndpoint(
           };
           return c.json(logBody, 500);
         }
-        const authResult = config.authHandler(parsed.request);
+        const authResult = config.authHandler(request);
         if (authResult instanceof AppResponse) {
           logStatus = authResult.status;
           logBody = authResult.body;
@@ -79,7 +89,11 @@ function registerEndpoint(
         }
       }
 
-      const response = await endpoint.handler(parsed.request);
+      if (config.autoThrowValidationErrors && endpoint.validator) {
+        errors.throwValidationError(config.autoThrowValidationErrors);
+      }
+
+      const response = await endpoint.handler(request);
       logStatus = response.status;
       logBody = response.body;
       // biome-ignore lint/suspicious/noExplicitAny: status is a valid HTTP code
@@ -96,9 +110,9 @@ function registerEndpoint(
           .log({
             method: endpoint.method,
             path: c.req.path,
-            query: JSON.stringify(parsed.query),
-            requestHeaders: JSON.stringify(parsed.headers),
-            requestBody: JSON.stringify(parsed.body),
+            query: JSON.stringify(raw.query),
+            requestHeaders: JSON.stringify(raw.headers),
+            requestBody: JSON.stringify(raw.body),
             responseStatus: logStatus,
             responseBody: JSON.stringify(logBody),
             durationMs: Date.now() - start,
@@ -110,7 +124,25 @@ function registerEndpoint(
   });
 }
 
-async function buildRequest(c: Context): Promise<ParsedRequest> {
+function runZodValidation(
+  validator: EndpointDefinition["validator"],
+  body: Record<string, unknown>
+): ValidationErrors {
+  if (!validator) return new ValidationErrors({});
+
+  const result = z.object(validator).safeParse(body);
+  if (result.success) return new ValidationErrors({});
+
+  const bag: Record<string, string[]> = {};
+  for (const issue of result.error.issues) {
+    const field = String(issue.path[0] ?? "_");
+    if (!bag[field]) bag[field] = [];
+    bag[field].push(issue.message);
+  }
+  return new ValidationErrors(bag);
+}
+
+async function buildRawRequest(c: Context): Promise<RawRequest> {
   const headers: Record<string, string> = {};
   c.req.raw.headers.forEach((value, key) => {
     headers[key] = value;
@@ -134,13 +166,11 @@ async function buildRequest(c: Context): Promise<ParsedRequest> {
     query[key] = value;
   });
 
-  const urlParams = c.req.param() as Record<string, string>;
-
   return {
-    request: new AppRequest(headers, body, query, urlParams),
     headers,
     body,
     query,
+    urlParams: c.req.param() as Record<string, string>,
   };
 }
 

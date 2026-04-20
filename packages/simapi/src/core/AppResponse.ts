@@ -1,4 +1,3 @@
-// FakeDescriptor wraps a generator so fake.array() can produce unique values per item.
 export class FakeDescriptor<T> {
   constructor(private readonly generator: () => T) {}
 
@@ -85,12 +84,6 @@ export class AppResponse {
     return new AppResponse(500, body ?? { message: "Internal server error" });
   }
 
-  /**
-   * Randomly returns a 500 failure response with the given probability (0–1),
-   * or undefined to let the handler continue normally.
-   *
-   * Usage: const failure = AppResponse.fail(0.3); if (failure) return failure;
-   */
   static fail(probability: number): AppResponse | undefined {
     if (Math.random() < probability) {
       return new AppResponse(500, { message: "Simulated failure" });
@@ -98,9 +91,12 @@ export class AppResponse {
     return undefined;
   }
 
-  /** Resolves after the given number of milliseconds. Use with await. */
   static delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  static array<T>(count: number, factory: () => T): T[] {
+    return Array.from({ length: count }, () => factory());
   }
 
   static readonly fake = fake;

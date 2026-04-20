@@ -1,3 +1,4 @@
+import type { z } from "zod";
 import type { AppRequest } from "./AppRequest.js";
 import type { AppResponse } from "./AppResponse.js";
 
@@ -14,5 +15,8 @@ export interface EndpointDefinition {
   path: string;
   method: HttpMethod;
   type: "open" | "secure";
+  validator?: z.ZodRawShape;
   handler: (req: AppRequest) => AppResponse | Promise<AppResponse>;
 }
+
+export type Endpoint = EndpointDefinition;

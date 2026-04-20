@@ -1,22 +1,19 @@
-import { type AppRequest, AppResponse, Validator } from "simapi";
+import { type AppRequest, AppResponse, faker, z } from "simapi";
 
 export const createPost = {
   path: "/api/posts",
   method: "POST",
   type: "open",
+  validator: {
+    title: z.string().min(3),
+    body: z.string(),
+  },
   handler: (req: AppRequest) => {
-    const errors = req.validateBody({
-      title: [Validator.required(), Validator.string(), Validator.minLength(3)],
-      body: [Validator.required(), Validator.string()],
-    });
-
-    if (errors.hasError) {
-      errors.throwValidationError("laravel");
-    }
+    req.errors.throwValidationError("laravel");
 
     return AppResponse.created({
       data: {
-        id: AppResponse.fake.uuid(),
+        id: faker.string.ulid(),
         title: req.body<string>("title"),
         body: req.body<string>("body"),
         published: false,
