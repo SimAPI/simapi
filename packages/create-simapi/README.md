@@ -4,6 +4,8 @@
 
 > Mock backends that behave like real ones.
 
+**[Documentation](https://simapi.mayrlabs.com)** | **[Quickstart](#usage)** | **[Github](https://github.com/SimAPI/simapi)**
+
 Scaffold a new [SimAPI](../simapi) project with a single command.
 
 ## Usage

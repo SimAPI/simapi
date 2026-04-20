@@ -5,6 +5,7 @@
     "type": "git",
     "url": "git+https://github.com/SimAPI/simapi.git"
   },
+  "homepage": "https://simapi.mayrlabs.com",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",

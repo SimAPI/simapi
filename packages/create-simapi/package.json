@@ -17,7 +17,7 @@
     "url": "git+https://github.com/SimAPI/simapi.git",
     "directory": "packages/create-simapi"
   },
-  "homepage": "https://github.com/SimAPI/simapi#readme",
+  "homepage": "https://simapi.mayrlabs.com",
   "bugs": {
     "url": "https://github.com/SimAPI/simapi/issues"
   },

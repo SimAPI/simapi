@@ -6,6 +6,10 @@ export default defineConfig({
     "A local-first backend simulator for frontend developers — build against real API behavior before your backend exists.",
   head: [["link", { rel: "icon", href: "/favicon.ico" }]],
 
+  sitemap: {
+    hostname: "https://simapi.mayrlabs.com",
+  },
+
   themeConfig: {
     logo: "/public/simapi.png",
 
