@@ -10,10 +10,7 @@ export default defineConfig({
     nav: [
       { text: "Guide", link: "/guide/" },
       { text: "API", link: "/api/app-request" },
-      {
-        text: "GitHub",
-        link: "https://github.com/SimAPI/simapi",
-      },
+      { text: "GitHub", link: "https://github.com/SimAPI/simapi" },
     ],
 
     sidebar: [
@@ -42,4 +39,6 @@ export default defineConfig({
       message: "Released under the MIT License.",
     },
   },
+
+  ignoreDeadLinks: "localhostLinks",
 });

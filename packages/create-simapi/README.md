@@ -1,5 +1,7 @@
 # create-simapi
 
+<img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" />
+
 Scaffold a new [SimAPI](../simapi) project with a single command.
 
 ## Usage

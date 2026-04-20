@@ -1,5 +1,7 @@
 # simapi
 
+<img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" />
+
 > Mock backends that behave like real ones.
 
 Build frontend features against real API behavior — before your backend exists. Define endpoints as plain TypeScript objects, generate realistic fake data with faker-js, and validate requests with Zod.
@@ -26,9 +28,9 @@ npm run serve
 ## Defining an endpoint
 
 ```ts
-import { faker, AppResponse, type Endpoint } from "simapi";
+import { faker, AppResponse, type EndpointDefinition } from "simapi";
 
-export const getPosts: Endpoint = {
+export const getPosts: EndpointDefinition = {
   path: "/api/posts",
   method: "GET",
   type: "open",
@@ -37,7 +39,7 @@ export const getPosts: Endpoint = {
       data: AppResponse.array(5, () => ({
         id: faker.string.ulid(),
         title: faker.lorem.sentence(),
-        published: faker.boolean(),
+        published: faker.datatype.boolean(),
       })),
     }),
 };

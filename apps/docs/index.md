@@ -5,6 +5,9 @@ hero:
   name: SimAPI
   text: Mock backends that behave like real ones.
   tagline: Build frontend features against real API behavior — before your backend exists.
+  image:
+    src: /simapi.png
+    alt: SimAPI
   actions:
     - theme: brand
       text: Get Started

@@ -1,5 +1,7 @@
 # @simapi/console
 
+<img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" />
+
 Optional debug UI for [SimAPI](../simapi) — inspect live requests, browse your endpoint schema, and fire test requests interactively.
 
 ## Install

@@ -1,5 +1,7 @@
 # SimAPI
 
+<img src="simapi.png" alt="SimAPI" width="120" />
+
 > Mock backends that behave like real ones.
 
 Build frontend features against real API behavior — before your backend exists. SimAPI lets you define endpoints as plain TypeScript objects, generate realistic fake data with faker-js, validate requests with Zod, and log everything to a database.
