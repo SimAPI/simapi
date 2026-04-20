@@ -7,10 +7,15 @@ export default defineConfig({
   head: [["link", { rel: "icon", href: "/favicon.ico" }]],
 
   themeConfig: {
+    logo: "/public/simapi.png",
+
+    search: { provider: "local" },
+
     nav: [
       { text: "Guide", link: "/guide/" },
       { text: "API", link: "/api/app-request" },
       { text: "GitHub", link: "https://github.com/SimAPI/simapi" },
+      { text: "Team", link: "/team" },
     ],
 
     sidebar: [
@@ -37,6 +42,7 @@ export default defineConfig({
 
     footer: {
       message: "Released under the MIT License.",
+      copyright: "Copyright © 2026 - Present MayR Labs",
     },
   },
 
