@@ -27,6 +27,15 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
 
   const port = config.port ?? 3000;
   const app = await createApp(config, endpointsDir, bus);
+
+  try {
+    const { mountConsole } = await import("@simapi/console");
+    mountConsole(app);
+    console.log(`  Console at http://localhost:${port}/__simapi/console/\n`);
+  } catch {
+    // @simapi/console not installed — skip
+  }
+
   startServer(app, port);
 
   for (const signal of ["SIGINT", "SIGTERM"] as const) {

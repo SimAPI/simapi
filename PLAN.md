@@ -85,17 +85,19 @@ Drizzle ORM with swappable adapters for request logging.
 
 ---
 
-## Wave 7 — Console (`@simapi/console`) (pending)
+## Wave 7 — Console (`@simapi/console`) ✅
 
-Opt-in React SPA served at `localhost:3000/console`.
+Opt-in React SPA served at `localhost:3000/__simapi/console/`.
 
-- [ ] Scaffold `packages/console` with Vite + React + TypeScript + Tailwind + shadcn/ui
-- [ ] Dynamic mount: core attempts `import('@simapi/console')` at startup; skips silently if missing
-- [ ] `mountConsole()` exporter built with tsdown alongside Vite SPA assets
-- [ ] **Overview** tab — server metadata, health, endpoint count
-- [ ] **Logs** tab — live SSE feed, filterable, exportable
-- [ ] **Schema** tab — Swagger-style docs from endpoint definitions, exportable as OpenAPI 3
-- [ ] **Try** tab — interactive request tester
+- [x] `packages/console` scaffolded with Vite + React 18 + TypeScript + Tailwind 3
+- [x] `mount/index.ts` → `dist/index.mjs` (tsdown); `src/` → `dist/spa/` (Vite)
+- [x] `mountConsole(app: Hono)` serves SPA assets from `dist/spa/` via Node.js `fs.readFile`; SPA fallback to `index.html` for unknown paths
+- [x] Dynamic mount in `serve.ts`: `import("@simapi/console")` silently skips if not installed; marked `neverBundle` so it stays external in the CLI bundle
+- [x] **Overview** tab — health/version/endpoint count from `/__simapi/health`
+- [x] **Logs** tab — live SSE feed (`/__simapi/logs/stream`) + paginated history; filter, expand request/response bodies, export JSON
+- [x] **Schema** tab — endpoint list with method/type badges; export OpenAPI 3 JSON (with path params + security schemes)
+- [x] **Try** tab — select endpoint, fill path/query params and JSON body, fire request, display response
+- [x] Root `biome.json` override: `noUnknownAtRules` off for CSS (suppresses `@tailwind` directives)
 
 ---
 

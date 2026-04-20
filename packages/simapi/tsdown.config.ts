@@ -13,5 +13,6 @@ export default defineConfig([
     format: ["esm"],
     dts: false,
     sourcemap: false,
+    deps: { neverBundle: ["@simapi/console"] },
   },
 ]);
