@@ -24,15 +24,17 @@
 
 ---
 
-## Wave 3 — Dev Server (pending)
+## Wave 3 — Dev Server ✅
 Hono-based server that auto-discovers endpoints and runs the request lifecycle.
 
-- [ ] Hono + `@hono/node-server` setup
-- [ ] Endpoint auto-discovery from `endpoints/` directory (using `tsx`)
-- [ ] Request lifecycle: log → match → auth → handler → response
-- [ ] `secure` vs `open` endpoint routing
-- [ ] Global auth handler invocation
-- [ ] `simapi serve` command wired up
+- [x] Hono + `@hono/node-server` setup (`src/server/startServer.ts`)
+- [x] Endpoint auto-discovery from `endpoints/` directory (using `tsx/esm/api`)
+- [x] Request lifecycle: match → auth → handler → response (+ global error handler)
+- [x] `secure` vs `open` endpoint routing
+- [x] Global auth handler invocation; 500 if endpoint is secure but handler not configured
+- [x] JSON + form-urlencoded body parsing; query param + URL param extraction
+- [x] Validation errors caught globally and formatted per `laravel` / `zod` convention
+- [x] `simapi serve` command wired up (`bin/simapi.js` → `dist/cli.mjs`)
 
 ---
 

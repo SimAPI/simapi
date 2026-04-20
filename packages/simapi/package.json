@@ -17,8 +17,12 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
+  "bin": {
+    "simapi": "bin/simapi.js"
+  },
   "files": [
-    "dist"
+    "dist",
+    "bin"
   ],
   "scripts": {
     "build": "tsdown",
@@ -26,8 +30,14 @@
     "check-types": "tsc --noEmit",
     "lint": "biome lint ./src"
   },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "hono": "^4.7.0",
+    "tsx": "^4.19.0"
+  },
   "devDependencies": {
     "@repo/typescript-config": "*",
+    "@types/node": "^25.6.0",
     "tsdown": "^0.21.7",
     "typescript": "5.9.2"
   }
