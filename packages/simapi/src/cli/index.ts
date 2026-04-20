@@ -1,7 +1,6 @@
 import { cac } from "cac";
 import { runBuild } from "./build.js";
 import { runConsoleAdd, runConsoleRemove } from "./console.js";
-import { runEndpointCreate } from "./endpoint-create.js";
 import { runExportOpenAPI } from "./export-openapi.js";
 import { runImportOpenAPI } from "./import-openapi.js";
 import { runInit } from "./init.js";
@@ -32,15 +31,6 @@ cli
   .command("start [cwd]", "Run the compiled production server")
   .action((cwd: string | undefined) => {
     runStart(cwd);
-  });
-
-cli
-  .command(
-    "endpoint:create [cwd]",
-    "Scaffold a new endpoint file interactively"
-  )
-  .action((cwd: string | undefined) => {
-    runEndpointCreate(cwd).catch(fatal);
   });
 
 cli

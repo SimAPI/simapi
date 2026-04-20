@@ -40,6 +40,5 @@
 - `simapi build` — compile project to `.simapi/dist/server.mjs`
 - `simapi start` — run the compiled server
 - `simapi init` — interactive project scaffolder
-- `simapi endpoint:create` — interactive endpoint file generator
 - `simapi import <spec>` — generate typed endpoint stubs from an OpenAPI 3 YAML/JSON spec
 - `simapi console:add` / `console:remove` — manage `@simapi/console`

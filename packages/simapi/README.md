@@ -93,7 +93,6 @@ simapi import openapi.yaml --output endpoints/
 | `simapi build`                 | Compile to `.simapi/dist/server.mjs` |
 | `simapi start`                 | Run compiled server                  |
 | `simapi init`                  | Scaffold a new project               |
-| `simapi endpoint:create`       | Scaffold a new endpoint              |
 | `simapi import <spec>`         | Generate stubs from an OpenAPI spec  |
 | `simapi console:add`           | Install the debug console            |
 

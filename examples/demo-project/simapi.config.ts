@@ -5,6 +5,7 @@ export default defineConfig({
   description: "Demo project — posts API",
   port: 3000,
   logEntries: true,
+  consoleLog: true,
   database: {
     type: "sqlite",
     path: "./.simapi/db.sqlite",

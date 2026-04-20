@@ -1,5 +1,7 @@
+import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import * as p from "@clack/prompts";
 
@@ -16,6 +18,22 @@ import {
 
 function cancelled(): void {
   p.cancel("Cancelled.");
+}
+
+function getSimAPIVersion(): string {
+  try {
+    // dist/cli.mjs lives one level below the package root
+    const here = dirname(fileURLToPath(import.meta.url));
+    const pkgPath = resolve(here, "../package.json");
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as {
+      name?: string;
+      version?: string;
+    };
+    if (pkg.name === "simapi" && pkg.version) return `^${pkg.version}`;
+  } catch {
+    // fall through
+  }
+  return "*";
 }
 
 export async function runInit(name: string | undefined): Promise<void> {
@@ -72,9 +90,11 @@ export async function runInit(name: string | undefined): Promise<void> {
   }
 
   const dir = resolve(process.cwd(), projectName as string);
+  const simapiVersion = getSimAPIVersion();
   const vars = {
     name: projectName as string,
     description: (description as string) || "",
+    simapiVersion,
   };
 
   const s = p.spinner();
@@ -105,7 +125,7 @@ export async function runInit(name: string | undefined): Promise<void> {
     const pkg = JSON.parse(fill(PACKAGE_JSON, vars)) as {
       dependencies: Record<string, string>;
     };
-    pkg.dependencies["@simapi/console"] = "^0.1.0";
+    pkg.dependencies["@simapi/console"] = simapiVersion;
     await writeFile(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
   }
 
