@@ -14,6 +14,7 @@ export const PACKAGE_JSON = `{
     "serve": "simapi serve",
     "build": "simapi build",
     "start": "simapi start",
+    "export": "simapi export",
     "endpoint:create": "simapi endpoint:create"
   },
   "dependencies": {

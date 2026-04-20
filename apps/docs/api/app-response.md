@@ -45,39 +45,19 @@ return AppResponse.unauthorised({ message: "Forbidden" });
 
 ```ts
 return AppResponse.notFound({ message: "Post not found" });
-// → 404 Not Found (default body: { message: "Not found" })
+// → 404 Not Found   (default body: { message: "Not found" })
 ```
 
 ### `AppResponse.error(payload?)`
 
 ```ts
 return AppResponse.error({ message: "Something went wrong" });
-// → 500 (default body: { message: "Internal server error" })
-```
-
-## Simulation helpers
-
-### `AppResponse.fail(probability)`
-
-Returns an error response with the given probability (0–1), or `undefined`.
-
-```ts
-const maybeError = AppResponse.fail(0.3); // 30% chance
-if (maybeError) return maybeError;
-```
-
-### `AppResponse.delay(ms)`
-
-Awaitable artificial delay. Call before returning to simulate network latency.
-
-```ts
-await AppResponse.delay(500);
-return AppResponse.success({ data: {} });
+// → 500   (default body: { message: "Internal server error" })
 ```
 
 ## `AppResponse.array(count, factory)`
 
-Creates an array of `count` items by calling `factory` once per item. Use this with `faker` to generate realistic list responses:
+Creates an array of `count` items by calling `factory` once per item. Use with `faker` to generate realistic list responses:
 
 ```ts
 import { faker, AppResponse } from "simapi";
@@ -88,3 +68,22 @@ AppResponse.array(5, () => ({
   email: faker.internet.email(),
 }))
 ```
+
+Every element gets independently generated values — `faker` is called fresh per item.
+
+## Simulating failures and latency
+
+Failures and latency are configured on the `EndpointDefinition` directly, not on `AppResponse`:
+
+```ts
+export const getOrders: EndpointDefinition = {
+  path: "/api/orders",
+  method: "GET",
+  type: "open",
+  failRate: 0.2,   // 20% chance of 500 — no handler code needed
+  delay: 500,      // always wait 500ms before responding
+  handler: () => AppResponse.success({ data: [] }),
+};
+```
+
+See [Defining Endpoints — Simulating failures](/guide/endpoints#simulating-failures-and-latency) for full details.

@@ -2,6 +2,7 @@ import { cac } from "cac";
 import { runBuild } from "./build.js";
 import { runConsoleAdd, runConsoleRemove } from "./console.js";
 import { runEndpointCreate } from "./endpoint-create.js";
+import { runExportOpenAPI } from "./export-openapi.js";
 import { runImportOpenAPI } from "./import-openapi.js";
 import { runInit } from "./init.js";
 import { runServe } from "./serve.js";
@@ -60,6 +61,19 @@ cli
   .action((spec: string, opts: { output?: string }) => {
     runImportOpenAPI(spec, undefined, opts).catch(fatal);
   });
+
+cli
+  .command("export [cwd]", "Export endpoints as an OpenAPI 3 spec")
+  .option("-o, --output <file>", "Output file (default: openapi.yaml)")
+  .option("--format <fmt>", "Output format: yaml or json (default: yaml)")
+  .action(
+    (
+      cwd: string | undefined,
+      opts: { output?: string; format?: "yaml" | "json" }
+    ) => {
+      runExportOpenAPI(cwd, opts).catch(fatal);
+    }
+  );
 
 cli.help();
 cli.version("0.1.0");

@@ -6,7 +6,8 @@
   "scripts": {
     "serve": "simapi serve",
     "build": "simapi build",
-    "start": "simapi start"
+    "start": "simapi start",
+    "export": "simapi export"
   },
   "dependencies": {
     "simapi": "*"
