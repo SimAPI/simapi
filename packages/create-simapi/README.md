@@ -1,6 +1,8 @@
 # create-simapi
 
-<img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" />
+<img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" style="display: block; margin: 10px auto; border-radius: 10px;" />
+
+> Mock backends that behave like real ones.
 
 Scaffold a new [SimAPI](../simapi) project with a single command.
 

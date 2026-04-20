@@ -1,10 +1,10 @@
 # simapi
 
-<img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" />
+<img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" style="display: block; margin: 10px auto; border-radius: 10px;" />
 
 > Mock backends that behave like real ones.
 
-Build frontend features against real API behavior — before your backend exists. Define endpoints as plain TypeScript objects, generate realistic fake data with faker-js, and validate requests with Zod.
+Build frontend features against real API behavior — before your backend exists. SimAPI lets you define endpoints as plain TypeScript objects, generate realistic fake data with faker-js, validate requests with Zod, and log everything to a database.
 
 ## Install
 
@@ -67,14 +67,14 @@ export const createPost = {
 
 ## CLI commands
 
-| Command | Description |
-|---|---|
-| `simapi serve` | Start dev server with live reload |
-| `simapi build` | Compile to `.simapi/dist/server.mjs` |
-| `simapi start` | Run compiled server |
-| `simapi init` | Scaffold a new project |
-| `simapi endpoint:create` | Scaffold a new endpoint |
-| `simapi console:add` | Install the debug console |
+| Command                  | Description                          |
+| ------------------------ | ------------------------------------ |
+| `simapi serve`           | Start dev server with live reload    |
+| `simapi build`           | Compile to `.simapi/dist/server.mjs` |
+| `simapi start`           | Run compiled server                  |
+| `simapi init`            | Scaffold a new project               |
+| `simapi endpoint:create` | Scaffold a new endpoint              |
+| `simapi console:add`     | Install the debug console            |
 
 ## License
 

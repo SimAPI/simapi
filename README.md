@@ -1,6 +1,4 @@
-# SimAPI
-
-<img src="simapi.png" alt="SimAPI" width="120" />
+<img src="simapi.png" alt="SimAPI" width="120" style="display: block; margin: 10px auto; border-radius: 10px;" />
 
 > Mock backends that behave like real ones.
 
