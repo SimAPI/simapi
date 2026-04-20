@@ -9,16 +9,18 @@
 
 ---
 
-## Wave 2 — Core Types (pending)
+## Wave 2 — Core Types ✅
 `packages/simapi` skeleton with the public API surface users write against.
 
-- [ ] Scaffold `packages/simapi` with `package.json`, `tsconfig.json`, `tsup.config.ts`
-- [ ] `defineConfig()` — typed server config
-- [ ] `AppRequest` — wrapper with `.header()`, `.body()`, `.param()`, `.urlParam()`, `.validateBody()`
-- [ ] `AppResponse` — static methods: `.success()`, `.created()`, `.unauthenticated()`, `.unauthorised()`, `.error()`, `.fail()`, `.delay()`
-- [ ] `AppResponse.fake` — `.string()`, `.number()`, `.array()`
-- [ ] `Validator` — `.required()`, `.string()` and the errors object shape
-- [ ] Type declarations + dual ESM/CJS build via tsup
+- [x] Scaffold `packages/simapi` with `package.json`, `tsconfig.json`, `tsdown.config.ts`
+- [x] `defineConfig()` — typed server config
+- [x] `AppRequest` — wrapper with `.header()`, `.body()`, `.param()`, `.urlParam()`, `.validateBody()`
+- [x] `AppResponse` — static methods: `.success()`, `.created()`, `.unauthenticated()`, `.unauthorised()`, `.error()`, `.fail()`, `.delay()`
+- [x] `AppResponse.fake` — `.string()`, `.number()`, `.boolean()`, `.uuid()`, `.array()`
+- [x] `Validator` — `.required()`, `.string()`, `.number()`, `.boolean()`, `.minLength()`, `.maxLength()`, `.email()`
+- [x] `ValidationErrors` + `ValidationError` — `.hasError`, `.errorFields`, `.errorBag`, `.throwValidationError(format)`
+- [x] `EndpointDefinition` type — typed endpoint shape
+- [x] Type declarations + dual ESM/CJS build via tsdown
 
 ---
 
@@ -40,7 +42,7 @@ All user-facing commands.
 - [ ] CLI entry via `cac` + `@clack/prompts`
 - [ ] `simapi init <name>` — scaffold new project (prompts: description, console, Dockerfile)
 - [ ] `simapi serve` — dev server with `tsx` live loading
-- [ ] `simapi build` — compile to `.simapi/dist/` via tsup
+- [ ] `simapi build` — compile to `.simapi/dist/` via tsdown
 - [ ] `simapi start` — run compiled bundle
 - [ ] `simapi endpoint:create` — interactive scaffold into `endpoints/`
 - [ ] `simapi console add` / `simapi console remove`
@@ -75,7 +77,7 @@ Opt-in React SPA served at `localhost:3000/console`.
 
 - [ ] Scaffold `packages/console` with Vite + React + TypeScript + Tailwind + shadcn/ui
 - [ ] Dynamic mount: core attempts `import('@simapi/console')` at startup; skips silently if missing
-- [ ] `mountConsole()` exporter built with tsup alongside Vite SPA assets
+- [ ] `mountConsole()` exporter built with tsdown alongside Vite SPA assets
 - [ ] **Overview** tab — server metadata, health, endpoint count
 - [ ] **Logs** tab — live SSE feed, filterable, exportable
 - [ ] **Schema** tab — Swagger-style docs from endpoint definitions, exportable as OpenAPI 3
@@ -103,7 +105,7 @@ Opt-in React SPA served at `localhost:3000/console`.
 | Console UI | Vite + React + Tailwind + shadcn/ui |
 | Live logs | Server-Sent Events |
 | Validation (internal) | Zod |
-| Package build | tsup |
+| Package build | tsdown |
 | Testing | Vitest |
 | Monorepo | Turborepo + npm workspaces |
 | Lint + Format | Biome |
