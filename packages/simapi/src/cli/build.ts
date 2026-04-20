@@ -177,7 +177,7 @@ for (const endpoint of endpoints) {
   });
 }
 
-const port = config.port ?? 3000;
+const port = Number(process.env.PORT ?? config.port ?? 3000);
 serve({ fetch: app.fetch, port }, (info) => {
   console.log(\`\\n  SimAPI running at http://localhost:\${info.port}\\n\`);
 });

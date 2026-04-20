@@ -1,0 +1,47 @@
+import { defineConfig } from "vitepress";
+
+export default defineConfig({
+  title: "SimAPI",
+  description:
+    "A local-first backend simulator for frontend developers — build against real API behavior before your backend exists.",
+  head: [["link", { rel: "icon", href: "/favicon.ico" }]],
+
+  themeConfig: {
+    nav: [
+      { text: "Guide", link: "/guide/" },
+      { text: "API", link: "/api/app-request" },
+      {
+        text: "GitHub",
+        link: "https://github.com/youngmayor/simapi",
+      },
+    ],
+
+    sidebar: [
+      {
+        text: "Guide",
+        items: [
+          { text: "Getting Started", link: "/guide/" },
+          { text: "Defining Endpoints", link: "/guide/endpoints" },
+          { text: "Configuration", link: "/guide/config" },
+          { text: "Deployment", link: "/guide/deployment" },
+        ],
+      },
+      {
+        text: "API Reference",
+        items: [
+          { text: "AppRequest", link: "/api/app-request" },
+          { text: "AppResponse", link: "/api/app-response" },
+          { text: "Validator", link: "/api/validator" },
+        ],
+      },
+    ],
+
+    socialLinks: [
+      { icon: "github", link: "https://github.com/youngmayor/simapi" },
+    ],
+
+    footer: {
+      message: "Released under the MIT License.",
+    },
+  },
+});

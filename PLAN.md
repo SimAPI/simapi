@@ -101,12 +101,12 @@ Opt-in React SPA served at `localhost:3000/__simapi/console/`.
 
 ---
 
-## Wave 8 — `create-simapi` + Docs (pending)
+## Wave 8 — `create-simapi` + Docs ✅
 
-- [ ] `packages/create-simapi` — powers `npm create simapi@latest`
-- [ ] `apps/docs` — documentation site
-- [ ] Railway deployment guide (canonical path)
-- [ ] `examples/demo-project` — dogfooding project using both packages
+- [x] `packages/create-simapi` — powers `npm create simapi@latest`
+- [x] `apps/docs` — VitePress documentation site with guide + API reference pages
+- [x] Railway deployment guide (canonical path); `PORT` env var support in `startServer.ts` and production entry
+- [x] `examples/demo-project` — dogfooding project using both packages
 
 ---
 
@@ -126,3 +126,10 @@ Opt-in React SPA served at `localhost:3000/__simapi/console/`.
 | Testing               | Vitest                                               |
 | Monorepo              | Turborepo + npm workspaces                           |
 | Lint + Format         | Biome                                                |
+
+<!--
+AppResponse.fail(0.3)
+await AppResponse.delay(1200)
+ -->
+
+<!-- Add models to servr -->

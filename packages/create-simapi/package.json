@@ -1,0 +1,27 @@
+{
+  "name": "create-simapi",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Create a new SimAPI project",
+  "bin": {
+    "create-simapi": "bin/create-simapi.js"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "cac": "^6.7.14"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/node": "^25.6.0",
+    "tsdown": "^0.21.7",
+    "typescript": "5.9.2"
+  }
+}
