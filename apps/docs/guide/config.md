@@ -11,7 +11,10 @@ export default defineConfig({
   name: "my-api",
   description: "Mock backend for my app",
   port: 3000,
+  endpointsDir: "./endpoints",
   logEntries: true,
+  consoleLog: false,
+  autoThrowValidationErrors: "laravel",
   database: {
     type: "sqlite",
     path: "./.simapi/db.sqlite",
@@ -26,9 +29,12 @@ export default defineConfig({
 | `name` | `string` | — | Project name (required) |
 | `description` | `string` | `""` | Short description |
 | `port` | `number` | `3000` | Port to listen on (overridden by `PORT` env var) |
-| `logEntries` | `boolean` | `true` | Whether to write request logs |
-| `database` | `DatabaseConfig` | — | Where to store logs |
-| `authHandler` | `AuthHandler` | — | Called for `secure` endpoints |
+| `endpointsDir` | `string` | `"./endpoints"` | Directory scanned for endpoint files |
+| `logEntries` | `boolean` | `true` | Whether to write request logs to the database |
+| `consoleLog` | `boolean` | `false` | Log each request to stdout: `[SimAPI] GET /api/posts → 200 (4ms)` |
+| `autoThrowValidationErrors` | `"laravel" \| "zod" \| false` | `false` | Automatically throw a 422 when a `validator` fails, before the handler runs |
+| `database` | `DatabaseConfig` | — | Where to store request logs |
+| `authHandler` | `AuthHandler` | — | Called for every `secure` endpoint |
 
 ## Database adapters
 

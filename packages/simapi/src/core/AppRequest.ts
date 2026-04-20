@@ -1,7 +1,4 @@
 import { ValidationErrors } from "./ValidationErrors.js";
-import type { ValidatorRule } from "./Validator.js";
-
-export type ValidationRules = Record<string, ValidatorRule[]>;
 
 export class AppRequest {
   readonly errors: ValidationErrors;
@@ -34,27 +31,5 @@ export class AppRequest {
 
   urlParam(name: string): string | undefined {
     return this._urlParams[name];
-  }
-
-  validateBody(rules: ValidationRules): ValidationErrors {
-    const bag: Record<string, string[]> = {};
-
-    for (const [field, fieldRules] of Object.entries(rules)) {
-      const value = this._body[field];
-      const messages: string[] = [];
-
-      for (const rule of fieldRules) {
-        const error = rule.validate(field, value);
-        if (error !== null) {
-          messages.push(error);
-        }
-      }
-
-      if (messages.length > 0) {
-        bag[field] = messages;
-      }
-    }
-
-    return new ValidationErrors(bag);
   }
 }

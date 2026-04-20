@@ -4,18 +4,25 @@ All endpoint handlers must return an `AppResponse`. Use the static factory metho
 
 ## Success responses
 
-### `AppResponse.success(payload)`
+### `AppResponse.success(payload?)`
 
 ```ts
 return AppResponse.success({ data: { id: 1, name: "Alice" } });
 // → 200 OK
 ```
 
-### `AppResponse.created(payload)`
+### `AppResponse.created(payload?)`
 
 ```ts
 return AppResponse.created({ data: { id: 42 } });
 // → 201 Created
+```
+
+### `AppResponse.noContent()`
+
+```ts
+return AppResponse.noContent();
+// → 204 No Content
 ```
 
 ## Error responses
@@ -34,73 +41,50 @@ return AppResponse.unauthorised({ message: "Forbidden" });
 // → 403 Forbidden
 ```
 
-### `AppResponse.error(payload?, status?)`
+### `AppResponse.notFound(payload?)`
 
 ```ts
-return AppResponse.error({ message: "Not found" }, 404);
-// → 404 (default 400 if status omitted)
+return AppResponse.notFound({ message: "Post not found" });
+// → 404 Not Found (default body: { message: "Not found" })
+```
+
+### `AppResponse.error(payload?)`
+
+```ts
+return AppResponse.error({ message: "Something went wrong" });
+// → 500 (default body: { message: "Internal server error" })
 ```
 
 ## Simulation helpers
 
 ### `AppResponse.fail(probability)`
 
-Returns an error response with the given probability (0–1), or `undefined` (no error).
+Returns an error response with the given probability (0–1), or `undefined`.
 
 ```ts
 const maybeError = AppResponse.fail(0.3); // 30% chance
 if (maybeError) return maybeError;
 ```
 
-When triggered, returns a 500-like error response.
-
 ### `AppResponse.delay(ms)`
 
 Awaitable artificial delay. Call before returning to simulate network latency.
 
 ```ts
-await AppResponse.delay(500); // wait 500ms
+await AppResponse.delay(500);
 return AppResponse.success({ data: {} });
 ```
 
-## Fake data — `AppResponse.fake`
+## `AppResponse.array(count, factory)`
 
-### `.string(length?)`
-
-Random alphanumeric string. Default length: 8.
+Creates an array of `count` items by calling `factory` once per item. Use this with `faker` to generate realistic list responses:
 
 ```ts
-AppResponse.fake.string()    // "a3Kx9mRt"
-AppResponse.fake.string(16)
-```
+import { faker, AppResponse } from "simapi";
 
-### `.number(min?, max?)`
-
-Random integer in `[min, max]`. Defaults: `min=0`, `max=1000`.
-
-```ts
-AppResponse.fake.number(1, 100)
-```
-
-### `.boolean()`
-
-Random `true` or `false`.
-
-### `.uuid()`
-
-Random UUID v4 string.
-
-```ts
-AppResponse.fake.uuid() // "110e8400-e29b-41d4-a716-446655440000"
-```
-
-### `.array(length, factory)`
-
-Array of `length` items. The factory function is called once per item, so each gets unique values.
-
-```ts
-AppResponse.fake.array(5, () => ({
-  id:   AppResponse.fake.uuid(),
-  name: AppResponse.fake.string(6),
+AppResponse.array(5, () => ({
+  id:    faker.string.ulid(),
+  name:  faker.person.fullName(),
+  email: faker.internet.email(),
 }))
 ```

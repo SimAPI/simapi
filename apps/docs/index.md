@@ -11,7 +11,7 @@ hero:
       link: /guide/
     - theme: alt
       text: View on GitHub
-      link: https://github.com/youngmayor/simapi
+      link: https://github.com/SimAPI/simapi
 
 features:
   - title: TypeScript-first

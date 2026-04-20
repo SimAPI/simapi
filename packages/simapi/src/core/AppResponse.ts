@@ -1,52 +1,3 @@
-export class FakeDescriptor<T> {
-  constructor(private readonly generator: () => T) {}
-
-  resolve(): T {
-    return this.generator();
-  }
-}
-
-type ResolveFake<T> = T extends FakeDescriptor<infer V> ? V : T;
-type ResolveTemplate<T> = { [K in keyof T]: ResolveFake<T[K]> };
-
-const fake = {
-  string(): FakeDescriptor<string> {
-    return new FakeDescriptor(() => Math.random().toString(36).slice(2, 10));
-  },
-
-  number(): FakeDescriptor<number> {
-    return new FakeDescriptor(() => Math.floor(Math.random() * 10000));
-  },
-
-  boolean(): FakeDescriptor<boolean> {
-    return new FakeDescriptor(() => Math.random() > 0.5);
-  },
-
-  uuid(): FakeDescriptor<string> {
-    return new FakeDescriptor(() =>
-      "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-        const r = (Math.random() * 16) | 0;
-        const v = c === "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      })
-    );
-  },
-
-  array<T extends Record<string, unknown>>(
-    count: number,
-    template: () => T
-  ): ResolveTemplate<T>[] {
-    return Array.from({ length: count }, () => {
-      const item: Record<string, unknown> = {};
-
-      for (const [key, value] of Object.entries(template())) {
-        item[key] = value instanceof FakeDescriptor ? value.resolve() : value;
-      }
-      return item as ResolveTemplate<T>;
-    });
-  },
-};
-
 export class AppResponse {
   readonly status: number;
   readonly body: unknown;
@@ -98,6 +49,4 @@ export class AppResponse {
   static array<T>(count: number, factory: () => T): T[] {
     return Array.from({ length: count }, () => factory());
   }
-
-  static readonly fake = fake;
 }

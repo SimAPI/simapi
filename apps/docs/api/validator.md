@@ -1,79 +1,104 @@
-# Validator
+# Validation
 
-`Validator` provides composable validation rules for `req.validateBody()`.
+SimAPI uses [Zod](https://zod.dev) for request validation. Import `z` directly from `simapi`:
 
 ```ts
-import { Validator } from "simapi";
+import { z } from "simapi";
+```
 
-const errors = req.validateBody({
-  email:    [Validator.required(), Validator.email()],
-  password: [Validator.required(), Validator.minLength(8)],
-  age:      [Validator.number()],
+## Endpoint validator
+
+Add a `validator` field to your endpoint definition with a Zod shape:
+
+```ts
+import { z, AppResponse, type AppRequest, type EndpointDefinition } from "simapi";
+
+export const createPost: EndpointDefinition = {
+  path: "/api/posts",
+  method: "POST",
+  type: "open",
+  validator: {
+    title: z.string().min(3),
+    body:  z.string(),
+    tags:  z.array(z.string()).optional(),
+  },
+  handler: (req: AppRequest) => {
+    req.errors.throwValidationError("laravel");
+    return AppResponse.created({ data: { id: 1 } });
+  },
+};
+```
+
+The validator runs before the handler. Results are accessible via `req.errors`.
+
+## `req.errors`
+
+| Property | Type | Description |
+|---|---|---|
+| `hasError` | `boolean` | `true` if any field failed |
+| `errorFields` | `string[]` | Names of failing fields |
+| `errorBag` | `Record<string, string[]>` | Field → error messages |
+| `throwValidationError(format?)` | `void` | Throws 422 **only when `hasError` is true** |
+
+## Auto-throw
+
+Set `autoThrowValidationErrors` in `simapi.config.ts` to throw automatically before the handler runs:
+
+```ts
+export default defineConfig({
+  name: "my-api",
+  autoThrowValidationErrors: "laravel",
 });
-
-if (errors.hasError) {
-  errors.throwValidationError("laravel");
-}
 ```
 
-## Rules
+With this setting, no manual `throwValidationError` call is needed.
 
-### `Validator.required()`
-
-The field must be present and non-empty (not `undefined`, `null`, or `""`).
-
-### `Validator.string()`
-
-The value must be a string (or absent — combine with `required()` to enforce presence).
-
-### `Validator.number()`
-
-The value must be a number or a numeric string.
-
-### `Validator.boolean()`
-
-The value must be a boolean or the strings `"true"` / `"false"`.
-
-### `Validator.email()`
-
-The value must be a valid email address.
-
-### `Validator.minLength(n)`
-
-The value (string) must be at least `n` characters.
+## Common Zod schemas
 
 ```ts
-Validator.minLength(8)
+z.string()              // any string
+z.string().email()      // valid email
+z.string().min(3)       // at least 3 chars
+z.string().max(255)     // at most 255 chars
+z.string().ulid()       // ULID format
+z.string().uuid()       // UUID format
+
+z.number()              // any number
+z.number().int()        // integer
+z.number().min(0)       // non-negative
+
+z.boolean()             // true | false
+
+z.array(z.string())     // array of strings
+z.object({ ... })       // nested object
+
+z.string().optional()   // field may be absent
+z.string().nullable()   // field may be null
 ```
 
-### `Validator.maxLength(n)`
+See the [Zod documentation](https://zod.dev) for the full API.
 
-The value (string) must be at most `n` characters.
+## Error formats
 
-```ts
-Validator.maxLength(255)
-```
-
-## Error format
-
-`throwValidationError("laravel")` — responds 422 in Laravel's format:
+### Laravel (`"laravel"`)
 
 ```json
 {
   "message": "The given data was invalid.",
   "errors": {
-    "email": ["The email field is required."],
-    "password": ["The password must be at least 8 characters."]
+    "email": ["Invalid email"],
+    "password": ["String must contain at least 8 character(s)"]
   }
 }
 ```
 
-`throwValidationError("zod")` — responds 422 in Zod's format:
+### Zod (`"zod"`)
 
 ```json
 {
   "issues": [
-    { "path": ["email"], "message": "The email field is required." }
+    { "path": ["email"],    "message": "Invalid email" },
+    { "path": ["password"], "message": "String must contain at least 8 character(s)" }
   ]
 }
 ```

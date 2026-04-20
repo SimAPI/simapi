@@ -3,6 +3,9 @@ import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { extname, join, relative, resolve } from "node:path";
 
 import * as p from "@clack/prompts";
+import { tsImport } from "tsx/esm/api";
+
+import type { SimAPIConfig } from "../core/defineConfig.js";
 
 export async function runBuild(cwd: string = process.cwd()): Promise<void> {
   p.intro("SimAPI — build");
@@ -13,9 +16,17 @@ export async function runBuild(cwd: string = process.cwd()): Promise<void> {
     process.exit(1);
   }
 
+  let userConfig: SimAPIConfig | undefined;
+  try {
+    const mod = await tsImport(configPath, { parentURL: import.meta.url });
+    userConfig = (mod.default ?? mod) as SimAPIConfig;
+  } catch {
+    // use defaults if config can't be loaded at build time
+  }
+
   const distDir = resolve(cwd, ".simapi", "dist");
   const tmpDir = resolve(cwd, ".simapi", "_build");
-  const endpointsDir = resolve(cwd, "endpoints");
+  const endpointsDir = resolve(cwd, userConfig?.endpointsDir ?? "endpoints");
   const authHandlerPath = resolve(cwd, "authHandler.ts");
 
   const s = p.spinner();
@@ -151,6 +162,7 @@ app.onError((err, c) => {
 
 for (const endpoint of endpoints) {
   app.on(endpoint.method, endpoint.path, async (c) => {
+    const start = Date.now();
     const headers: Record<string, string> = {};
     c.req.raw.headers.forEach((v, k) => { headers[k] = v; });
 
@@ -173,7 +185,8 @@ for (const endpoint of endpoints) {
         const _bag: Record<string, string[]> = {};
         for (const _issue of _result.error.issues) {
           const _f = String(_issue.path[0] ?? "_");
-          (_bag[_f] ??= []).push(_issue.message);
+          if (!_bag[_f]) _bag[_f] = [];
+          _bag[_f].push(_issue.message);
         }
         _errors = new ValidationErrors(_bag);
       }
@@ -191,6 +204,12 @@ for (const endpoint of endpoints) {
     }
 
     const res = await endpoint.handler(req);
+    const durationMs = Date.now() - start;
+
+    if (config.consoleLog) {
+      console.log(\`[SimAPI] \${endpoint.method} \${c.req.path} → \${res.status} (\${durationMs}ms)\`);
+    }
+
     return c.json(res.body, res.status as never);
   });
 }

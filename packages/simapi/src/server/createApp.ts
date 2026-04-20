@@ -105,6 +105,14 @@ function registerEndpoint(
       }
       throw err;
     } finally {
+      const durationMs = Date.now() - start;
+
+      if (config.consoleLog) {
+        console.log(
+          `[SimAPI] ${endpoint.method} ${c.req.path} → ${logStatus} (${durationMs}ms)`
+        );
+      }
+
       if (bus && config.logEntries !== false) {
         bus
           .log({
@@ -115,7 +123,7 @@ function registerEndpoint(
             requestBody: JSON.stringify(raw.body),
             responseStatus: logStatus,
             responseBody: JSON.stringify(logBody),
-            durationMs: Date.now() - start,
+            durationMs,
             timestamp: new Date().toISOString(),
           })
           .catch((err) => console.error("[SimAPI] log error:", err));

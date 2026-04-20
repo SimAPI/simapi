@@ -14,8 +14,10 @@ export interface SimAPIConfig {
   name: string;
   description?: string;
   port?: number;
+  endpointsDir?: string;
   authHandler?: AuthHandler;
   logEntries?: boolean;
+  consoleLog?: boolean;
   database?: DatabaseConfig;
   autoThrowValidationErrors?: ValidationFormat | false | null;
 }

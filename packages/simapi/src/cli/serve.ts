@@ -10,7 +10,6 @@ import { startServer } from "../server/startServer.js";
 
 export async function runServe(cwd: string = process.cwd()): Promise<void> {
   const configPath = resolve(cwd, "simapi.config.ts");
-  const endpointsDir = resolve(cwd, "endpoints");
 
   let config!: SimAPIConfig;
   try {
@@ -26,6 +25,7 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
   const bus = new LogBus(adapter);
 
   const port = config.port ?? 3000;
+  const endpointsDir = resolve(cwd, config.endpointsDir ?? "endpoints");
   const app = await createApp(config, endpointsDir, bus);
 
   try {

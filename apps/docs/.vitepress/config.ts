@@ -12,7 +12,7 @@ export default defineConfig({
       { text: "API", link: "/api/app-request" },
       {
         text: "GitHub",
-        link: "https://github.com/youngmayor/simapi",
+        link: "https://github.com/SimAPI/simapi",
       },
     ],
 
@@ -31,14 +31,12 @@ export default defineConfig({
         items: [
           { text: "AppRequest", link: "/api/app-request" },
           { text: "AppResponse", link: "/api/app-response" },
-          { text: "Validator", link: "/api/validator" },
+          { text: "Validation", link: "/api/validator" },
         ],
       },
     ],
 
-    socialLinks: [
-      { icon: "github", link: "https://github.com/youngmayor/simapi" },
-    ],
+    socialLinks: [{ icon: "github", link: "https://github.com/SimAPI/simapi" }],
 
     footer: {
       message: "Released under the MIT License.",

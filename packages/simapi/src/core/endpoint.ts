@@ -18,5 +18,3 @@ export interface EndpointDefinition {
   validator?: z.ZodRawShape;
   handler: (req: AppRequest) => AppResponse | Promise<AppResponse>;
 }
-
-export type Endpoint = EndpointDefinition;
