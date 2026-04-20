@@ -1,13 +1,19 @@
 {
   "name": "simapi",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimAPI/simapi.git"
+  },
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
     "check": "biome check --write .",
     "check-types": "turbo run check-types",
+    "release": "npx changeset publish",
     "prepare": "husky"
   },
   "devDependencies": {
@@ -18,7 +24,7 @@
     "typescript": "5.9.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "packageManager": "npm@11.8.0",
   "workspaces": [
@@ -26,6 +32,11 @@
     "packages/*"
   ],
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,json}": "biome check --write --no-errors-on-unmatched"
+    "*.{ts,tsx,js,jsx,json}": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.31.0"
   }
 }
