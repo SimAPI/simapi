@@ -38,17 +38,17 @@ Hono-based server that auto-discovers endpoints and runs the request lifecycle.
 
 ---
 
-## Wave 4 — CLI (pending)
+## Wave 4 — CLI ✅
 All user-facing commands.
 
-- [ ] CLI entry via `cac` + `@clack/prompts`
-- [ ] `simapi init <name>` — scaffold new project (prompts: description, console, Dockerfile)
-- [ ] `simapi serve` — dev server with `tsx` live loading
-- [ ] `simapi build` — compile to `.simapi/dist/` via tsdown
-- [ ] `simapi start` — run compiled bundle
-- [ ] `simapi endpoint:create` — interactive scaffold into `endpoints/`
-- [ ] `simapi console add` / `simapi console remove`
-- [ ] Project templates (scaffold files for `init` and `endpoint:create`)
+- [x] CLI entry via `cac` + `@clack/prompts`
+- [x] `simapi init <name>` — scaffold new project (prompts: description, console, Dockerfile)
+- [x] `simapi serve` — dev server with `tsx` live loading
+- [x] `simapi build` — compile to `.simapi/dist/` via tsdown programmatic API
+- [x] `simapi start` — run compiled bundle via `fork()`
+- [x] `simapi endpoint:create` — interactive scaffold into `endpoints/`
+- [x] `simapi console:add` / `simapi console:remove`
+- [x] Project templates (inline template strings with `fill()` helper)
 
 ---
 
