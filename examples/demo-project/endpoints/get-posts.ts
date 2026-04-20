@@ -1,6 +1,6 @@
-import { AppResponse, type Endpoint, faker } from "simapi";
+import { AppResponse, type EndpointDefinition, faker } from "simapi";
 
-export const getPosts: Endpoint = {
+export const getPosts: EndpointDefinition = {
   path: "/api/posts",
   method: "GET",
   type: "open",
@@ -10,7 +10,7 @@ export const getPosts: Endpoint = {
         id: faker.string.ulid(),
         title: faker.lorem.sentence(),
         body: faker.lorem.paragraph(),
-        published: faker.boolean(),
+        published: faker.datatype.boolean(),
       })),
       meta: { total: 5, page: 1, perPage: 20 },
     });

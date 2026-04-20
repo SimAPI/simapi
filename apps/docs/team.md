@@ -10,13 +10,16 @@ import {
 
 const members = [
   {
-    avatar: 'https://www.github.com/yyx990803.png',
-    name: 'Evan You',
-    title: 'Creator',
+    avatar: 'https://www.gravatar.com/avatar/45771b7793feb7b6a95418eeef3748a1',
+    name: 'YoungMayor',
+    title: 'Founder & Lead Developer',
+    org: 'MayR Labs',
+    orgLink: 'https://mayrlabs.com',
     links: [
-      { icon: 'github', link: 'https://github.com/yyx990803' },
-      { icon: 'twitter', link: 'https://twitter.com/youyuxi' }
-    ]
+      { icon: 'github', link: 'https://github.com/YoungMayor' },
+      { icon: 'awwwards', link: 'https://aghogho.mayrlabs.com' }
+    ],
+    sponsor: 'https://github.com/sponsors/YoungMayor'
   },
 ]
 </script>
@@ -27,8 +30,7 @@ const members = [
       Our Team
     </template>
     <template #lead>
-      The development of VitePress is guided by an international
-      team, some of whom have chosen to be featured below.
+      The core team and contributors shaping the future of backend simulation.
     </template>
   </VPTeamPageTitle>
   <VPTeamMembers :members />
