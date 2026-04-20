@@ -203,6 +203,55 @@ describe("createApp", () => {
     });
   });
 
+  describe("failRate", () => {
+    it("returns 500 when failRate is 1", async () => {
+      const app = await buildApp([
+        {
+          path: "/api/ping",
+          method: "GET",
+          type: "open",
+          failRate: 1,
+          handler: () => AppResponse.success({}),
+        },
+      ]);
+      const res = await app.request("/api/ping");
+      expect(res.status).toBe(500);
+      const json = await res.json();
+      expect(json).toEqual({ message: "Simulated failure" });
+    });
+
+    it("never fails when failRate is 0", async () => {
+      const app = await buildApp([
+        {
+          path: "/api/ping",
+          method: "GET",
+          type: "open",
+          failRate: 0,
+          handler: () => AppResponse.success({ ok: true }),
+        },
+      ]);
+      const res = await app.request("/api/ping");
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe("delay", () => {
+    it("waits the specified milliseconds before responding", async () => {
+      const app = await buildApp([
+        {
+          path: "/api/ping",
+          method: "GET",
+          type: "open",
+          delay: 50,
+          handler: () => AppResponse.success({}),
+        },
+      ]);
+      const start = Date.now();
+      await app.request("/api/ping");
+      expect(Date.now() - start).toBeGreaterThanOrEqual(40);
+    });
+  });
+
   describe("consoleLog", () => {
     it("logs to console when consoleLog is true", async () => {
       const spy = vi.spyOn(console, "log").mockImplementation(() => {});

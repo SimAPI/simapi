@@ -1,11 +1,19 @@
-import { type AppRequest, AppResponse, faker } from "simapi";
+import {
+  type AppRequest,
+  AppResponse,
+  type EndpointDefinition,
+  faker,
+} from "simapi";
 
-export const getPost = {
+export const getPost: EndpointDefinition = {
   path: "/api/posts/:id",
   method: "GET",
   type: "open",
+  delay: 1000,
+  failRate: 0.3,
   handler: (req: AppRequest) => {
     const id = req.urlParam("id");
+
     return AppResponse.success({
       data: {
         id,
@@ -15,4 +23,4 @@ export const getPost = {
       },
     });
   },
-} as const;
+};

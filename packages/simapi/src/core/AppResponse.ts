@@ -35,17 +35,6 @@ export class AppResponse {
     return new AppResponse(500, body ?? { message: "Internal server error" });
   }
 
-  static fail(probability: number): AppResponse | undefined {
-    if (Math.random() < probability) {
-      return new AppResponse(500, { message: "Simulated failure" });
-    }
-    return undefined;
-  }
-
-  static delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
   static array<T>(count: number, factory: () => T): T[] {
     return Array.from({ length: count }, () => factory());
   }

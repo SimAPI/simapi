@@ -2,6 +2,7 @@ import { cac } from "cac";
 import { runBuild } from "./build.js";
 import { runConsoleAdd, runConsoleRemove } from "./console.js";
 import { runEndpointCreate } from "./endpoint-create.js";
+import { runImportOpenAPI } from "./import-openapi.js";
 import { runInit } from "./init.js";
 import { runServe } from "./serve.js";
 import { runStart } from "./start.js";
@@ -51,6 +52,13 @@ cli
   .command("console:remove [cwd]", "Remove the @simapi/console debugging UI")
   .action((cwd: string | undefined) => {
     runConsoleRemove(cwd).catch(fatal);
+  });
+
+cli
+  .command("import <spec>", "Generate endpoint stubs from an OpenAPI 3 spec")
+  .option("-o, --output <dir>", "Output directory (default: endpoints/)")
+  .action((spec: string, opts: { output?: string }) => {
+    runImportOpenAPI(spec, undefined, opts).catch(fatal);
   });
 
 cli.help();

@@ -45,31 +45,6 @@ describe("AppResponse", () => {
     });
   });
 
-  describe("fail", () => {
-    it("returns undefined when probability is 0", () => {
-      expect(AppResponse.fail(0)).toBeUndefined();
-    });
-
-    it("returns an AppResponse when probability is 1", () => {
-      const r = AppResponse.fail(1);
-      expect(r).toBeInstanceOf(AppResponse);
-      expect(r?.status).toBe(500);
-    });
-
-    it("returns 500 body on failure", () => {
-      const r = AppResponse.fail(1);
-      expect(r?.body).toEqual({ message: "Simulated failure" });
-    });
-  });
-
-  describe("delay", () => {
-    it("resolves after the specified ms", async () => {
-      const start = Date.now();
-      await AppResponse.delay(50);
-      expect(Date.now() - start).toBeGreaterThanOrEqual(40);
-    });
-  });
-
   describe("array", () => {
     it("returns an array of the given length", () => {
       const result = AppResponse.array(5, () => ({ id: 1 }));
@@ -85,9 +60,9 @@ describe("AppResponse", () => {
     it("each item is independently generated", () => {
       let counter = 0;
       const result = AppResponse.array(3, () => ({ index: counter++ }));
-      expect(result[0].index).toBe(0);
-      expect(result[1].index).toBe(1);
-      expect(result[2].index).toBe(2);
+      expect(result[0]?.index).toBe(0);
+      expect(result[1]?.index).toBe(1);
+      expect(result[2]?.index).toBe(2);
     });
   });
 });

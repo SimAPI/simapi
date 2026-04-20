@@ -89,8 +89,23 @@ function registerEndpoint(
         }
       }
 
+      if (endpoint.delay && endpoint.delay > 0) {
+        await new Promise<void>((resolve) =>
+          setTimeout(resolve, endpoint.delay)
+        );
+      }
+
       if (config.autoThrowValidationErrors && endpoint.validator) {
         errors.throwValidationError(config.autoThrowValidationErrors);
+      }
+
+      if (
+        typeof endpoint.failRate === "number" &&
+        Math.random() < endpoint.failRate
+      ) {
+        logStatus = 500;
+        logBody = { message: "Simulated failure" };
+        return c.json(logBody, 500);
       }
 
       const response = await endpoint.handler(request);

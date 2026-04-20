@@ -29,6 +29,7 @@ export default defineConfig({
           { text: "Getting Started", link: "/guide/" },
           { text: "Defining Endpoints", link: "/guide/endpoints" },
           { text: "Configuration", link: "/guide/config" },
+          { text: "OpenAPI Import", link: "/guide/openapi-import" },
           { text: "Deployment", link: "/guide/deployment" },
         ],
       },
