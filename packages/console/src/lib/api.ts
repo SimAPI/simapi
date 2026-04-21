@@ -17,10 +17,18 @@ export const api = {
     ),
   deleteLog: (id: number) =>
     fetch(`${BASE}/logs/${id}`, { method: "DELETE" }).then((r) => r.json()),
-  send: (method: string, path: string, body?: unknown) =>
+  send: (
+    method: string,
+    path: string,
+    body?: unknown,
+    headers?: Record<string, string>
+  ) =>
     fetch(path, {
       method,
-      headers: body !== undefined ? { "content-type": "application/json" } : {},
+      headers: {
+        ...(body !== undefined ? { "content-type": "application/json" } : {}),
+        ...(headers ?? {}),
+      },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     }),
 };
