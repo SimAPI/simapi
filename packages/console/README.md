@@ -1,10 +1,19 @@
-# @simapi/console
+<h1 align="center">SimAPI Console</h1>
 
-<img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" style="display: block; margin: 10px auto; border-radius: 10px;" />
+<p align="center">
+  <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="160" style="display: block; border-radius: 10px;" />
 
-> Mock backends that behave like real ones.
+  <label style="display: block; text-align: center; margin: 0px;">
+    Mock backends that behave like real ones.
+  </label>
 
-**[Documentation](https://simapi.mayrlabs.com)** | **[Quickstart](#install)** | **[GitHub](https://github.com/SimAPI/simapi)**
+  <p style="text-align: center;">
+    <b><a href="https://simapi.mayrlabs.com">Documentation</a></b>
+    |
+    <b><a href="https://github.com/SimAPI/simapi">GitHub</a></b>
+  </p>
+</p>
+
 
 Optional debug UI for [SimAPI](../simapi) — inspect live requests, browse your endpoint schema, and fire test requests interactively.
 

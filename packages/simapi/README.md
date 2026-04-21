@@ -1,11 +1,18 @@
-# @simapi/simapi
+<h2 align="center">SimAPI (@simapi/simapi)</h2>
 
-> Mock backends that behave like real ones.
+<p align="center">
+  <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="160" style="display: block; border-radius: 10px;" />
 
-<div style="display: flex; justify-content: center;">
-  <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" style="display: block; margin: 10px auto; border-radius: 10px;" />
-</div>
+  <label style="display: block; text-align: center; margin: 0px;">
+    Mock backends that behave like real ones.
+  </label>
 
+  <p style="text-align: center;">
+    <b><a href="https://simapi.mayrlabs.com">Documentation</a></b>
+    |
+    <b><a href="https://github.com/SimAPI/simapi">GitHub</a></b>
+  </p>
+</p>
 
 **[Documentation](https://simapi.mayrlabs.com)** | **[GitHub](https://github.com/SimAPI/simapi)**
 
@@ -86,18 +93,18 @@ export const createPost: EndpointDefinition = {
 
 ### EndpointDefinition fields
 
-| Field | Required | Description |
-|---|---|---|
-| `path` | ✓ | Hono-style route pattern — `:param`, `/nested/path` |
-| `method` | ✓ | `GET` `POST` `PUT` `PATCH` `DELETE` `HEAD` `OPTIONS` |
-| `type` | ✓ | `"open"` (no auth) or `"secure"` (runs `authHandler` first) |
-| `handler` | ✓ | `(req: AppRequest) => AppResponse` |
-| `validator` | | Zod shape validated before the handler runs |
-| `title` | | Display name — shown in Console and exported OpenAPI |
-| `description` | | Longer description — same |
-| `authHandler` | | Per-endpoint auth check (runs after global handler) |
-| `failRate` | | `0`–`1` probability of returning a simulated 500 |
-| `delay` | | Milliseconds to wait before the handler runs |
+| Field         | Required | Description                                                 |
+| ------------- | -------- | ----------------------------------------------------------- |
+| `path`        | ✓        | Hono-style route pattern — `:param`, `/nested/path`         |
+| `method`      | ✓        | `GET` `POST` `PUT` `PATCH` `DELETE` `HEAD` `OPTIONS`        |
+| `type`        | ✓        | `"open"` (no auth) or `"secure"` (runs `authHandler` first) |
+| `handler`     | ✓        | `(req: AppRequest) => AppResponse`                          |
+| `validator`   |          | Zod shape validated before the handler runs                 |
+| `title`       |          | Display name — shown in Console and exported OpenAPI        |
+| `description` |          | Longer description — same                                   |
+| `authHandler` |          | Per-endpoint auth check (runs after global handler)         |
+| `failRate`    |          | `0`–`1` probability of returning a simulated 500            |
+| `delay`       |          | Milliseconds to wait before the handler runs                |
 
 ---
 
@@ -264,12 +271,12 @@ export default defineConfig({
 
 ### Database adapters
 
-| Adapter | Config |
-|---|---|
-| SQLite (default) | `{ type: "sqlite", path: "./.simapi/db.sqlite" }` |
-| libSQL / Turso | `{ type: "libsql", url: "libsql://...", authToken: "..." }` |
-| Postgres | `{ type: "postgres", url: process.env.DATABASE_URL }` |
-| None | `{ type: "none" }` |
+| Adapter          | Config                                                      |
+| ---------------- | ----------------------------------------------------------- |
+| SQLite (default) | `{ type: "sqlite", path: "./.simapi/db.sqlite" }`           |
+| libSQL / Turso   | `{ type: "libsql", url: "libsql://...", authToken: "..." }` |
+| Postgres         | `{ type: "postgres", url: process.env.DATABASE_URL }`       |
+| None             | `{ type: "none" }`                                          |
 
 ---
 
@@ -308,16 +315,16 @@ See [`@simapi/console`](../console) for details.
 
 ## CLI reference
 
-| Command | Description |
-|---|---|
-| `simapi serve` | Start dev server with live TypeScript reload |
-| `simapi build` | Compile project to `.simapi/dist/server.mjs` |
-| `simapi start` | Run the compiled production server |
-| `simapi init [name]` | Scaffold a new SimAPI project |
-| `simapi import <spec>` | Generate endpoint stubs from an OpenAPI spec |
-| `simapi export` | Export endpoints as an OpenAPI 3 spec |
-| `simapi console:add` | Install `@simapi/console` |
-| `simapi console:remove` | Uninstall `@simapi/console` |
+| Command                 | Description                                  |
+| ----------------------- | -------------------------------------------- |
+| `simapi serve`          | Start dev server with live TypeScript reload |
+| `simapi build`          | Compile project to `.simapi/dist/server.mjs` |
+| `simapi start`          | Run the compiled production server           |
+| `simapi init [name]`    | Scaffold a new SimAPI project                |
+| `simapi import <spec>`  | Generate endpoint stubs from an OpenAPI spec |
+| `simapi export`         | Export endpoints as an OpenAPI 3 spec        |
+| `simapi console:add`    | Install `@simapi/console`                    |
+| `simapi console:remove` | Uninstall `@simapi/console`                  |
 
 ---
 
