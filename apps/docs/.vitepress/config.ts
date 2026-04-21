@@ -45,6 +45,13 @@ export default defineConfig({
           { text: "defineConfig", link: "/api/define-config" },
         ],
       },
+      {
+        text: "Examples",
+        items: [
+          { text: "Blog API", link: "/examples/blog-sample" },
+          { text: "Shop API", link: "/examples/shop-sample" },
+        ],
+      },
     ],
 
     socialLinks: [{ icon: "github", link: "https://github.com/SimAPI/simapi" }],

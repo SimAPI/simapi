@@ -5,7 +5,9 @@
       "Bash(npx biome *)",
       "Bash(npm install *)",
       "Bash(npm test *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(cat)",
+      "Read(//tmp/**)"
     ]
   }
 }

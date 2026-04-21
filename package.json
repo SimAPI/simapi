@@ -16,10 +16,12 @@
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "release": "npx changeset publish",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:all": "concurrently -n \"docs,packages,demo,blog,shop\" -c \"cyan,green,yellow,magenta,blue\" \"npm run dev -w apps/docs\" \"turbo run dev --filter=./packages/*\" \"npm run serve -w examples/demo-project\" \"npm run serve -w examples/blog-sample\" \"npm run serve -w examples/shop-sample\""
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.12",
+    "concurrently": "^9.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "turbo": "^2.9.6",
@@ -31,7 +33,8 @@
   "packageManager": "npm@11.8.0",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "examples/*"
   ],
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json}": [

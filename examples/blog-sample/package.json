@@ -1,14 +1,13 @@
 {
-  "name": "simapi-demo",
+  "name": "simapi-blog-sample",
   "version": "0.1.0",
   "type": "module",
-  "description": "Demo project showing SimAPI patterns",
+  "description": "Blog platform API — a comprehensive SimAPI example",
   "scripts": {
     "dev": "simapi serve",
     "serve": "simapi serve",
     "build": "simapi build",
-    "start": "simapi start",
-    "export": "simapi export"
+    "start": "simapi start"
   },
   "dependencies": {
     "simapi": "*"
