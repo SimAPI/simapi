@@ -166,7 +166,7 @@ export async function runImportOpenAPI(
     for (const method of HTTP_METHODS) {
       const op = pathItem[method];
       if (!op) continue;
-      groups.get(resource)!.push(buildEndpoint(method, path, op));
+      groups.get(resource)?.push(buildEndpoint(method, path, op));
     }
   }
 

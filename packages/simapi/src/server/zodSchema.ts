@@ -45,8 +45,8 @@ export function zodTypeToJsonSchema(schema: any): Record<string, unknown> {
   }
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: Zod _def is internal API
 export function zodShapeToJsonSchema(
+  // biome-ignore lint/suspicious/noExplicitAny: Zod _def is internal API
   shape: Record<string, any>
 ): Record<string, unknown> {
   const properties: Record<string, unknown> = {};
