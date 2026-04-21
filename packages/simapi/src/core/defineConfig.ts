@@ -52,7 +52,7 @@ export interface SimAPIConfig {
    * Use `AuthHandlers` for common schemes or write your own.
    *
    * @example
-   * import { AuthHandlers } from "simapi";
+   * import { AuthHandlers } from "@simapi/simapi";
    * authHandler: AuthHandlers.bearer()
    */
   authHandler?: AuthHandler;
@@ -90,7 +90,7 @@ export interface SimAPIConfig {
  *
  * @example
  * // simapi.config.ts
- * import { defineConfig } from "simapi";
+ * import { defineConfig } from "@simapi/simapi";
  *
  * export default defineConfig({
  *   name: "my-api",

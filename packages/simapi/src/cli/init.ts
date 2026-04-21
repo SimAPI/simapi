@@ -11,10 +11,12 @@ import {
   ENV_EXAMPLE,
   fill,
   GITIGNORE,
+  HELLO_WORLD_TS,
   PACKAGE_JSON,
   SIMAPI_CONFIG_TS,
   SIMAPI_CONFIG_WITH_AUTH_TS,
   TSCONFIG_JSON,
+  USER_MODEL_TS,
 } from "./templates.js";
 
 function cancelled(): void {
@@ -95,7 +97,10 @@ export async function runInit(name: string | undefined): Promise<void> {
   const s = p.spinner();
   s.start("Scaffolding project");
 
-  await mkdir(join(dir, "endpoints"), { recursive: true });
+  await Promise.all([
+    mkdir(join(dir, "endpoints"), { recursive: true }),
+    mkdir(join(dir, "models"), { recursive: true }),
+  ]);
 
   await Promise.all([
     writeFile(join(dir, "package.json"), fill(PACKAGE_JSON, vars)),
@@ -106,7 +111,8 @@ export async function runInit(name: string | undefined): Promise<void> {
       join(dir, "simapi.config.ts"),
       fill(withAuth ? SIMAPI_CONFIG_WITH_AUTH_TS : SIMAPI_CONFIG_TS, vars)
     ),
-    writeFile(join(dir, "endpoints", ".gitkeep"), ""),
+    writeFile(join(dir, "endpoints", "hello-world.ts"), HELLO_WORLD_TS),
+    writeFile(join(dir, "models", "user.ts"), USER_MODEL_TS),
     withAuth
       ? writeFile(join(dir, "authHandler.ts"), AUTH_HANDLER_TS)
       : Promise.resolve(),

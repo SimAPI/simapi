@@ -1,5 +1,13 @@
 # @simapi/simapi
 
+## 0.0.4
+
+### Starter scaffold & port fallback
+
+- `simapi init` now scaffolds `endpoints/hello-world.ts` — a GET `/` (open) and POST `/` (secure) endpoint as a working example
+- `simapi init` now scaffolds `models/user.ts` — a typed `User` interface with a `makeUser()` faker factory
+- Fixed `EADDRINUSE` crash: the dev server now automatically retries on the next available port (up to 10 attempts) instead of throwing an unhandled error
+
 ## 0.0.3
 
 ### Bug fixes & init improvements

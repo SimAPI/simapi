@@ -127,6 +127,59 @@ EXPOSE 3000
 CMD ["npm", "run", "start"]
 `;
 
+// ─── starter files ───────────────────────────────────────────────────────────
+
+export const USER_MODEL_TS = `import { faker } from "@simapi/simapi";
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "member" | "guest";
+  createdAt: string;
+}
+
+export function makeUser(): User {
+  return {
+    id: faker.string.ulid(),
+    name: faker.person.fullName(),
+    email: faker.internet.email(),
+    role: faker.helpers.arrayElement(["admin", "member", "guest"] as const),
+    createdAt: faker.date.recent({ days: 30 }).toISOString(),
+  };
+}
+`;
+
+export const HELLO_WORLD_TS = `import { AppResponse, type EndpointDefinition } from "@simapi/simapi";
+
+import { makeUser } from "../models/user.js";
+
+export const helloGet: EndpointDefinition = {
+  path: "/",
+  method: "GET",
+  type: "open",
+  title: "Hello World",
+  description: "Returns a greeting. No authentication required.",
+  handler: () =>
+    AppResponse.success({
+      message: "Hello, World!",
+    }),
+};
+
+export const helloPost: EndpointDefinition = {
+  path: "/",
+  method: "POST",
+  type: "secure",
+  title: "Hello (Authenticated)",
+  description: "Returns a greeting with a sample user. Requires authentication.",
+  handler: () =>
+    AppResponse.created({
+      message: "Hello from behind the wall!",
+      user: makeUser(),
+    }),
+};
+`;
+
 // ─── endpoint template ────────────────────────────────────────────────────────
 
 export const ENDPOINT_TS = `import { AppResponse, type AppRequest } from "@simapi/simapi";

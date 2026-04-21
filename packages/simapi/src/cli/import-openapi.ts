@@ -180,7 +180,7 @@ export async function runImportOpenAPI(
     imports.push("AppResponse", "type EndpointDefinition");
 
     const file =
-      `import { ${imports.join(", ")} } from "simapi";\n\n` +
+      `import { ${imports.join(", ")} } from "@simapi/simapi";\n\n` +
       endpoints.join("\n\n") +
       "\n";
 

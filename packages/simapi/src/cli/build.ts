@@ -133,8 +133,8 @@ function buildProductionEntry(opts: {
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { z } from "zod";
-import { AppRequest, AppResponse, ValidationError, ValidationErrors } from "simapi";
-import type { EndpointDefinition } from "simapi";
+import { AppRequest, AppResponse, ValidationError, ValidationErrors } from "@simapi/simapi";
+import type { EndpointDefinition } from "@simapi/simapi";
 import config from "${configRel}";
 ${authImport}
 ${importLines.join("\n")}
