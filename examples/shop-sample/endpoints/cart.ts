@@ -4,7 +4,7 @@ import {
   type EndpointDefinition,
   faker,
   z,
-} from "simapi";
+} from "@simapi/simapi";
 import { makeProduct } from "../models/product.js";
 
 function makeCartItem() {

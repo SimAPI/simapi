@@ -1,8 +1,16 @@
-<img src="simapi.png" alt="SimAPI" width="120" style="display: block; margin: 10px auto; border-radius: 10px;" />
+<p align="center">
+  <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="160" style="display: block; border-radius: 10px;" />
+</p>
 
-> Mock backends that behave like real ones.
+<p align="center">
+  Mock backends that behave like real ones.
+</p>
 
-**[Documentation](https://simapi.mayrlabs.com)** | **[Quickstart](#quickstart)** | **[GitHub](https://github.com/SimAPI/simapi)**
+<p align="center">
+  <b><a href="https://simapi.mayrlabs.com">Documentation</a></b>
+  |
+  <b><a href="https://github.com/SimAPI/simapi">GitHub</a></b>
+</p>
 
 Build frontend features against real API behavior — before your backend exists. SimAPI lets you define endpoints as plain TypeScript objects, generate realistic fake data with faker-js, validate requests with Zod, and log everything to a database.
 

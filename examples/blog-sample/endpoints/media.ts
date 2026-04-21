@@ -3,7 +3,7 @@ import {
   AppResponse,
   type EndpointDefinition,
   z,
-} from "simapi";
+} from "@simapi/simapi";
 import { makeMedia } from "../models/media.js";
 
 export const listMedia: EndpointDefinition = {

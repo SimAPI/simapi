@@ -1,8 +1,7 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join, resolve } from "node:path";
 
 import * as p from "@clack/prompts";
 
@@ -20,21 +19,6 @@ import {
 
 function cancelled(): void {
   p.cancel("Cancelled.");
-}
-
-function getSimAPIVersion(): string {
-  try {
-    const here = dirname(fileURLToPath(import.meta.url));
-    const pkgPath = resolve(here, "../package.json");
-    const pkg = JSON.parse(readFileSync(pkgPath, "utf8")) as {
-      name?: string;
-      version?: string;
-    };
-    if (pkg.name === "simapi" && pkg.version) return `^${pkg.version}`;
-  } catch {
-    // fall through
-  }
-  return "*";
 }
 
 export async function runInit(name: string | undefined): Promise<void> {
@@ -103,11 +87,9 @@ export async function runInit(name: string | undefined): Promise<void> {
     return;
   }
 
-  const simapiVersion = getSimAPIVersion();
   const vars = {
     name: projectName as string,
     description: (description as string) || "",
-    simapiVersion,
   };
 
   const s = p.spinner();
@@ -115,17 +97,8 @@ export async function runInit(name: string | undefined): Promise<void> {
 
   await mkdir(join(dir, "endpoints"), { recursive: true });
 
-  let pkgJson = fill(PACKAGE_JSON, vars);
-  if (withConsole) {
-    const pkg = JSON.parse(pkgJson) as {
-      dependencies: Record<string, string>;
-    };
-    pkg.dependencies["@simapi/console"] = simapiVersion;
-    pkgJson = `${JSON.stringify(pkg, null, 2)}\n`;
-  }
-
   await Promise.all([
-    writeFile(join(dir, "package.json"), pkgJson),
+    writeFile(join(dir, "package.json"), fill(PACKAGE_JSON, vars)),
     writeFile(join(dir, "tsconfig.json"), TSCONFIG_JSON),
     writeFile(join(dir, ".gitignore"), GITIGNORE),
     writeFile(join(dir, ".env.example"), ENV_EXAMPLE),
@@ -144,13 +117,21 @@ export async function runInit(name: string | undefined): Promise<void> {
 
   s.stop("Project scaffolded");
 
+  const packages = ["@simapi/simapi"];
+  if (withConsole) packages.push("@simapi/console");
+
   const installSpinner = p.spinner();
-  installSpinner.start("Installing dependencies");
+  installSpinner.start(`Installing ${packages.join(", ")}`);
   try {
-    execFileSync("npm", ["install"], { cwd: dir, stdio: "ignore" });
+    execFileSync("npm", ["install", ...packages], {
+      cwd: dir,
+      stdio: "ignore",
+    });
     installSpinner.stop("Dependencies installed");
   } catch {
-    installSpinner.stop("Could not install — run npm install manually");
+    installSpinner.stop(
+      `Could not install — run npm install ${packages.join(" ")} manually`
+    );
   }
 
   p.note(`cd ${projectName as string}\nnpm run serve`, "Next steps");

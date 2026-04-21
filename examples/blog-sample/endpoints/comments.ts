@@ -3,7 +3,7 @@ import {
   AppResponse,
   type EndpointDefinition,
   z,
-} from "simapi";
+} from "@simapi/simapi";
 import { makeComment } from "../models/comment.js";
 
 export const listComments: EndpointDefinition = {

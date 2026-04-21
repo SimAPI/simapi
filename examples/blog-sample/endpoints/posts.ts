@@ -3,7 +3,7 @@ import {
   AppResponse,
   type EndpointDefinition,
   z,
-} from "simapi";
+} from "@simapi/simapi";
 import { makePost } from "../models/post.js";
 
 export const listPosts: EndpointDefinition = {

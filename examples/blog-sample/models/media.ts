@@ -1,4 +1,4 @@
-import { faker } from "simapi";
+import { faker } from "@simapi/simapi";
 
 export type MediaType = "image" | "video" | "document";
 

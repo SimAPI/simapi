@@ -17,9 +17,7 @@ export const PACKAGE_JSON = `{
     "import": "simapi import",
     "export": "simapi export"
   },
-  "dependencies": {
-    "simapi": "{{simapiVersion}}"
-  }
+  "dependencies": {}
 }
 `;
 
@@ -73,7 +71,7 @@ SIMAPI_CONSOLE_USERNAME=
 SIMAPI_CONSOLE_PASSWORD=
 `;
 
-export const SIMAPI_CONFIG_TS = `import { defineConfig } from "simapi";
+export const SIMAPI_CONFIG_TS = `import { defineConfig } from "@simapi/simapi";
 
 export default defineConfig({
   name: "{{name}}",
@@ -89,7 +87,7 @@ export default defineConfig({
 });
 `;
 
-export const SIMAPI_CONFIG_WITH_AUTH_TS = `import { defineConfig } from "simapi";
+export const SIMAPI_CONFIG_WITH_AUTH_TS = `import { defineConfig } from "@simapi/simapi";
 import { authHandler } from "./authHandler.js";
 
 export default defineConfig({
@@ -106,7 +104,7 @@ export default defineConfig({
 });
 `;
 
-export const AUTH_HANDLER_TS = `import { AppResponse, type AppRequest } from "simapi";
+export const AUTH_HANDLER_TS = `import { AppResponse, type AppRequest } from "@simapi/simapi";
 
 export function authHandler(req: AppRequest) {
   const token = req.header("Authorization");
@@ -131,7 +129,7 @@ CMD ["npm", "run", "start"]
 
 // ─── endpoint template ────────────────────────────────────────────────────────
 
-export const ENDPOINT_TS = `import { AppResponse, type AppRequest } from "simapi";
+export const ENDPOINT_TS = `import { AppResponse, type AppRequest } from "@simapi/simapi";
 
 export const {{handlerName}} = {
   path: "{{path}}",

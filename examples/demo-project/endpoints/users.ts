@@ -3,7 +3,7 @@ import {
   AppResponse,
   type EndpointDefinition,
   z,
-} from "simapi";
+} from "@simapi/simapi";
 import { makeUser } from "../models/user.js";
 
 export const listUsers: EndpointDefinition = {

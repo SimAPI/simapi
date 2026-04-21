@@ -1,4 +1,4 @@
-import { AuthHandlers, defineConfig } from "simapi";
+import { AuthHandlers, defineConfig } from "@simapi/simapi";
 
 export default defineConfig({
   name: "SimAPI Shop Sample",

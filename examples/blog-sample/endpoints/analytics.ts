@@ -3,7 +3,7 @@ import {
   AppResponse,
   type EndpointDefinition,
   faker,
-} from "simapi";
+} from "@simapi/simapi";
 
 export const overview: EndpointDefinition = {
   path: "/api/analytics/overview",

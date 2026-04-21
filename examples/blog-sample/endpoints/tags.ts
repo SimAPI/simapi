@@ -1,4 +1,8 @@
-import { type AppRequest, AppResponse, type EndpointDefinition } from "simapi";
+import {
+  type AppRequest,
+  AppResponse,
+  type EndpointDefinition,
+} from "@simapi/simapi";
 import { makePost } from "../models/post.js";
 import { allTags, makeTag } from "../models/tag.js";
 

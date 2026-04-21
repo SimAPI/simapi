@@ -4,7 +4,7 @@ import {
   type EndpointDefinition,
   faker,
   z,
-} from "simapi";
+} from "@simapi/simapi";
 import { makeReview } from "../models/review.js";
 
 export const listReviews: EndpointDefinition = {

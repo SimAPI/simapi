@@ -1,4 +1,4 @@
-import { AppResponse, type EndpointDefinition, z } from "simapi";
+import { AppResponse, type EndpointDefinition, z } from "@simapi/simapi";
 
 export const login: EndpointDefinition = {
   path: "/api/auth/login",

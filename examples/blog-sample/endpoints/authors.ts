@@ -3,7 +3,7 @@ import {
   AppResponse,
   type EndpointDefinition,
   z,
-} from "simapi";
+} from "@simapi/simapi";
 import { makeAuthor } from "../models/author.js";
 import { makePost } from "../models/post.js";
 
