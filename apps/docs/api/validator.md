@@ -3,7 +3,7 @@
 SimAPI uses [Zod](https://zod.dev) for request validation. Import `z` directly from `simapi`:
 
 ```ts
-import { z } from "simapi";
+import { z } from "@simapi/simapi";
 ```
 
 ## Endpoint validator
@@ -11,7 +11,7 @@ import { z } from "simapi";
 Add a `validator` field to your endpoint definition with a Zod shape:
 
 ```ts
-import { z, AppResponse, type AppRequest, type EndpointDefinition } from "simapi";
+import { z, AppResponse, type AppRequest, type EndpointDefinition } from "@simapi/simapi";
 
 export const createPost: EndpointDefinition = {
   path: "/api/posts",

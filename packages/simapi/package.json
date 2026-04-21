@@ -1,6 +1,6 @@
 {
-  "name": "simapi",
-  "version": "0.0.1",
+  "name": "@simapi/simapi",
+  "version": "0.0.2",
   "description": "Build frontend features against real API behavior — before your backend exists.",
   "keywords": [
     "mock",
@@ -54,6 +54,7 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "prepublishOnly": "npm run build",
     "dev": "tsdown --watch",
     "check-types": "tsc --noEmit",
     "lint": "biome lint ./src",

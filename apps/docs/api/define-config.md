@@ -3,7 +3,7 @@
 `defineConfig` is a typed helper that defines your server configuration. Import it in `simapi.config.ts`:
 
 ```ts
-import { defineConfig } from "simapi";
+import { defineConfig } from "@simapi/simapi";
 
 export default defineConfig({
   name: "my-api",
@@ -75,7 +75,7 @@ database: { type: "none" }
 Runs before every `type: "secure"` endpoint. Return an `AppResponse` to reject the request, or return nothing to allow it:
 
 ```ts
-import { AppResponse, type AppRequest } from "simapi";
+import { AppResponse, type AppRequest } from "@simapi/simapi";
 
 export function authHandler(req: AppRequest) {
   const token = req.header("Authorization");

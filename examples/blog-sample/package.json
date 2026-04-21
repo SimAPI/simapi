@@ -1,6 +1,7 @@
 {
   "name": "simapi-blog-sample",
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "description": "Blog platform API — a comprehensive SimAPI example",
   "scripts": {
@@ -10,6 +11,6 @@
     "export": "simapi export"
   },
   "dependencies": {
-    "simapi": "*"
+    "@simapi/simapi": "*"
   }
 }

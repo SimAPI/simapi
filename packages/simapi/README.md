@@ -1,4 +1,4 @@
-# simapi
+# @simapi/simapi
 
 <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="120" style="display: block; margin: 10px auto; border-radius: 10px;" />
 
@@ -11,19 +11,19 @@ Build frontend features against real API behavior — before your backend exists
 ## Install
 
 ```sh
-npm install simapi
+npm install @simapi/simapi
 ```
 
 Or scaffold a full project:
 
 ```sh
-npm create simapi@latest my-api
+npx @simapi/simapi@latest init my-api
 ```
 
 ## Quickstart
 
 ```sh
-npx simapi init
+npx @simapi/simapi@latest init
 npm run serve
 ```
 
@@ -33,7 +33,7 @@ Multiple endpoints in one file, reusing a shared model:
 
 ```ts
 // models/post.ts
-import { faker } from "simapi";
+import { faker } from "@simapi/simapi";
 export interface Post { id: string; title: string; published: boolean; }
 export function makePost(): Post {
   return { id: faker.string.ulid(), title: faker.lorem.sentence(), published: faker.datatype.boolean() };
@@ -42,7 +42,7 @@ export function makePost(): Post {
 
 ```ts
 // endpoints/posts.ts
-import { z, AppResponse, type EndpointDefinition } from "simapi";
+import { z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
 import { makePost } from "../models/post.js";
 
 export const listPosts: EndpointDefinition = {
@@ -83,6 +83,7 @@ Generate endpoint stubs from an existing spec:
 
 ```sh
 simapi import openapi.yaml --output endpoints/
+
 ```
 
 ## CLI commands

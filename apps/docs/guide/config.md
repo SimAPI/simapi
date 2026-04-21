@@ -5,7 +5,7 @@
 Every SimAPI project needs a `simapi.config.ts` at the project root:
 
 ```ts
-import { defineConfig } from "simapi";
+import { defineConfig } from "@simapi/simapi";
 
 export default defineConfig({
   name: "my-api",
@@ -86,7 +86,7 @@ The auth handler runs before every `secure` endpoint. Return an `AppResponse` to
 
 ```ts
 // authHandler.ts
-import { AppResponse, type AppRequest } from "simapi";
+import { AppResponse, type AppRequest } from "@simapi/simapi";
 
 export function authHandler(req: AppRequest) {
   const token = req.header("Authorization");

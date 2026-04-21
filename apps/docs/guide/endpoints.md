@@ -5,7 +5,7 @@
 An endpoint is a plain TypeScript object. All fields:
 
 ```ts
-import { z, AppResponse, type AppRequest, type EndpointDefinition } from "simapi";
+import { z, AppResponse, type AppRequest, type EndpointDefinition } from "@simapi/simapi";
 
 export const myEndpoint: EndpointDefinition = {
   path: "/api/posts/:id",   // Hono-style route — :param, /nested/path
@@ -39,7 +39,7 @@ Multiple endpoints can live in one file — group by resource:
 
 ```ts
 // endpoints/posts.ts
-import { AppResponse, type EndpointDefinition } from "simapi";
+import { AppResponse, type EndpointDefinition } from "@simapi/simapi";
 import { makePost } from "../models/post.js";
 
 export const listPosts: EndpointDefinition = {
@@ -70,7 +70,7 @@ Define data factories in a `models/` directory and import them across endpoints:
 
 ```ts
 // models/post.ts
-import { faker } from "simapi";
+import { faker } from "@simapi/simapi";
 
 export interface Post {
   id: string;
@@ -134,7 +134,7 @@ const all = req.bodyAll<{ title: string; age: number }>();
 Add a `validator` field — SimAPI runs it before your handler and populates `req.errors`:
 
 ```ts
-import { z, AppResponse, type AppRequest, type EndpointDefinition } from "simapi";
+import { z, AppResponse, type AppRequest, type EndpointDefinition } from "@simapi/simapi";
 
 export const createUser: EndpointDefinition = {
   path: "/api/users",
@@ -186,7 +186,7 @@ export default defineConfig({
 Import `faker` (powered by faker-js) and `AppResponse.array` for realistic responses:
 
 ```ts
-import { faker, AppResponse, type EndpointDefinition } from "simapi";
+import { faker, AppResponse, type EndpointDefinition } from "@simapi/simapi";
 
 export const getPosts: EndpointDefinition = {
   path: "/api/posts",

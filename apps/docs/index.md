@@ -48,7 +48,7 @@ features:
 One command to scaffold, one command to serve:
 
 ```sh
-npm create simapi@latest my-api
+npx @simapi/simapi@latest init my-api
 cd my-api
 npm run serve
 ```
@@ -59,7 +59,7 @@ Your API is live at `http://localhost:3000`. Now define endpoints.
 
 ```ts
 // endpoints/posts.ts
-import { faker, z, AppResponse, type EndpointDefinition } from "simapi";
+import { faker, z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
 
 export const listPosts: EndpointDefinition = {
   path: "/api/posts",

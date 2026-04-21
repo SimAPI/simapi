@@ -8,7 +8,7 @@ Set `authHandler` in your config to protect all `type: "secure"` endpoints:
 
 ```ts
 // simapi.config.ts
-import { defineConfig, AuthHandlers } from "simapi";
+import { defineConfig, AuthHandlers } from "@simapi/simapi";
 
 export default defineConfig({
   name: "my-api",
@@ -117,7 +117,7 @@ authHandler: AuthHandlers.digest()
 For anything beyond the built-ins, write your own handler directly:
 
 ```ts
-import { defineConfig, AppResponse, type AuthHandler } from "simapi";
+import { defineConfig, AppResponse, type AuthHandler } from "@simapi/simapi";
 
 const authHandler: AuthHandler = (req) => {
   const token = req.header("Authorization");

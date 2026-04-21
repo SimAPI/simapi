@@ -3,7 +3,7 @@
 Every endpoint handler receives an `AppRequest` instance as its only argument.
 
 ```ts
-import type { AppRequest } from "simapi";
+import type { AppRequest } from "@simapi/simapi";
 
 export const myEndpoint = {
   path: "/api/resource",
