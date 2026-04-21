@@ -3,9 +3,9 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="160" style="display: block; border-radius: 10px;" />
 
-  <label style="display: block; text-align: center; margin: 0px;">
+  <span style="display: block; text-align: center; margin: 0px;">
     Mock backends that behave like real ones.
-  </label>
+  </span>
 
   <p style="text-align: center;">
     <b><a href="https://simapi.mayrlabs.com">Documentation</a></b>
@@ -15,7 +15,7 @@
 </p>
 
 
-Optional debug UI for [SimAPI](../simapi) — inspect live requests, browse your endpoint schema, and fire test requests interactively.
+Optional debug UI for [@SimAPI/simapi](https://github.com/SimAPI/simapi) — inspect live requests, browse your endpoint schema, and fire test requests interactively.
 
 ## Install
 

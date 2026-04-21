@@ -1,11 +1,12 @@
-<h2 align="center">SimAPI (@simapi/simapi)</h2>
+<h1 align="center" style="margin-bottom: 0px;">SimAPI</h1>
+<h3 align="center" style="margin: -10px 0 30px 0;">@simapi/simapi</h3>
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="160" style="display: block; border-radius: 10px;" />
 
-  <label style="display: block; text-align: center; margin: 0px;">
+  <span>
     Mock backends that behave like real ones.
-  </label>
+  </span>
 
   <p style="text-align: center;">
     <b><a href="https://simapi.mayrlabs.com">Documentation</a></b>
@@ -13,8 +14,6 @@
     <b><a href="https://github.com/SimAPI/simapi">GitHub</a></b>
   </p>
 </p>
-
-**[Documentation](https://simapi.mayrlabs.com)** | **[GitHub](https://github.com/SimAPI/simapi)**
 
 Build frontend features against real API behavior — before your backend exists. SimAPI lets you define endpoints as plain TypeScript objects, generate realistic fake data with faker-js, validate requests with Zod, and log everything to a database.
 
@@ -325,6 +324,14 @@ See [`@simapi/console`](../console) for details.
 | `simapi export`         | Export endpoints as an OpenAPI 3 spec        |
 | `simapi console:add`    | Install `@simapi/console`                    |
 | `simapi console:remove` | Uninstall `@simapi/console`                  |
+
+---
+
+## Contributing
+
+`@simapi/simapi` is open source and contributions are welcome and appreciated — whether it's a bug report, a feature suggestion, a doc fix, or a pull request.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, development workflow, code style, and how to submit a PR.
 
 ---
 
