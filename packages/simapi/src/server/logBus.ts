@@ -8,9 +8,10 @@ export class LogBus extends EventEmitter implements DbAdapter {
     this.setMaxListeners(100);
   }
 
-  async log(entry: Omit<RequestLogEntry, "id">): Promise<void> {
-    await this.adapter.log(entry);
-    this.emit("entry", entry);
+  async log(entry: Omit<RequestLogEntry, "id">): Promise<number> {
+    const id = await this.adapter.log(entry);
+    this.emit("entry", { ...entry, id });
+    return id;
   }
 
   getLogs(opts?: {
@@ -18,6 +19,10 @@ export class LogBus extends EventEmitter implements DbAdapter {
     offset?: number;
   }): Promise<RequestLogEntry[]> {
     return this.adapter.getLogs(opts);
+  }
+
+  deleteLog(id: number): Promise<void> {
+    return this.adapter.deleteLog(id);
   }
 
   async close(): Promise<void> {

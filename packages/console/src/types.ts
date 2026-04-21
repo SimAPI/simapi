@@ -6,13 +6,34 @@ export interface HealthResponse {
   logging: boolean;
 }
 
+export interface JsonSchemaProperty {
+  type?: string;
+  format?: string;
+  minLength?: number;
+  maxLength?: number;
+  minimum?: number;
+  maximum?: number;
+  items?: JsonSchemaProperty;
+  properties?: Record<string, JsonSchemaProperty>;
+}
+
+export interface JsonSchema {
+  type: "object";
+  properties?: Record<string, JsonSchemaProperty>;
+  required?: string[];
+}
+
 export interface EndpointInfo {
   method: string;
   path: string;
   type: "open" | "secure";
+  title?: string;
+  description?: string;
+  schema?: JsonSchema;
 }
 
 export interface RequestLog {
+  id: number;
   method: string;
   path: string;
   query: string;

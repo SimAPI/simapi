@@ -5,6 +5,7 @@ import type { SimAPIConfig } from "../core/defineConfig.js";
 import type { EndpointDefinition } from "../core/endpoint.js";
 import type { RequestLogEntry } from "../db/types.js";
 import type { LogBus } from "./logBus.js";
+import { zodShapeToJsonSchema } from "./zodSchema.js";
 
 const SIMAPI_VERSION = "0.1.0";
 
@@ -26,7 +27,16 @@ export function registerInternalRoutes(
 
   app.get("/__simapi/endpoints", (c) => {
     return c.json(
-      endpoints.map((e) => ({ method: e.method, path: e.path, type: e.type }))
+      endpoints.map((e) => ({
+        method: e.method,
+        path: e.path,
+        type: e.type,
+        title: e.title,
+        description: e.description,
+        schema: e.validator
+          ? zodShapeToJsonSchema(e.validator as Record<string, unknown>)
+          : undefined,
+      }))
     );
   });
 
@@ -37,9 +47,18 @@ export function registerInternalRoutes(
     return c.json({ data, limit, offset });
   });
 
+  app.delete("/__simapi/logs/:id", async (c) => {
+    const id = Number(c.req.param("id"));
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.json({ error: "Invalid id" }, 400);
+    }
+    await bus.deleteLog(id);
+    return c.json({ ok: true });
+  });
+
   app.get("/__simapi/logs/stream", (c) => {
     return streamSSE(c, async (stream) => {
-      const onEntry = (entry: Omit<RequestLogEntry, "id">) => {
+      const onEntry = (entry: RequestLogEntry) => {
         stream
           .writeSSE({ data: JSON.stringify(entry), event: "log" })
           .catch(() => {});

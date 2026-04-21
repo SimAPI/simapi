@@ -13,6 +13,8 @@ interface EndpointDefinition {
   path: string;
   method: HttpMethod;
   type: "open" | "secure";
+  title?: string;
+  description?: string;
   validator?: z.ZodRawShape;
   failRate?: number;
   delay?: number;
@@ -44,6 +46,22 @@ One of: `GET` `POST` `PUT` `PATCH` `DELETE` `HEAD` `OPTIONS`.
 
 - `"open"` — request passes directly to the handler.
 - `"secure"` — `authHandler` runs first. If it returns an `AppResponse`, that response is sent and the handler is skipped.
+
+### `title` — `string` *(optional)*
+
+A short display name for the endpoint. Shown in the SimAPI Console schema view and included as `summary` in exported OpenAPI specs.
+
+```ts
+title: "Create Post",
+```
+
+### `description` — `string` *(optional)*
+
+A longer description of what the endpoint does. Shown in the Console and as `description` in exported OpenAPI specs.
+
+```ts
+description: "Creates a new post and returns it with a generated ID.",
+```
 
 ### `validator` — `z.ZodRawShape` *(optional)*
 
@@ -113,6 +131,8 @@ export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "secure",
+  title: "Create Post",
+  description: "Creates a new published post.",
   validator: {
     title: z.string().min(3),
     body:  z.string().min(10),

@@ -17,6 +17,8 @@ type OASchema = {
 
 type OAOperation = {
   operationId?: string;
+  summary?: string;
+  description?: string;
   security?: unknown[];
   requestBody?: {
     content?: { "application/json"?: { schema?: OASchema } };
@@ -123,6 +125,8 @@ function buildEndpoint(method: string, path: string, op: OAOperation): string {
     `  method: "${methodUpper}",`,
     `  type: "${authType}",`,
   ];
+  if (op.summary) lines.push(`  title: "${op.summary}",`);
+  if (op.description) lines.push(`  description: "${op.description}",`);
   if (validatorBlock) lines.push(validatorBlock);
   lines.push(`  handler: ${handlerBody},`, "};");
   return lines.join("\n");

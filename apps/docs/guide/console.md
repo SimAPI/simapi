@@ -20,71 +20,98 @@ Start the dev server and open:
 
 **http://localhost:3000/__simapi/console/**
 
-The console is only mounted when `@simapi/console` is installed. It is served alongside your endpoints — no separate server needed.
+The console is only mounted when `@simapi/console` is installed. It is served alongside your endpoints — no separate server needed. It supports **light and dark mode** — toggle with the button in the sidebar footer.
 
-## Overview tab
+## Overview page
 
-The landing page shows the health of your running server:
+The landing page shows your server's status and the available internal SimAPI API:
 
-| Field | Description |
-|---|---|
-| **Status** | `running` when the server is reachable |
-| **Name** | Value of `name` from `simapi.config.ts` |
-| **Version** | SimAPI package version |
-| **Endpoints** | Total number of discovered endpoints |
-| **Uptime** | Time since the server started |
+- **Server card** — name, version, and online/offline indicator
+- **Stats** — endpoint count and logging status
+- **Internal API table** — all `/__simapi/*` routes available for programmatic use
 
-## Logs tab
+## Request Logs page
 
-Every request logged to your database appears here in real time.
-
-### Live stream
-
-A Server-Sent Events connection keeps the log table updating as requests arrive. New rows slide in at the top without a page refresh.
+Every request logged to your database appears here in real time via a Server-Sent Events stream. New rows appear at the top without a page refresh.
 
 ### Log columns
 
 | Column | Description |
 |---|---|
-| **Method** | HTTP method badge (color-coded) |
-| **Path** | The matched route path |
-| **Status** | Response status code (green 2xx, yellow 4xx, red 5xx) |
-| **Duration** | Time from request received to response sent |
 | **Time** | Timestamp of the request |
+| **Method** | HTTP method badge (color-coded) |
+| **Path** | The matched route path including query string |
+| **Status** | Response status code (green 2xx, yellow 4xx, red 5xx) |
+| **ms** | Duration from request received to response sent |
+
+### Log detail modal
+
+Click any row to open a **detail modal** showing:
+
+- Request headers (parsed as a key/value table)
+- Request body (JSON-formatted)
+- Response status and body (JSON-formatted)
+- Duration in milliseconds
+
+The modal also has a **Delete** button to remove the entry from the database.
 
 ### Filtering
 
-Use the filter bar to narrow results by method, status code range, or path substring. Filters apply to both the live stream and paginated history.
+Use the filter bar to narrow results by path or method prefix.
 
 ### JSON export
 
-Click **Export** to download the visible log entries as a `.json` file — useful for sharing reproduction cases or feeding into other tools.
+Click **Export JSON** to download all visible log entries as a `.json` file.
 
-## Schema tab
+## Schema & Try page
 
-A full list of every endpoint SimAPI has loaded, including:
+A split-panel view of your endpoints with interactive documentation and a built-in HTTP client.
 
-- **Method badge** — GET, POST, PUT, PATCH, DELETE with distinct colors
-- **Path** — the full route pattern
-- **Type badge** — `open` or `secure`
-- **Validator** — shown when the endpoint has a `validator` field
+### Endpoint list
 
-### OpenAPI export
+All discovered endpoints are listed on the left with method badges and paths. Click any endpoint to open its detail view.
 
-Click **Export OpenAPI** to download an `openapi.yaml` spec generated from your live endpoints. Equivalent to running `simapi export` from the CLI.
+### Documentation tab
 
-## Try tab
+For the selected endpoint:
 
-Send a real HTTP request to any endpoint directly from the console.
+- **Title and description** (if set on the `EndpointDefinition`)
+- **Method, path, and auth type** header
+- **Path parameters** table (name, type, required)
+- **Request body** table — shows every field from the `validator` with its type, required/optional status, and constraints (min/max length, format)
+- **Responses** section — expected status codes (200/201, 401 for secure, 422 when validator present)
 
-1. **Select an endpoint** from the dropdown — path and method are filled in automatically.
-2. **Fill path params** — if the route has `:id` segments, input fields appear for each one.
-3. **Fill query params** — add any `?key=value` pairs.
-4. **Fill request body** — a JSON editor appears for POST/PUT/PATCH endpoints. If the endpoint has a `validator`, the expected fields are shown as placeholders.
-5. **Add headers** — include `Authorization` or any custom header.
-6. Click **Send** — the response status, body, and duration appear below.
+To make schema documentation richer, add `title` and `description` to your endpoints:
 
-All requests fired from the Try tab go through your full SimAPI pipeline — auth handlers, validators, fake data — exactly as a real client would experience them.
+```ts
+export const createPost: EndpointDefinition = {
+  path: "/api/posts",
+  method: "POST",
+  type: "secure",
+  title: "Create Post",
+  description: "Creates a new post and returns it with a generated ID.",
+  validator: {
+    title: z.string().min(3),
+    body:  z.string().min(10),
+  },
+  handler: (req) => {
+    req.errors.throwValidationError();
+    return AppResponse.created({ data: makePost() });
+  },
+};
+```
+
+### Try it tab
+
+Send a real HTTP request directly from the console:
+
+1. Select an endpoint from the left list
+2. Fill in **path parameters** (`:id` fields get their own inputs)
+3. Add optional **query parameters**
+4. Edit the **request body** — pre-filled with field names from the `validator` if present
+5. Click **Send**
+
+The response status and body appear below the form. All requests go through the full SimAPI pipeline — auth, validation, fake data — exactly as a real client would.
 
 ## Configuration
 
@@ -94,11 +121,11 @@ The console respects your `simapi.config.ts` settings. To disable request loggin
 export default defineConfig({
   name: "my-api",
   logEntries: false,   // don't write to DB
-  // @simapi/console still mounts; Logs tab will be empty
+  // @simapi/console still mounts; Logs page will be empty
 });
 ```
 
-To run without the console even when it's installed, remove the package:
+To run without the console even when it's installed:
 
 ```sh
 npx simapi console:remove

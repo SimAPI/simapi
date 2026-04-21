@@ -15,6 +15,8 @@ export const api = {
     fetch(`${BASE}/logs?limit=${limit}&offset=${offset}`).then<LogsResponse>(
       (r) => r.json()
     ),
+  deleteLog: (id: number) =>
+    fetch(`${BASE}/logs/${id}`, { method: "DELETE" }).then((r) => r.json()),
   send: (method: string, path: string, body?: unknown) =>
     fetch(path, {
       method,

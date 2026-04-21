@@ -1,5 +1,5 @@
 import { createClient } from "@libsql/client";
-import { desc, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
@@ -42,7 +42,11 @@ export async function createSqliteAdapter(
 
   return {
     async log(entry) {
-      await db.insert(requestLogs).values(entry);
+      const rows = await db
+        .insert(requestLogs)
+        .values(entry)
+        .returning({ id: requestLogs.id });
+      return rows[0]?.id ?? 0;
     },
     async getLogs({ limit = 100, offset = 0 } = {}) {
       return db
@@ -51,6 +55,9 @@ export async function createSqliteAdapter(
         .orderBy(desc(requestLogs.id))
         .limit(limit)
         .offset(offset) as Promise<RequestLogEntry[]>;
+    },
+    async deleteLog(id) {
+      await db.delete(requestLogs).where(eq(requestLogs.id, id));
     },
     async close() {
       client.close();

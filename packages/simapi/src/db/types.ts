@@ -12,10 +12,11 @@ export interface RequestLogEntry {
 }
 
 export interface DbAdapter {
-  log(entry: Omit<RequestLogEntry, "id">): Promise<void>;
+  log(entry: Omit<RequestLogEntry, "id">): Promise<number>;
   getLogs(opts?: {
     limit?: number;
     offset?: number;
   }): Promise<RequestLogEntry[]>;
+  deleteLog(id: number): Promise<void>;
   close(): Promise<void>;
 }

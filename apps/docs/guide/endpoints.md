@@ -12,6 +12,10 @@ export const myEndpoint: EndpointDefinition = {
   method: "GET",             // GET | POST | PUT | PATCH | DELETE | HEAD | OPTIONS
   type: "open",              // "open" = no auth | "secure" = runs authHandler first
 
+  // Optional — shown in the Console schema view and OpenAPI export
+  title: "Get Post",
+  description: "Returns a single post by ID.",
+
   // Optional — Zod shape validated before handler runs
   validator: {
     title: z.string().min(3),
