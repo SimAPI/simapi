@@ -68,11 +68,13 @@ export async function registerInternalRoutes(
 
   app.get("/__simapi/openapi.json", async (c) => {
     const spec = await buildOpenApiSpec(endpoints, config);
+
     return c.json(spec);
   });
 
   app.get("/__simapi/openapi.yaml", async (_c) => {
     const spec = await buildOpenApiSpec(endpoints, config);
+
     return new Response(yamlStringify(spec, { lineWidth: 120 }), {
       headers: { "content-type": "text/yaml; charset=utf-8" },
     });
@@ -83,23 +85,34 @@ export async function registerInternalRoutes(
   });
 
   app.get("/__simapi/logs", async (c) => {
-    const limit = Math.min(Number(c.req.query("limit") ?? "100"), 500);
-    const offset = Number(c.req.query("offset") ?? "0");
+    const rawLimit = Number(c.req.query("limit"));
+    const rawOffset = Number(c.req.query("offset"));
+    const limit = Math.min(
+      Number.isFinite(rawLimit) && rawLimit >= 0 ? Math.floor(rawLimit) : 100,
+      500
+    );
+    const offset =
+      Number.isFinite(rawOffset) && rawOffset >= 0 ? Math.floor(rawOffset) : 0;
+
     const data = await bus.getLogs({ limit, offset });
+
     return c.json({ data, limit, offset });
   });
 
   app.delete("/__simapi/logs", async (c) => {
     await bus.clearLogs();
+
     return c.json({ ok: true });
   });
 
   app.delete("/__simapi/logs/:id", async (c) => {
     const id = Number(c.req.param("id"));
-    if (!Number.isInteger(id) || id <= 0) {
+
+    if (!Number.isInteger(id) || id <= 0)
       return c.json({ error: "Invalid id" }, 400);
-    }
+
     await bus.deleteLog(id);
+
     return c.json({ ok: true });
   });
 

@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { dirname, extname, join } from "node:path";
+import { dirname, extname, join, resolve as resolvePath, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { Hono } from "hono";
@@ -30,9 +30,12 @@ export function mountConsole(app: Hono): void {
       ext && urlPath !== "/"
         ? join(spaDir, urlPath)
         : join(spaDir, "index.html");
-    const target = existsSync(candidate)
-      ? candidate
-      : join(spaDir, "index.html");
+
+    // Prevent path traversal: resolved path must stay within spaDir
+    const resolved = resolvePath(candidate);
+    const safe = resolved.startsWith(spaDir + sep) || resolved === spaDir;
+    const target =
+      safe && existsSync(resolved) ? resolved : join(spaDir, "index.html");
 
     const content = await readFile(target);
     const mime = MIME[extname(target)] ?? "application/octet-stream";

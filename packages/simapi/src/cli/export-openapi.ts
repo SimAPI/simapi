@@ -1,10 +1,10 @@
-import { existsSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tsImport } from "tsx/esm/api";
 import { stringify as yamlStringify } from "yaml";
 
 import type { SimAPIConfig } from "../core/defineConfig.js";
-import type { EndpointDefinition } from "../core/endpoint.js";
+import { discoverEndpoints } from "../server/discovery.js";
 import { buildOpenApiSpec } from "../server/openapi.js";
 
 export async function runExportOpenAPI(
@@ -30,33 +30,7 @@ export async function runExportOpenAPI(
     process.exit(1);
   }
 
-  const files = readdirSync(endpointsDir, { recursive: false })
-    .filter((f): f is string => typeof f === "string")
-    .filter((f) => f.endsWith(".ts") || f.endsWith(".js"));
-
-  const endpoints: EndpointDefinition[] = [];
-
-  for (const file of files) {
-    try {
-      const mod = await tsImport(join(endpointsDir, file), {
-        parentURL: import.meta.url,
-      });
-      for (const key of Object.keys(mod)) {
-        const val = mod[key];
-        if (
-          val &&
-          typeof val === "object" &&
-          "path" in val &&
-          "method" in val &&
-          "type" in val
-        ) {
-          endpoints.push(val as EndpointDefinition);
-        }
-      }
-    } catch (err) {
-      console.warn(`[SimAPI] Skipping ${file}:`, err);
-    }
-  }
+  const endpoints = await discoverEndpoints(endpointsDir);
 
   if (endpoints.length === 0) {
     console.error("[SimAPI] No endpoints found.");
