@@ -47,6 +47,7 @@
   ],
   "scripts": {
     "build": "vite build && tsdown",
+    "prepublishOnly": "npm run build",
     "dev": "vite",
     "check-types": "tsc --noEmit"
   },
