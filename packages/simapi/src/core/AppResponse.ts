@@ -100,4 +100,21 @@ export class AppResponse {
   static array<T>(count: number, factory: () => T): T[] {
     return Array.from({ length: count }, () => factory());
   }
+
+  /**
+   * Returns `true` when `val` is an `AppResponse`.
+   *
+   * Use this instead of `instanceof AppResponse` anywhere the check must work
+   * across separate bundle copies of the package (e.g. inside the CLI bundle
+   * when user code imports `AppResponse` from the library bundle).
+   */
+  static isAppResponse(val: unknown): val is AppResponse {
+    return (
+      val !== null &&
+      val !== undefined &&
+      typeof val === "object" &&
+      typeof (val as { status?: unknown }).status === "number" &&
+      "body" in (val as object)
+    );
+  }
 }

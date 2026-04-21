@@ -80,8 +80,9 @@ function registerEndpoint(
           };
           return c.json(logBody, 500);
         }
+
         const authResult = await config.authHandler(request);
-        if (authResult instanceof AppResponse) {
+        if (AppResponse.isAppResponse(authResult)) {
           logStatus = authResult.status;
           logBody = authResult.body;
           // biome-ignore lint/suspicious/noExplicitAny: status is a valid HTTP code
@@ -91,7 +92,7 @@ function registerEndpoint(
 
       if (endpoint.authHandler) {
         const authResult = await endpoint.authHandler(request);
-        if (authResult instanceof AppResponse) {
+        if (AppResponse.isAppResponse(authResult)) {
           logStatus = authResult.status;
           logBody = authResult.body;
           // biome-ignore lint/suspicious/noExplicitAny: status is a valid HTTP code
