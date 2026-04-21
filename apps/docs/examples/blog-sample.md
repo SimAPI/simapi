@@ -11,7 +11,7 @@ A full-featured blog backend simulator covering authentication, content manageme
 ```bash
 cd examples/blog-sample
 npm install
-npm run dev
+npm run serve
 # → http://localhost:3001
 # → http://localhost:3001/__simapi/console
 ```
@@ -25,7 +25,7 @@ export default defineConfig({
   name: "Blog API",
   authHandler: AuthHandlers.bearer(),
   autoThrowValidationErrors: "laravel",
-  db: { type: "sqlite", file: ".data/blog.db" },
+  database: { type: "sqlite", path: ".data/blog.db" },
 });
 ```
 

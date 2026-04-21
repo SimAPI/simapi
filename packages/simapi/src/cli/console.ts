@@ -25,7 +25,7 @@ export async function runConsoleAdd(
     });
     s.stop("@simapi/console installed");
     p.outro(
-      "Console enabled. Start your server and visit http://localhost:3000/console"
+      "Console enabled. Start your server and visit http://localhost:3000/__simapi/console/"
     );
   } catch (err) {
     s.stop("Installation failed");

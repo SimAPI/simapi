@@ -11,7 +11,7 @@ A complete e-commerce backend simulator covering product catalog, cart managemen
 ```bash
 cd examples/shop-sample
 npm install
-npm run dev
+npm run serve
 # → http://localhost:3002
 # → http://localhost:3002/__simapi/console
 ```
@@ -25,40 +25,33 @@ export default defineConfig({
   name: "Shop API",
   authHandler: AuthHandlers.bearer(),
   autoThrowValidationErrors: "laravel",
-  db: { type: "sqlite", file: ".data/shop.db" },
+  database: { type: "sqlite", path: ".data/shop.db" },
 });
 ```
 
-Register a customer account via `POST /auth/register`, then sign in at `POST /auth/login`. Include the returned token as `Authorization: Bearer <token>` on protected routes.
-
+Register a customer account via `POST /api/auth/register`, then sign in at `POST /api/auth/login`. Include the returned token as `Authorization: Bearer <token>` on protected routes.
 ## Endpoints
-
 ### Auth
-
-| Method | Path             | Auth | Description                    |
-| ------ | ---------------- | ---- | ------------------------------ |
-| `POST` | `/auth/register` | —    | Create customer account        |
-| `POST` | `/auth/login`    | —    | Sign in, returns access token  |
-| `GET`  | `/auth/me`       | ✓    | Authenticated customer profile |
-| `PUT`  | `/auth/me`       | ✓    | Update profile                 |
-
+| Method | Path                 | Auth | Description                    |
+| ------ | -------------------- | ---- | ------------------------------ |
+| `POST` | `/api/auth/register` | —    | Create customer account        |
+| `POST` | `/api/auth/login`    | —    | Sign in, returns access token  |
+| `GET`  | `/api/auth/me`       | ✓    | Authenticated customer profile |
+| `PUT`  | `/api/auth/me`       | ✓    | Update profile                 |
 ### Products
-
-| Method   | Path               | Auth | Description                                                                    |
-| -------- | ------------------ | ---- | ------------------------------------------------------------------------------ |
-| `GET`    | `/products`        | —    | Paginated catalog (filter by `category`, `min_price`, `max_price`, `in_stock`) |
-| `GET`    | `/products/search` | —    | Search products by `q`                                                         |
-| `GET`    | `/products/:id`    | —    | Product detail with variants and reviews                                       |
-| `POST`   | `/products`        | ✓    | Create product                                                                 |
-| `PUT`    | `/products/:id`    | ✓    | Update product                                                                 |
-| `DELETE` | `/products/:id`    | ✓    | Delete product                                                                 |
-
+| Method   | Path                   | Auth | Description                                                                    |
+| -------- | ---------------------- | ---- | ------------------------------------------------------------------------------ |
+| `GET`    | `/api/products`        | —    | Paginated catalog (filter by `category`, `min_price`, `max_price`, `in_stock`) |
+| `GET`    | `/api/products/search` | —    | Search products by `q`                                                         |
+| `GET`    | `/api/products/:id`    | —    | Product detail with variants and reviews                                       |
+| `POST`   | `/api/products`        | ✓    | Create product                                                                 |
+| `PUT`    | `/api/products/:id`    | ✓    | Update product                                                                 |
+| `DELETE` | `/api/products/:id`    | ✓    | Delete product                                                                 |
 ### Categories
-
-| Method | Path                         | Auth | Description            |
-| ------ | ---------------------------- | ---- | ---------------------- |
-| `GET`  | `/categories`                | —    | All categories         |
-| `GET`  | `/categories/:slug/products` | —    | Products in a category |
+| Method | Path                             | Auth | Description            |
+| ------ | -------------------------------- | ---- | ---------------------- |
+| `GET`  | `/api/categories`                | —    | All categories         |
+| `GET`  | `/api/categories/:slug/products` | —    | Products in a category |
 
 ### Cart
 

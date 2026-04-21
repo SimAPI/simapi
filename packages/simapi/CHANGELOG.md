@@ -8,7 +8,7 @@
 
 - `AppResponse` — static factory methods: `success`, `created`, `noContent`, `unauthenticated`, `unauthorised`, `notFound`, `error`, `array`
 - `AppRequest` — typed accessors: `header`, `body`, `bodyAll`, `param`, `urlParam`; populated `errors: ValidationErrors` field
-- `ValidationErrors` — `hasError`, `errorFields`, `errorsFor`, `throwValidationError(format)` (throws only when errors exist)
+- `ValidationErrors` — `hasError`, `errorFields`, `throwValidationError(format)` (throws only when errors exist)
 - `ValidationError` — thrown by `throwValidationError`; caught and formatted as 422 by the server
 
 **Zod validation**

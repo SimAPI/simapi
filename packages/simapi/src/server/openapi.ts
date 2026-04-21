@@ -4,6 +4,8 @@ import type { EndpointDefinition } from "../core/endpoint.js";
 import { ValidationErrors } from "../core/ValidationErrors.js";
 import { zodShapeToJsonSchema } from "./zodSchema.js";
 
+declare const __SIMAPI_VERSION__: string;
+
 const BODY_METHODS = new Set(["POST", "PUT", "PATCH"]);
 
 function honoToOAPath(path: string): string {
@@ -98,14 +100,12 @@ export async function buildOpenApiSpec(
     info: {
       title: config.name || "SimAPI",
       ...(config.description ? { description: config.description } : {}),
-      version: "1.0.0",
+      version: __SIMAPI_VERSION__,
     },
     ...(hasSecurity
       ? {
           components: {
-            securitySchemes: {
-              bearerAuth: { type: "http", scheme: "bearer" },
-            },
+            securitySchemes: { bearerAuth: { type: "http", scheme: "bearer" } },
           },
         }
       : {}),
