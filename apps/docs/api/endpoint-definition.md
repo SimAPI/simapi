@@ -15,6 +15,7 @@ interface EndpointDefinition {
   type: "open" | "secure";
   title?: string;
   description?: string;
+  authHandler?: AuthHandler;
   validator?: z.ZodRawShape;
   failRate?: number;
   delay?: number;
@@ -61,6 +62,20 @@ A longer description of what the endpoint does. Shown in the Console and as `des
 
 ```ts
 description: "Creates a new post and returns it with a generated ID.",
+```
+
+### `authHandler` — `AuthHandler` *(optional)*
+
+An additional auth check that runs after the global `authHandler` (for `secure` endpoints) or standalone (for `open` endpoints). See the [Authentication guide](/guide/authentication) for full details.
+
+```ts
+authHandler: AuthHandlers.apiKey("x-api-key", "header"),
+
+// or custom:
+authHandler: (req) => {
+  if (req.header("x-user-role") !== "admin")
+    return AppResponse.unauthorised({ message: "Admin only." });
+},
 ```
 
 ### `validator` — `z.ZodRawShape` *(optional)*

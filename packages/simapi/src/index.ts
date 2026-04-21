@@ -2,6 +2,7 @@ export { faker } from "@faker-js/faker";
 export { z } from "zod";
 export { AppRequest } from "./core/AppRequest.js";
 export { AppResponse } from "./core/AppResponse.js";
+export { AuthHandlers } from "./core/AuthHandlers.js";
 export type {
   AuthHandler,
   DatabaseConfig,

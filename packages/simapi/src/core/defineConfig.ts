@@ -2,7 +2,9 @@ import type { AppRequest } from "./AppRequest.js";
 import type { AppResponse } from "./AppResponse.js";
 import type { ValidationFormat } from "./ValidationErrors.js";
 
-export type AuthHandler = (req: AppRequest) => AppResponse | undefined;
+export type AuthHandler = (
+  req: AppRequest
+) => AppResponse | undefined | Promise<AppResponse | undefined>;
 
 export type DatabaseConfig =
   | { type: "sqlite"; path: string }

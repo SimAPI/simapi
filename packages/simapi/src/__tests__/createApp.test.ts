@@ -123,6 +123,108 @@ describe("createApp", () => {
       const res = await app.request("/api/secret");
       expect(res.status).toBe(200);
     });
+
+    it("supports async authHandler", async () => {
+      const app = await buildApp(
+        [
+          {
+            path: "/api/secret",
+            method: "GET",
+            type: "secure",
+            handler: () => AppResponse.success({ ok: true }),
+          },
+        ],
+        {
+          name: "test",
+          authHandler: async () =>
+            AppResponse.unauthenticated({ message: "async reject" }),
+        }
+      );
+      const res = await app.request("/api/secret");
+      expect(res.status).toBe(401);
+    });
+  });
+
+  describe("per-endpoint authHandler", () => {
+    it("runs endpoint authHandler on open endpoints", async () => {
+      const app = await buildApp([
+        {
+          path: "/api/posts",
+          method: "GET",
+          type: "open",
+          authHandler: () =>
+            AppResponse.unauthenticated({ message: "key required" }),
+          handler: () => AppResponse.success({ data: [] }),
+        },
+      ]);
+      const res = await app.request("/api/posts");
+      expect(res.status).toBe(401);
+    });
+
+    it("allows open endpoint through when endpoint authHandler returns void", async () => {
+      const app = await buildApp([
+        {
+          path: "/api/posts",
+          method: "GET",
+          type: "open",
+          authHandler: () => undefined,
+          handler: () => AppResponse.success({ data: [] }),
+        },
+      ]);
+      const res = await app.request("/api/posts");
+      expect(res.status).toBe(200);
+    });
+
+    it("runs global then endpoint authHandler on secure endpoints", async () => {
+      const order: string[] = [];
+      const app = await buildApp(
+        [
+          {
+            path: "/api/secret",
+            method: "GET",
+            type: "secure",
+            authHandler: () => {
+              order.push("endpoint");
+            },
+            handler: () => AppResponse.success({ ok: true }),
+          },
+        ],
+        {
+          name: "test",
+          authHandler: () => {
+            order.push("global");
+          },
+        }
+      );
+      const res = await app.request("/api/secret");
+      expect(res.status).toBe(200);
+      expect(order).toEqual(["global", "endpoint"]);
+    });
+
+    it("stops at global authHandler when it rejects on secure endpoint", async () => {
+      const endpointCalled = { value: false };
+      const app = await buildApp(
+        [
+          {
+            path: "/api/secret",
+            method: "GET",
+            type: "secure",
+            authHandler: () => {
+              endpointCalled.value = true;
+            },
+            handler: () => AppResponse.success({ ok: true }),
+          },
+        ],
+        {
+          name: "test",
+          authHandler: () =>
+            AppResponse.unauthenticated({ message: "rejected" }),
+        }
+      );
+      const res = await app.request("/api/secret");
+      expect(res.status).toBe(401);
+      expect(endpointCalled.value).toBe(false);
+    });
   });
 
   describe("Zod validation via validator field", () => {

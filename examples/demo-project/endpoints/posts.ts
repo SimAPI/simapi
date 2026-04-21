@@ -10,6 +10,8 @@ export const listPosts: EndpointDefinition = {
   path: "/api/posts",
   method: "GET",
   type: "open",
+  title: "List Posts",
+  description: "Returns a paginated list of all published posts.",
   handler: () =>
     AppResponse.success({
       data: AppResponse.array(10, makePost),
@@ -21,6 +23,8 @@ export const getPost: EndpointDefinition = {
   path: "/api/posts/:id",
   method: "GET",
   type: "open",
+  title: "Get Post",
+  description: "Returns a single post by ID.",
   delay: 400,
   failRate: 0.1,
   handler: (req: AppRequest) =>
@@ -31,6 +35,8 @@ export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "secure",
+  title: "Create Post",
+  description: "Creates a new post. Requires authentication.",
   validator: {
     title: z.string().min(3),
     body: z.string().min(10),
@@ -52,5 +58,7 @@ export const deletePost: EndpointDefinition = {
   path: "/api/posts/:id",
   method: "DELETE",
   type: "secure",
+  title: "Delete Post",
+  description: "Permanently deletes a post by ID. Requires authentication.",
   handler: () => AppResponse.noContent(),
 };
