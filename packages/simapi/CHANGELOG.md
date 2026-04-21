@@ -1,5 +1,13 @@
 # @simapi/simapi
 
+## 0.0.3
+
+### Bug fixes & init improvements
+
+- Fixed all example files importing from `"simapi"` — now correctly import from `"@simapi/simapi"`
+- Fixed scaffolded `simapi.config.ts`, `authHandler.ts`, and endpoint templates importing from `"simapi"` — updated to `"@simapi/simapi"`
+- `simapi init` now installs `@simapi/simapi` (and `@simapi/console`) via `npm install` directly instead of pre-writing them into `package.json` — ensures the latest published version is always fetched from the registry
+
 ## 0.0.2
 
 ### Package rename & build fix
