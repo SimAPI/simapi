@@ -1,0 +1,15 @@
+{
+  "name": "simapi-shop-sample",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "E-commerce store API — a comprehensive SimAPI example",
+  "scripts": {
+    "serve": "simapi serve",
+    "build": "simapi build",
+    "start": "simapi start",
+    "export": "simapi export"
+  },
+  "dependencies": {
+    "simapi": "*"
+  }
+}

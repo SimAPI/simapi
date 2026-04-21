@@ -1,0 +1,15 @@
+{
+  "name": "simapi-demo",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Demo project showing SimAPI patterns",
+  "scripts": {
+    "serve": "simapi serve",
+    "build": "simapi build",
+    "start": "simapi start",
+    "export": "simapi export"
+  },
+  "dependencies": {
+    "simapi": "*"
+  }
+}

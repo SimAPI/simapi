@@ -1,0 +1,15 @@
+{
+  "name": "simapi-blog-sample",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Blog platform API — a comprehensive SimAPI example",
+  "scripts": {
+    "serve": "simapi serve",
+    "build": "simapi build",
+    "start": "simapi start",
+    "export": "simapi export"
+  },
+  "dependencies": {
+    "simapi": "*"
+  }
+}

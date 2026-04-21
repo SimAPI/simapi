@@ -1,0 +1,16 @@
+import { AuthHandlers, defineConfig } from "simapi";
+
+export default defineConfig({
+  name: "SimAPI Blog Sample",
+  description:
+    "A realistic blog platform API — posts, authors, comments, categories, tags, media and analytics.",
+  port: 3001,
+  logEntries: true,
+  consoleLog: true,
+  authHandler: AuthHandlers.bearer(),
+  autoThrowValidationErrors: "laravel",
+  database: {
+    type: "sqlite",
+    path: "./.simapi/db.sqlite",
+  },
+});

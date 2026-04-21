@@ -1,24 +1,48 @@
 {
   "name": "simapi",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimAPI/simapi.git"
+  },
+  "homepage": "https://simapi.mayrlabs.com",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "serve": "turbo run serve",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "check-types": "turbo run check-types",
+    "test": "turbo run test",
+    "release": "npx changeset publish",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
+    "@biomejs/biome": "^2.4.12",
+    "concurrently": "^9.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "turbo": "^2.9.6",
     "typescript": "5.9.2"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "packageManager": "npm@11.8.0",
   "workspaces": [
     "apps/*",
-    "packages/*"
-  ]
+    "packages/*",
+    "examples/*"
+  ],
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json}": [
+      "biome check --write --no-errors-on-unmatched",
+      "biome lint --no-errors-on-unmatched"
+    ]
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.31.0"
+  }
 }
