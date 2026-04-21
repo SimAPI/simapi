@@ -13,6 +13,8 @@ cli
     });
   });
 
+declare const __CREATE_SIMAPI_VERSION__: string;
+
 cli.help();
-cli.version("0.1.0");
+cli.version(__CREATE_SIMAPI_VERSION__);
 cli.parse();

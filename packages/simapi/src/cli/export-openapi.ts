@@ -5,82 +5,7 @@ import { stringify as yamlStringify } from "yaml";
 
 import type { SimAPIConfig } from "../core/defineConfig.js";
 import type { EndpointDefinition } from "../core/endpoint.js";
-
-// ─── path helpers ─────────────────────────────────────────────────────────────
-
-function honoToOAPath(path: string): string {
-  return path.replace(/:([^/]+)/g, "{$1}");
-}
-
-function defaultStatusForMethod(method: string): number {
-  switch (method.toUpperCase()) {
-    case "POST":
-      return 201;
-    case "DELETE":
-      return 204;
-    default:
-      return 200;
-  }
-}
-
-import { zodShapeToJsonSchema } from "../server/zodSchema.js";
-
-// ─── openapi builder ──────────────────────────────────────────────────────────
-
-function buildOperation(ep: EndpointDefinition): Record<string, unknown> {
-  const status = defaultStatusForMethod(ep.method);
-
-  const operation: Record<string, unknown> = {
-    ...(ep.title ? { summary: ep.title } : {}),
-    ...(ep.description ? { description: ep.description } : {}),
-    responses: {
-      [status]: {
-        description: "Success",
-        content: {
-          "application/json": { schema: { type: "object" } },
-        },
-      },
-      ...(ep.validator
-        ? {
-            422: {
-              description: "Validation error",
-              content: {
-                "application/json": { schema: { type: "object" } },
-              },
-            },
-          }
-        : {}),
-    },
-  };
-
-  if (ep.type === "secure") {
-    operation.security = [{}];
-  }
-
-  if (ep.validator) {
-    operation.requestBody = {
-      required: true,
-      content: {
-        "application/json": {
-          schema: zodShapeToJsonSchema(ep.validator as Record<string, unknown>),
-        },
-      },
-    };
-  }
-
-  // Path parameters from the route pattern
-  const params = [...ep.path.matchAll(/:([^/]+)/g)].map(([, name]) => ({
-    name,
-    in: "path",
-    required: true,
-    schema: { type: "string" },
-  }));
-  if (params.length > 0) operation.parameters = params;
-
-  return operation;
-}
-
-// ─── main ─────────────────────────────────────────────────────────────────────
+import { buildOpenApiSpec } from "../server/openapi.js";
 
 export async function runExportOpenAPI(
   cwd?: string,
@@ -138,29 +63,10 @@ export async function runExportOpenAPI(
     return;
   }
 
-  const paths: Record<string, Record<string, unknown>> = {};
-  for (const ep of endpoints) {
-    const oaPath = honoToOAPath(ep.path);
-    if (!paths[oaPath]) paths[oaPath] = {};
-    paths[oaPath][ep.method.toLowerCase()] = buildOperation(ep);
-  }
-
-  const spec = {
-    openapi: "3.0.3",
-    info: {
-      title: config?.name ?? "SimAPI",
-      description: config?.description ?? "",
-      version: "1.0.0",
-    },
-    ...(ep_hasSecure(endpoints)
-      ? {
-          components: {
-            securitySchemes: { bearerAuth: { type: "http", scheme: "bearer" } },
-          },
-        }
-      : {}),
-    paths,
-  };
+  const spec = await buildOpenApiSpec(endpoints, {
+    name: config?.name ?? "SimAPI",
+    description: config?.description,
+  });
 
   const outputArg = opts.output ?? "openapi.yaml";
   const format = opts.format ?? (outputArg.endsWith(".json") ? "json" : "yaml");
@@ -173,8 +79,4 @@ export async function runExportOpenAPI(
 
   writeFileSync(outPath, content, "utf8");
   console.log(`[SimAPI] Exported ${endpoints.length} endpoint(s) → ${outPath}`);
-}
-
-function ep_hasSecure(endpoints: EndpointDefinition[]): boolean {
-  return endpoints.some((ep) => ep.type === "secure");
 }

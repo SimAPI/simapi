@@ -11,10 +11,11 @@ export const PACKAGE_JSON = `{
     "serve": "simapi serve",
     "build": "simapi build",
     "start": "simapi start",
-    "endpoint:create": "simapi endpoint:create"
+    "import": "simapi import",
+    "export": "simapi export"
   },
   "dependencies": {
-    "simapi": "^0.1.0"
+    "simapi": "*"
   }
 }
 `;
@@ -42,7 +43,9 @@ export default defineConfig({
   name: "{{name}}",
   description: "{{description}}",
   port: 3000,
+  // authHandler: AuthHandlers.bearer(),
   logEntries: true,
+  consoleLog: true,
   database: {
     type: "sqlite",
     path: "./.simapi/db.sqlite",
@@ -59,6 +62,7 @@ export default defineConfig({
   port: 3000,
   authHandler,
   logEntries: true,
+  consoleLog: true,
   database: {
     type: "sqlite",
     path: "./.simapi/db.sqlite",

@@ -100,7 +100,7 @@ export async function runCreate(name: string | undefined): Promise<void> {
     const pkg = JSON.parse(pkgJson) as {
       dependencies: Record<string, string>;
     };
-    pkg.dependencies["@simapi/console"] = "^0.1.0";
+    pkg.dependencies["@simapi/console"] = "*";
     pkgJson = `${JSON.stringify(pkg, null, 2)}\n`;
   }
 

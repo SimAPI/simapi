@@ -1,5 +1,6 @@
 import type { Hono } from "hono";
 import { streamSSE } from "hono/streaming";
+import { stringify as yamlStringify } from "yaml";
 
 import { AppRequest } from "../core/AppRequest.js";
 import type { SimAPIConfig } from "../core/defineConfig.js";
@@ -7,9 +8,10 @@ import type { EndpointDefinition } from "../core/endpoint.js";
 import { ValidationErrors } from "../core/ValidationErrors.js";
 import type { RequestLogEntry } from "../db/types.js";
 import type { LogBus } from "./logBus.js";
+import { buildOpenApiSpec } from "./openapi.js";
 import { zodShapeToJsonSchema } from "./zodSchema.js";
 
-const SIMAPI_VERSION = "0.1.0";
+declare const __SIMAPI_VERSION__: string;
 
 async function getResponseExample(
   endpoint: EndpointDefinition
@@ -47,10 +49,22 @@ export async function registerInternalRoutes(
   app.get("/__simapi/health", (c) => {
     return c.json({
       ok: true,
-      version: SIMAPI_VERSION,
+      version: __SIMAPI_VERSION__,
       name: config.name,
       endpointCount: endpoints.length,
       logging: config.logEntries !== false,
+    });
+  });
+
+  app.get("/__simapi/openapi.json", async (c) => {
+    const spec = await buildOpenApiSpec(endpoints, config);
+    return c.json(spec);
+  });
+
+  app.get("/__simapi/openapi.yaml", async (_c) => {
+    const spec = await buildOpenApiSpec(endpoints, config);
+    return new Response(yamlStringify(spec, { lineWidth: 120 }), {
+      headers: { "content-type": "text/yaml; charset=utf-8" },
     });
   });
 

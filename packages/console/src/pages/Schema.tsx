@@ -40,7 +40,7 @@ const AUTH_OPTIONS: { value: AuthPreset; label: string }[] = [
   { value: "cookie", label: "Cookie / Session" },
 ];
 
-// ─── export helpers ───────────────────────────────────────────────────────────
+// ─── export helper ────────────────────────────────────────────────────────────
 
 function downloadBlob(content: string, filename: string, type: string) {
   const blob = new Blob([content], { type });
@@ -48,79 +48,6 @@ function downloadBlob(content: string, filename: string, type: string) {
   a.href = URL.createObjectURL(blob);
   a.download = filename;
   a.click();
-}
-
-function toOaPath(path: string): string {
-  return path.replace(/:(\w+)/g, "{$1}");
-}
-
-function buildOpenApiSpec(endpoints: EndpointInfo[]): object {
-  const paths: Record<string, Record<string, unknown>> = {};
-  const hasSecurity = endpoints.some((e) => e.type === "secure");
-
-  for (const ep of endpoints) {
-    const oaPath = toOaPath(ep.path);
-    if (!paths[oaPath]) paths[oaPath] = {};
-    const method = ep.method.toLowerCase();
-    const pathParams = extractPathParams(ep.path);
-
-    const operation: Record<string, unknown> = {
-      summary: ep.title ?? ep.path,
-      ...(ep.description ? { description: ep.description } : {}),
-      ...(ep.type === "secure" ? { security: [{ bearerAuth: [] }] } : {}),
-    };
-
-    if (pathParams.length > 0) {
-      operation.parameters = pathParams.map((p) => ({
-        name: p,
-        in: "path",
-        required: true,
-        schema: { type: "string" },
-      }));
-    }
-
-    if (ep.schema && BODY_METHODS.has(ep.method)) {
-      operation.requestBody = {
-        required: true,
-        content: { "application/json": { schema: ep.schema } },
-      };
-    }
-
-    const successCode =
-      ep.method === "POST" ? "201" : ep.method === "DELETE" ? "204" : "200";
-    operation.responses = {
-      [successCode]: {
-        description: successCode === "204" ? "No content" : "Success",
-        ...(ep.responseExample !== undefined && successCode !== "204"
-          ? {
-              content: {
-                "application/json": { example: ep.responseExample },
-              },
-            }
-          : {}),
-      },
-      ...(ep.type === "secure" ? { "401": { description: "Unauthorized" } } : {}),
-      ...(ep.schema ? { "422": { description: "Validation error" } } : {}),
-      "500": { description: "Internal server error" },
-    };
-
-    paths[oaPath][method] = operation;
-  }
-
-  return {
-    openapi: "3.0.3",
-    info: { title: "SimAPI", version: "1.0.0" },
-    ...(hasSecurity
-      ? {
-          components: {
-            securitySchemes: {
-              bearerAuth: { type: "http", scheme: "bearer" },
-            },
-          },
-        }
-      : {}),
-    paths,
-  };
 }
 
 // ─── constants ────────────────────────────────────────────────────────────────
@@ -881,20 +808,15 @@ export default function Schema() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [exportOpen]);
 
-  const exportAs = (format: "json" | "openapi") => {
+  const exportAs = async (format: "json" | "yaml") => {
     setExportOpen(false);
-    if (format === "json") {
-      downloadBlob(
-        JSON.stringify(endpoints, null, 2),
-        "simapi-schema.json",
-        "application/json"
-      );
-    } else {
-      downloadBlob(
-        JSON.stringify(buildOpenApiSpec(endpoints), null, 2),
-        "simapi-openapi.json",
-        "application/json"
-      );
+    try {
+      const res = await fetch(`/__simapi/openapi.${format}`);
+      const text = await res.text();
+      const mime = format === "json" ? "application/json" : "text/yaml";
+      downloadBlob(text, `simapi-openapi.${format}`, mime);
+    } catch (err) {
+      console.error("[SimAPI] Export failed:", err);
     }
   };
 
@@ -943,14 +865,14 @@ export default function Schema() {
                       onClick={() => exportAs("json")}
                       className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                     >
-                      JSON
+                      OpenAPI 3.0 JSON
                     </button>
                     <button
                       type="button"
-                      onClick={() => exportAs("openapi")}
+                      onClick={() => exportAs("yaml")}
                       className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border-t border-zinc-100 dark:border-zinc-800"
                     >
-                      OpenAPI 3.0
+                      OpenAPI 3.0 YAML
                     </button>
                   </div>
                 )}
