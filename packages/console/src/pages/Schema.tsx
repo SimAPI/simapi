@@ -794,10 +794,17 @@ export default function Schema() {
       )
     : endpoints;
 
+  // On mobile: show list OR detail (not both). On desktop: always side-by-side.
+  const showList = !selected; // mobile: hide list when an endpoint is selected
+
   return (
     <div className="flex flex-1 overflow-hidden min-h-0">
-      {/* Endpoint list */}
-      <div className="w-72 shrink-0 border-r border-zinc-200 dark:border-zinc-800 flex flex-col bg-white dark:bg-zinc-900 overflow-hidden">
+      {/* Endpoint list — full width on mobile when no endpoint selected, fixed sidebar on desktop */}
+      <div
+        className={`${
+          showList ? "flex" : "hidden sm:flex"
+        } w-full sm:w-72 sm:shrink-0 flex-col border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden`}
+      >
         {/* List header with search */}
         <div className="px-3 py-3 border-b border-zinc-100 dark:border-zinc-800 shrink-0 space-y-2">
           <div className="flex items-baseline justify-between px-1">
@@ -831,7 +838,7 @@ export default function Schema() {
                 key={`${e.method}-${e.path}`}
                 type="button"
                 onClick={() => setSelected(e)}
-                className={`w-full flex items-start gap-2 px-3 py-2.5 text-left transition-colors border-r-2 ${
+                className={`w-full flex items-start gap-2 px-3 py-3 sm:py-2.5 text-left transition-colors border-r-2 active:bg-zinc-100 dark:active:bg-zinc-800 ${
                   isSelected
                     ? "bg-cyan-50 dark:bg-cyan-950/30 border-cyan-500"
                     : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border-transparent"
@@ -842,7 +849,7 @@ export default function Schema() {
                 >
                   {e.method}
                 </span>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-xs font-mono text-zinc-700 dark:text-zinc-200 truncate">
                     {e.path}
                   </p>
@@ -852,21 +859,42 @@ export default function Schema() {
                     </p>
                   )}
                 </div>
+                {/* Mobile chevron */}
+                <span className="sm:hidden text-zinc-300 dark:text-zinc-600 text-xs mt-1 shrink-0">
+                  ›
+                </span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Detail panel */}
-      <div className="flex-1 overflow-hidden flex flex-col min-w-0">
+      {/* Detail panel — full width on mobile when endpoint selected, fills remaining on desktop */}
+      <div
+        className={`${
+          selected ? "flex" : "hidden sm:flex"
+        } flex-1 overflow-hidden flex-col min-w-0`}
+      >
         {selected ? (
-          <EndpointDetail
-            key={`${selected.method}-${selected.path}`}
-            endpoint={selected}
-            auth={auth}
-            onAuthChange={setAuth}
-          />
+          <>
+            {/* Mobile back button */}
+            <div className="sm:hidden flex items-center gap-2 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="flex items-center gap-1.5 text-sm text-cyan-600 dark:text-cyan-400 font-medium active:opacity-70 transition-opacity"
+              >
+                <span className="text-lg leading-none">‹</span>
+                Endpoints
+              </button>
+            </div>
+            <EndpointDetail
+              key={`${selected.method}-${selected.path}`}
+              endpoint={selected}
+              auth={auth}
+              onAuthChange={setAuth}
+            />
+          </>
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center max-w-xs px-6">

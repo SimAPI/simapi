@@ -56,7 +56,7 @@ export default function Overview() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-8 max-w-2xl">
+      <div className="p-4 sm:p-8 max-w-2xl">
         <div className="mb-7">
           <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-1">
             Overview

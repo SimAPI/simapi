@@ -269,31 +269,26 @@ export default function Logs() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Toolbar */}
-      <div className="px-6 py-3.5 border-b border-zinc-200 dark:border-zinc-800 flex items-center gap-3 bg-white dark:bg-zinc-900 shrink-0">
-        <h1 className="font-semibold text-zinc-900 dark:text-zinc-100">
+      <div className="px-4 sm:px-6 py-3 border-b border-zinc-200 dark:border-zinc-800 flex flex-wrap items-center gap-2 bg-white dark:bg-zinc-900 shrink-0">
+        <h1 className="font-semibold text-zinc-900 dark:text-zinc-100 mr-1">
           Request Logs
         </h1>
         <input
-          className="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 w-52 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-400 dark:focus:border-cyan-600 transition-colors"
-          placeholder="Filter path or method…"
+          className="bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-1.5 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 min-w-0 flex-1 sm:flex-none sm:w-48 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-400 dark:focus:border-cyan-600 transition-colors"
+          placeholder="Filter…"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
         <button
           type="button"
           onClick={exportJson}
-          className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors font-medium"
+          className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 px-3 py-1.5 border border-zinc-200 dark:border-zinc-700 rounded-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors font-medium whitespace-nowrap"
         >
-          Export JSON
+          Export
         </button>
-        <div className="ml-auto flex items-center gap-1.5">
-          <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">
-            {filtered.length}
-          </span>
-          <span className="text-xs text-zinc-300 dark:text-zinc-600">
-            entries
-          </span>
-        </div>
+        <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono ml-auto">
+          {filtered.length} entries
+        </span>
       </div>
 
       {/* Table */}
@@ -301,11 +296,19 @@ export default function Logs() {
         <table className="w-full text-sm">
           <thead className="sticky top-0 z-10">
             <tr className="text-left text-xs text-zinc-400 dark:text-zinc-500 bg-zinc-50/90 dark:bg-zinc-900/90 backdrop-blur-sm border-b border-zinc-200 dark:border-zinc-800">
-              <th className="px-4 py-2.5 font-medium w-32">Time</th>
-              <th className="px-4 py-2.5 font-medium w-20">Method</th>
-              <th className="px-4 py-2.5 font-medium">Path</th>
-              <th className="px-4 py-2.5 font-medium w-20">Status</th>
-              <th className="px-4 py-2.5 font-medium text-right w-16">ms</th>
+              <th className="hidden sm:table-cell px-4 py-2.5 font-medium w-32">
+                Time
+              </th>
+              <th className="px-3 sm:px-4 py-2.5 font-medium w-16 sm:w-20">
+                Method
+              </th>
+              <th className="px-3 sm:px-4 py-2.5 font-medium">Path</th>
+              <th className="px-3 sm:px-4 py-2.5 font-medium w-16 sm:w-20">
+                Status
+              </th>
+              <th className="hidden sm:table-cell px-4 py-2.5 font-medium text-right w-16">
+                ms
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-50 dark:divide-zinc-800/60 bg-white dark:bg-zinc-900">
@@ -327,19 +330,19 @@ export default function Logs() {
               <tr
                 key={log.id}
                 onClick={() => setSelected(log)}
-                className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 cursor-pointer transition-colors group"
+                className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 active:bg-zinc-100 dark:active:bg-zinc-800 cursor-pointer transition-colors"
               >
-                <td className="px-4 py-2.5 text-zinc-400 dark:text-zinc-500 font-mono text-xs whitespace-nowrap">
+                <td className="hidden sm:table-cell px-4 py-2.5 text-zinc-400 dark:text-zinc-500 font-mono text-xs whitespace-nowrap">
                   {new Date(log.timestamp).toLocaleTimeString()}
                 </td>
-                <td className="px-4 py-2.5">
+                <td className="px-3 sm:px-4 py-2.5">
                   <span
-                    className={`text-xs font-semibold px-1.5 py-0.5 rounded font-mono ${METHOD_COLORS[log.method] ?? "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300"}`}
+                    className={`text-[10px] sm:text-xs font-semibold px-1 sm:px-1.5 py-0.5 rounded font-mono ${METHOD_COLORS[log.method] ?? "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300"}`}
                   >
                     {log.method}
                   </span>
                 </td>
-                <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-300 font-mono text-xs max-w-0 truncate">
+                <td className="px-3 sm:px-4 py-2.5 text-zinc-600 dark:text-zinc-300 font-mono text-xs max-w-0 truncate">
                   {log.path}
                   {log.query && (
                     <span className="text-zinc-400 dark:text-zinc-500">
@@ -347,9 +350,9 @@ export default function Logs() {
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-2.5">
+                <td className="px-3 sm:px-4 py-2.5">
                   <span
-                    className={`inline-flex items-center gap-1.5 font-semibold font-mono text-xs ${statusColor(log.responseStatus)}`}
+                    className={`inline-flex items-center gap-1 sm:gap-1.5 font-semibold font-mono text-xs ${statusColor(log.responseStatus)}`}
                   >
                     <span
                       className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusDot(log.responseStatus)}`}
@@ -357,7 +360,7 @@ export default function Logs() {
                     {log.responseStatus}
                   </span>
                 </td>
-                <td className="px-4 py-2.5 text-zinc-400 dark:text-zinc-500 font-mono text-xs text-right">
+                <td className="hidden sm:table-cell px-4 py-2.5 text-zinc-400 dark:text-zinc-500 font-mono text-xs text-right">
                   {log.durationMs}
                 </td>
               </tr>
