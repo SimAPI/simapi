@@ -43,7 +43,7 @@ export async function createApp(
   }
 
   if (bus) {
-    registerInternalRoutes(app, endpoints, config, bus);
+    await registerInternalRoutes(app, endpoints, config, bus);
   }
 
   return app;

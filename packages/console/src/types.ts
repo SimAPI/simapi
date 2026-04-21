@@ -30,6 +30,7 @@ export interface EndpointInfo {
   title?: string;
   description?: string;
   schema?: JsonSchema;
+  responseExample?: unknown;
 }
 
 export interface RequestLog {

@@ -443,11 +443,33 @@ function EndpointDetail({ endpoint }: { endpoint: EndpointInfo }) {
               Responses
             </h3>
             <div className="space-y-2">
-              <ResponseRow
-                status={successStatus}
-                description={successStatus === "204" ? "No content" : "Success"}
-                color="text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800"
-              />
+              <div className="rounded-lg border border-emerald-200 dark:border-emerald-800 overflow-hidden">
+                <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 dark:bg-emerald-950/30">
+                  <span className="font-mono font-semibold text-sm w-10 shrink-0 text-emerald-600 dark:text-emerald-400">
+                    {successStatus}
+                  </span>
+                  <span className="text-sm text-emerald-700 dark:text-emerald-300 flex-1">
+                    {successStatus === "204" ? "No content" : "Success"}
+                  </span>
+                </div>
+                {endpoint.responseExample !== undefined &&
+                  successStatus !== "204" && (
+                    <div className="border-t border-emerald-100 dark:border-emerald-900">
+                      <div className="px-4 py-1.5 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-between">
+                        <span className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                          Example response
+                        </span>
+                        <span className="text-xs text-zinc-300 dark:text-zinc-600 font-mono">
+                          application/json
+                        </span>
+                      </div>
+                      <pre className="text-xs font-mono text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 px-4 py-3 overflow-auto max-h-72 whitespace-pre-wrap border-t border-zinc-100 dark:border-zinc-800">
+                        {JSON.stringify(endpoint.responseExample, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+              </div>
+
               {endpoint.type === "secure" && (
                 <ResponseRow
                   status="401"
