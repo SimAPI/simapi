@@ -131,10 +131,12 @@ function ClearLogsModal({
           </div>
 
           <div>
+            {/* biome-ignore lint/a11y/noLabelWithoutControl: label wraps the input below */}
             <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1.5">
               Enter PIN to confirm
             </label>
             <input
+              // biome-ignore lint/a11y/noAutofocus: PIN dialog needs immediate focus so the user can type without an extra click
               autoFocus
               type="text"
               inputMode="numeric"
