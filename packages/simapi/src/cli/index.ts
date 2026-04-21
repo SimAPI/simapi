@@ -7,6 +7,8 @@ import { runInit } from "./init.js";
 import { runServe } from "./serve.js";
 import { runStart } from "./start.js";
 
+declare const __SIMAPI_VERSION__: string;
+
 const cli = cac("simapi");
 
 cli
@@ -66,7 +68,7 @@ cli
   );
 
 cli.help();
-cli.version("0.1.0");
+cli.version(__SIMAPI_VERSION__);
 cli.parse();
 
 function fatal(err: unknown): never {

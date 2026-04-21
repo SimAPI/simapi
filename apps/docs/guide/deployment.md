@@ -13,6 +13,21 @@ The server reads the `PORT` environment variable, falling back to the port in `s
 
 ---
 
+## Securing the console
+
+When deployed, protect the `/__simapi/*` endpoints by setting these environment variables on your host:
+
+```
+SIMAPI_CONSOLE_USERNAME=admin
+SIMAPI_CONSOLE_PASSWORD=a-strong-password
+```
+
+SimAPI will apply HTTP Basic Auth to all `/__simapi/*` routes — including the debug console, logs API, and OpenAPI export endpoints. Requests without valid credentials receive a `401` response.
+
+For local development, leave these variables unset (or empty in `.env`) — no auth is applied.
+
+---
+
 ## Vercel (recommended for lightweight deployments)
 
 Vercel is the recommended choice for lightweight SimAPI deployments. It offers instant Git-based deploys, a generous free tier, and automatic HTTPS — ideal for sharing a mock API with your team during active frontend development.
@@ -72,7 +87,7 @@ Railway is the most reliable option for persistent deployments with zero configu
 4. Set any environment variables in the Railway dashboard.
 5. Your mock API is live at `https://your-project.railway.app`.
 
-**With a Dockerfile** (if you selected it during `create-simapi`):
+**With a Dockerfile** (if you selected it during `simapi init`):
 
 Railway uses the Dockerfile automatically:
 

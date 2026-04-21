@@ -1,4 +1,5 @@
-import { resolve } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 import { tsImport } from "tsx/esm/api";
 
@@ -8,7 +9,30 @@ import { createApp } from "../server/createApp.js";
 import { LogBus } from "../server/logBus.js";
 import { startServer } from "../server/startServer.js";
 
+function loadEnv(cwd: string): void {
+  const envPath = join(cwd, ".env");
+  if (!existsSync(envPath)) return;
+  try {
+    for (const line of readFileSync(envPath, "utf8").split("\n")) {
+      const t = line.trim();
+      if (!t || t.startsWith("#")) continue;
+      const i = t.indexOf("=");
+      if (i < 1) continue;
+      const key = t.slice(0, i).trim();
+      const val = t
+        .slice(i + 1)
+        .trim()
+        .replace(/^(['"])(.*)\1$/, "$2");
+      if (key && !(key in process.env)) process.env[key] = val;
+    }
+  } catch {
+    // ignore unreadable .env
+  }
+}
+
 export async function runServe(cwd: string = process.cwd()): Promise<void> {
+  loadEnv(cwd);
+
   const configPath = resolve(cwd, "simapi.config.ts");
 
   let config!: SimAPIConfig;

@@ -5,7 +5,7 @@
 The fastest way to start a SimAPI project:
 
 ```sh
-npm create simapi@latest my-api
+npx simapi init my-api
 cd my-api
 npm run serve
 ```

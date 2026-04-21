@@ -1,4 +1,5 @@
 import type { Hono } from "hono";
+import { basicAuth } from "hono/basic-auth";
 import { streamSSE } from "hono/streaming";
 import { stringify as yamlStringify } from "yaml";
 
@@ -31,6 +32,15 @@ export async function registerInternalRoutes(
   config: SimAPIConfig,
   bus: LogBus
 ): Promise<void> {
+  const consoleUser = process.env.SIMAPI_CONSOLE_USERNAME;
+  const consolePass = process.env.SIMAPI_CONSOLE_PASSWORD;
+  if (consoleUser && consolePass) {
+    app.use(
+      "/__simapi/*",
+      basicAuth({ username: consoleUser, password: consolePass })
+    );
+  }
+
   // Pre-compute endpoint info (including response examples) once at startup
   const endpointInfos = await Promise.all(
     endpoints.map(async (e) => ({

@@ -14,6 +14,7 @@ export const PACKAGE_JSON = `{
     "serve": "simapi serve",
     "build": "simapi build",
     "start": "simapi start",
+    "import": "simapi import",
     "export": "simapi export"
   },
   "dependencies": {
@@ -33,10 +34,43 @@ export const TSCONFIG_JSON = `{
 }
 `;
 
-export const GITIGNORE = `node_modules
-.simapi/dist
-.simapi/db.sqlite
+export const GITIGNORE = `# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# env files
 .env
+.env.*
+!.env.example
+
+# SimAPI runtime
+.simapi
+
+# Vercel
+.vercel
+
+# Build Outputs
+out/
+build
+dist
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.DS_Store
+*.pem
+`;
+
+export const ENV_EXAMPLE = `# Console authentication — set both to protect /__simapi/* with HTTP Basic Auth.
+# Leave empty to allow unauthenticated access (default for local dev).
+SIMAPI_CONSOLE_USERNAME=
+SIMAPI_CONSOLE_PASSWORD=
 `;
 
 export const SIMAPI_CONFIG_TS = `import { defineConfig } from "simapi";
@@ -45,7 +79,9 @@ export default defineConfig({
   name: "{{name}}",
   description: "{{description}}",
   port: 3000,
+  // authHandler: AuthHandlers.bearer(),
   logEntries: true,
+  consoleLog: true,
   database: {
     type: "sqlite",
     path: "./.simapi/db.sqlite",
@@ -62,6 +98,7 @@ export default defineConfig({
   port: 3000,
   authHandler,
   logEntries: true,
+  consoleLog: true,
   database: {
     type: "sqlite",
     path: "./.simapi/db.sqlite",
