@@ -2,7 +2,8 @@
 
 A complete e-commerce backend simulator covering product catalog, cart management, order processing, reviews, and customer accounts.
 
-**Live demo:** [simapi-shop-sample.mayrlabs.com](https://simapi-shop-sample.mayrlabs.com)
+**Live demo:** [simapi-shop-sample.mayrlabs.com/__simapi/console/](https://simapi-shop-sample.mayrlabs.com/__simapi/console/)
+
 **Source:** [`examples/shop-sample`](https://github.com/SimAPI/simapi/tree/main/examples/shop-sample)
 
 ## Running locally

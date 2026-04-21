@@ -4,10 +4,10 @@
   "type": "module",
   "description": "E-commerce store API — a comprehensive SimAPI example",
   "scripts": {
-    "dev": "simapi serve",
     "serve": "simapi serve",
     "build": "simapi build",
-    "start": "simapi start"
+    "start": "simapi start",
+    "export": "simapi export"
   },
   "dependencies": {
     "simapi": "*"

@@ -9,6 +9,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "serve": "turbo run serve",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
@@ -16,8 +17,7 @@
     "check-types": "turbo run check-types",
     "test": "turbo run test",
     "release": "npx changeset publish",
-    "prepare": "husky",
-    "dev:all": "concurrently -n \"docs,packages,demo,blog,shop\" -c \"cyan,green,yellow,magenta,blue\" \"npm run dev -w apps/docs\" \"turbo run dev --filter=./packages/*\" \"npm run serve -w examples/demo-project\" \"npm run serve -w examples/blog-sample\" \"npm run serve -w examples/shop-sample\""
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.12",
