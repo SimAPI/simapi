@@ -3,7 +3,7 @@
 `EndpointDefinition` is the TypeScript interface for a SimAPI endpoint. Every named export from a file inside `endpoints/` that matches this shape is automatically registered.
 
 ```ts
-import type { EndpointDefinition } from "simapi";
+import type { EndpointDefinition } from "@simapi/simapi";
 ```
 
 ## Interface
@@ -139,7 +139,7 @@ For each incoming request:
 ## Example
 
 ```ts
-import { z, AppResponse, faker, type EndpointDefinition } from "simapi";
+import { z, AppResponse, faker, type EndpointDefinition } from "@simapi/simapi";
 import { makePost } from "../models/post.js";
 
 export const createPost: EndpointDefinition = {

@@ -1,4 +1,12 @@
-# simapi
+# @simapi/simapi
+
+## 0.0.2
+
+### Package rename & build fix
+
+- Renamed package from `simapi` to `@simapi/simapi` — install with `npm install @simapi/simapi`
+- Added `prepublishOnly` build step to ensure `dist/` is always included when publishing
+- Fixed `ERR_MODULE_NOT_FOUND` error on `npx @simapi/simapi init` caused by missing `dist/cli.mjs` in the published package
 
 ## 0.0.1
 

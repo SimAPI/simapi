@@ -31,7 +31,7 @@ Each file contains typed, grouped stubs:
 
 ```ts
 // endpoints/posts.ts  (generated)
-import { z, AppResponse, type EndpointDefinition } from "simapi";
+import { z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
 
 export const listPosts: EndpointDefinition = {
   path: "/api/posts",

@@ -60,7 +60,7 @@ return AppResponse.error({ message: "Something went wrong" });
 Creates an array of `count` items by calling `factory` once per item. Use with `faker` to generate realistic list responses:
 
 ```ts
-import { faker, AppResponse } from "simapi";
+import { faker, AppResponse } from "@simapi/simapi";
 
 AppResponse.array(5, () => ({
   id:    faker.string.ulid(),

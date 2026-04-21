@@ -10,13 +10,13 @@ Build frontend features against real API behavior — before your backend exists
 
 | Package                               | Description                                      |
 | ------------------------------------- | ------------------------------------------------ |
-| [`simapi`](packages/simapi)           | Core library — server, CLI, faker, validation    |
+| [`@simapi/simapi`](packages/simapi)   | Core library — server, CLI, faker, validation    |
 | [`@simapi/console`](packages/console) | Optional debug UI served at `/__simapi/console/` |
 
 ## Quickstart
 
 ```sh
-npx simapi init my-api
+npx @simapi/simapi@latest init my-api
 cd my-api
 npm run serve
 ```

@@ -5,7 +5,7 @@
 The fastest way to start a SimAPI project:
 
 ```sh
-npx simapi init my-api
+npx @simapi/simapi@latest init my-api
 cd my-api
 npm run serve
 ```
@@ -17,8 +17,8 @@ Your mock server is running at **http://localhost:3000**.
 Install SimAPI into an existing project:
 
 ```sh
-npm install simapi
-npx simapi init
+npm install @simapi/simapi
+npx @simapi/simapi@latest init
 ```
 
 ## Project structure
@@ -46,7 +46,7 @@ A model file exports a TypeScript interface and a factory function that generate
 
 ```ts
 // models/post.ts
-import { faker } from "simapi";
+import { faker } from "@simapi/simapi";
 
 export interface Post {
   id: string;
@@ -73,7 +73,7 @@ Multiple endpoints can live in a single file. Importing from your model keeps th
 
 ```ts
 // endpoints/posts.ts
-import { z, AppResponse, type EndpointDefinition } from "simapi";
+import { z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
 import { makePost } from "../models/post.js";
 
 export const listPosts: EndpointDefinition = {
