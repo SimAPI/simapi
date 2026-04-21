@@ -58,6 +58,9 @@ export async function createPostgresAdapter(
     async deleteLog(id) {
       await db.delete(requestLogs).where(eq(requestLogs.id, id));
     },
+    async clearLogs() {
+      await db.delete(requestLogs);
+    },
     async close() {
       await pool.end();
     },

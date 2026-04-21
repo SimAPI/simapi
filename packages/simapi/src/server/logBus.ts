@@ -25,6 +25,10 @@ export class LogBus extends EventEmitter implements DbAdapter {
     return this.adapter.deleteLog(id);
   }
 
+  clearLogs(): Promise<void> {
+    return this.adapter.clearLogs();
+  }
+
   async close(): Promise<void> {
     this.removeAllListeners();
     return this.adapter.close();

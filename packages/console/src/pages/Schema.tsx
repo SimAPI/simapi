@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { api } from "../lib/api.js";
 import type { EndpointInfo, JsonSchemaProperty } from "../types.js";
@@ -39,6 +39,89 @@ const AUTH_OPTIONS: { value: AuthPreset; label: string }[] = [
   { value: "apiKey-query", label: "API Key — Query Param" },
   { value: "cookie", label: "Cookie / Session" },
 ];
+
+// ─── export helpers ───────────────────────────────────────────────────────────
+
+function downloadBlob(content: string, filename: string, type: string) {
+  const blob = new Blob([content], { type });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function toOaPath(path: string): string {
+  return path.replace(/:(\w+)/g, "{$1}");
+}
+
+function buildOpenApiSpec(endpoints: EndpointInfo[]): object {
+  const paths: Record<string, Record<string, unknown>> = {};
+  const hasSecurity = endpoints.some((e) => e.type === "secure");
+
+  for (const ep of endpoints) {
+    const oaPath = toOaPath(ep.path);
+    if (!paths[oaPath]) paths[oaPath] = {};
+    const method = ep.method.toLowerCase();
+    const pathParams = extractPathParams(ep.path);
+
+    const operation: Record<string, unknown> = {
+      summary: ep.title ?? ep.path,
+      ...(ep.description ? { description: ep.description } : {}),
+      ...(ep.type === "secure" ? { security: [{ bearerAuth: [] }] } : {}),
+    };
+
+    if (pathParams.length > 0) {
+      operation.parameters = pathParams.map((p) => ({
+        name: p,
+        in: "path",
+        required: true,
+        schema: { type: "string" },
+      }));
+    }
+
+    if (ep.schema && BODY_METHODS.has(ep.method)) {
+      operation.requestBody = {
+        required: true,
+        content: { "application/json": { schema: ep.schema } },
+      };
+    }
+
+    const successCode =
+      ep.method === "POST" ? "201" : ep.method === "DELETE" ? "204" : "200";
+    operation.responses = {
+      [successCode]: {
+        description: successCode === "204" ? "No content" : "Success",
+        ...(ep.responseExample !== undefined && successCode !== "204"
+          ? {
+              content: {
+                "application/json": { example: ep.responseExample },
+              },
+            }
+          : {}),
+      },
+      ...(ep.type === "secure" ? { "401": { description: "Unauthorized" } } : {}),
+      ...(ep.schema ? { "422": { description: "Validation error" } } : {}),
+      "500": { description: "Internal server error" },
+    };
+
+    paths[oaPath][method] = operation;
+  }
+
+  return {
+    openapi: "3.0.3",
+    info: { title: "SimAPI", version: "1.0.0" },
+    ...(hasSecurity
+      ? {
+          components: {
+            securitySchemes: {
+              bearerAuth: { type: "http", scheme: "bearer" },
+            },
+          },
+        }
+      : {}),
+    paths,
+  };
+}
 
 // ─── constants ────────────────────────────────────────────────────────────────
 
@@ -780,10 +863,40 @@ export default function Schema() {
   const [selected, setSelected] = useState<EndpointInfo | null>(null);
   const [search, setSearch] = useState("");
   const [auth, setAuth] = useState<AuthState>({ ...DEFAULT_AUTH });
+  const [exportOpen, setExportOpen] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     api.endpoints().then(setEndpoints).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (!exportOpen) return;
+    function onClickOutside(e: MouseEvent) {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setExportOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [exportOpen]);
+
+  const exportAs = (format: "json" | "openapi") => {
+    setExportOpen(false);
+    if (format === "json") {
+      downloadBlob(
+        JSON.stringify(endpoints, null, 2),
+        "simapi-schema.json",
+        "application/json"
+      );
+    } else {
+      downloadBlob(
+        JSON.stringify(buildOpenApiSpec(endpoints), null, 2),
+        "simapi-openapi.json",
+        "application/json"
+      );
+    }
+  };
 
   const filtered = search
     ? endpoints.filter(
@@ -807,13 +920,42 @@ export default function Schema() {
       >
         {/* List header with search */}
         <div className="px-3 py-3 border-b border-zinc-100 dark:border-zinc-800 shrink-0 space-y-2">
-          <div className="flex items-baseline justify-between px-1">
+          <div className="flex items-center justify-between px-1">
             <h1 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
               Schema & Try
             </h1>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">
-              {filtered.length}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">
+                {filtered.length}
+              </span>
+              <div ref={exportRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => setExportOpen((o) => !o)}
+                  className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors"
+                >
+                  Export ▾
+                </button>
+                {exportOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-36 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg overflow-hidden z-20">
+                    <button
+                      type="button"
+                      onClick={() => exportAs("json")}
+                      className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                    >
+                      JSON
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => exportAs("openapi")}
+                      className="w-full text-left px-3 py-2 text-xs text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors border-t border-zinc-100 dark:border-zinc-800"
+                    >
+                      OpenAPI 3.0
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <input
             className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md px-2.5 py-1.5 text-xs text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:border-cyan-400 dark:focus:border-cyan-600 transition-colors"

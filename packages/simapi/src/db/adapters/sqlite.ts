@@ -59,6 +59,9 @@ export async function createSqliteAdapter(
     async deleteLog(id) {
       await db.delete(requestLogs).where(eq(requestLogs.id, id));
     },
+    async clearLogs() {
+      await db.delete(requestLogs);
+    },
     async close() {
       client.close();
     },

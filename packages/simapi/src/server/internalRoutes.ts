@@ -65,6 +65,11 @@ export async function registerInternalRoutes(
     return c.json({ data, limit, offset });
   });
 
+  app.delete("/__simapi/logs", async (c) => {
+    await bus.clearLogs();
+    return c.json({ ok: true });
+  });
+
   app.delete("/__simapi/logs/:id", async (c) => {
     const id = Number(c.req.param("id"));
     if (!Number.isInteger(id) || id <= 0) {

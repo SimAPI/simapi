@@ -18,5 +18,6 @@ export interface DbAdapter {
     offset?: number;
   }): Promise<RequestLogEntry[]>;
   deleteLog(id: number): Promise<void>;
+  clearLogs(): Promise<void>;
   close(): Promise<void>;
 }

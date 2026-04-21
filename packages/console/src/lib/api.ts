@@ -17,6 +17,8 @@ export const api = {
     ),
   deleteLog: (id: number) =>
     fetch(`${BASE}/logs/${id}`, { method: "DELETE" }).then((r) => r.json()),
+  clearLogs: () =>
+    fetch(`${BASE}/logs`, { method: "DELETE" }).then((r) => r.json()),
   send: (
     method: string,
     path: string,

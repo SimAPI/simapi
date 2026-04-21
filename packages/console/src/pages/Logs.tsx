@@ -50,6 +50,128 @@ function downloadBlob(content: string, filename: string, type: string) {
   a.click();
 }
 
+function genPin(): string {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+// ─── Clear All PIN modal ───────────────────────────────────────────────────────
+
+function ClearLogsModal({
+  pin,
+  count,
+  onConfirm,
+  onClose,
+}: {
+  pin: string;
+  count: number;
+  onConfirm: () => Promise<void>;
+  onClose: () => void;
+}) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState("");
+  const [clearing, setClearing] = useState(false);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const handleConfirm = async () => {
+    setClearing(true);
+    try {
+      await onConfirm();
+    } finally {
+      setClearing(false);
+    }
+  };
+
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: modal backdrop
+    <div
+      ref={overlayRef}
+      role="presentation"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/30 dark:bg-black/50 backdrop-blur-[2px]"
+      onClick={(e) => {
+        if (e.target === overlayRef.current) onClose();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
+    >
+      <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+          <div className="flex items-center gap-2.5">
+            <span className="text-red-500 text-lg leading-none">⊗</span>
+            <h2 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+              Clear all logs
+            </h2>
+          </div>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
+            This will permanently delete{" "}
+            <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+              {count} {count === 1 ? "entry" : "entries"}
+            </span>
+            . This cannot be undone.
+          </p>
+        </div>
+
+        {/* PIN display */}
+        <div className="px-5 py-5 space-y-4">
+          <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 px-4 py-4 text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+              Confirmation PIN
+            </p>
+            <p className="font-mono text-3xl font-bold tracking-[0.25em] text-zinc-900 dark:text-zinc-100">
+              {pin}
+            </p>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1.5">
+              Enter PIN to confirm
+            </label>
+            <input
+              autoFocus
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              value={input}
+              onChange={(e) => setInput(e.target.value.replace(/\D/g, ""))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && input === pin) handleConfirm();
+              }}
+              placeholder="______"
+              className="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2.5 text-center font-mono text-lg tracking-[0.25em] text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-400 dark:focus:border-red-600 transition-colors placeholder-zinc-300 dark:placeholder-zinc-700"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-xs font-medium transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirm}
+              disabled={input !== pin || clearing}
+              className="flex-1 px-3 py-2 rounded-lg bg-red-500 hover:bg-red-400 active:bg-red-600 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold transition-colors"
+            >
+              {clearing ? "Clearing…" : "Clear All Logs"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Log detail modal ─────────────────────────────────────────────────────────
 
 function LogModal({
@@ -234,6 +356,7 @@ export default function Logs() {
   const [logs, setLogs] = useState<RequestLog[]>([]);
   const [selected, setSelected] = useState<RequestLog | null>(null);
   const [filter, setFilter] = useState("");
+  const [clearPin, setClearPin] = useState<string | null>(null);
 
   useEffect(() => {
     api
@@ -266,6 +389,12 @@ export default function Logs() {
     setLogs((prev) => prev.filter((l) => l.id !== id));
   };
 
+  const handleClearAll = async () => {
+    await api.clearLogs();
+    setLogs([]);
+    setClearPin(null);
+  };
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Toolbar */}
@@ -286,6 +415,15 @@ export default function Logs() {
         >
           Export
         </button>
+        {logs.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setClearPin(genPin())}
+            className="text-xs text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-300 px-3 py-1.5 border border-red-200 dark:border-red-900/60 rounded-lg hover:border-red-300 dark:hover:border-red-800 transition-colors font-medium whitespace-nowrap"
+          >
+            Clear All
+          </button>
+        )}
         <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono ml-auto">
           {filtered.length} entries
         </span>
@@ -369,12 +507,22 @@ export default function Logs() {
         </table>
       </div>
 
-      {/* Modal */}
+      {/* Log detail modal */}
       {selected && (
         <LogModal
           log={selected}
           onClose={() => setSelected(null)}
           onDelete={handleDelete}
+        />
+      )}
+
+      {/* Clear All PIN confirmation modal */}
+      {clearPin && (
+        <ClearLogsModal
+          pin={clearPin}
+          count={logs.length}
+          onConfirm={handleClearAll}
+          onClose={() => setClearPin(null)}
         />
       )}
     </div>

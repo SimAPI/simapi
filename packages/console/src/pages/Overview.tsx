@@ -26,6 +26,11 @@ const INTERNAL_ENDPOINTS = [
   },
   {
     method: "DELETE",
+    path: "/__simapi/logs",
+    description: "Clear all log entries",
+  },
+  {
+    method: "DELETE",
     path: "/__simapi/logs/:id",
     description: "Delete a log entry by ID",
   },

@@ -9,6 +9,7 @@ export function createNoneAdapter(): DbAdapter {
       return [];
     },
     async deleteLog() {},
+    async clearLogs() {},
     async close() {},
   };
 }
