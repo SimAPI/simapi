@@ -12,16 +12,12 @@ export const PACKAGE_JSON = `{
   "description": "{{description}}",
   "scripts": {
     "serve": "simapi serve",
+    "dev": "simapi dev",
     "build:netlify": "simapi build --platform netlify",
     "build:node": "simapi build --platform node",
     "build:vercel": "simapi build --platform vercel",
     "start": "simapi start",
-    "import": "simapi import",
-    "export": "simapi export",
-    "setup:netlify": "simapi setup netlify",
-    "setup:vercel": "simapi setup vercel",
-    "console:add": "simapi console:add",
-    "console:remove": "simapi console:remove"
+    "simapi": "simapi interactive"
   },
   "dependencies": {}
 }
@@ -33,7 +29,11 @@ export const TSCONFIG_JSON = `{
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }
 `;
@@ -87,6 +87,7 @@ export default defineConfig({
   name: "{{name}}",
   description: "{{description}}",
   port: 3000,
+  endpointsDir: "src/endpoints",
   // authHandler: AuthHandlers.bearer(),
   logEntries: true,
   consoleLog: true,
@@ -98,12 +99,13 @@ export default defineConfig({
 `;
 
 export const SIMAPI_CONFIG_WITH_AUTH_TS = `import { defineConfig } from "@simapi/simapi";
-import { authHandler } from "./authHandler.js";
+import { authHandler } from "./src/authHandler.js";
 
 export default defineConfig({
   name: "{{name}}",
   description: "{{description}}",
   port: 3000,
+  endpointsDir: "src/endpoints",
   authHandler,
   logEntries: true,
   consoleLog: true,
@@ -181,7 +183,7 @@ export function makeUser(): User {
 
 export const HELLO_WORLD_TS = `import { AppResponse, type AppRequest, type EndpointDefinition, z } from "@simapi/simapi";
 
-import { makeUser } from "../models/user.js";
+import { makeUser } from "@/models/user.js";
 
 export const helloGet: EndpointDefinition = {
   path: "/",
@@ -209,23 +211,6 @@ export const helloPost: EndpointDefinition = {
     return AppResponse.created({
       message: \`Hello \${name} from behind the wall!\`,
       user: makeUser(),
-    });
-  },
-};
-`;
-
-// ─── endpoint template ────────────────────────────────────────────────────────
-
-export const ENDPOINT_TS = `import { AppResponse, type AppRequest } from "@simapi/simapi";
-
-export const {{handlerName}} = {
-  path: "{{path}}",
-  method: "{{method}}",
-  type: "{{authType}}",
-  handler: (_req: AppRequest) => {
-    return AppResponse.success({
-      message: "{{message}}",
-      data: {},
     });
   },
 };

@@ -5,6 +5,7 @@ export default defineConfig({
   description:
     "A realistic e-commerce store API — products, cart, orders, reviews and customer accounts.",
   port: 3002,
+  endpointsDir: "src/endpoints",
   logEntries: true,
   consoleLog: true,
   authHandler: AuthHandlers.bearer(),

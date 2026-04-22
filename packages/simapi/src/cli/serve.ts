@@ -11,18 +11,26 @@ import { startServer } from "../server/startServer.js";
 
 function loadEnv(cwd: string): void {
   const envPath = join(cwd, ".env");
+
   if (!existsSync(envPath)) return;
+
   try {
     for (const line of readFileSync(envPath, "utf8").split("\n")) {
       const t = line.trim();
+
       if (!t || t.startsWith("#")) continue;
+
       const i = t.indexOf("=");
+
       if (i < 1) continue;
+
       const key = t.slice(0, i).trim();
+
       const val = t
         .slice(i + 1)
         .trim()
         .replace(/^(['"])(.*)\1$/, "$2");
+
       if (key && !(key in process.env)) process.env[key] = val;
     }
   } catch {
@@ -49,7 +57,7 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
   const bus = new LogBus(adapter);
 
   const port = config.port ?? 3000;
-  const endpointsDir = resolve(cwd, config.endpointsDir ?? "endpoints");
+  const endpointsDir = resolve(cwd, config.endpointsDir ?? "src/endpoints");
   const app = await createApp(config, endpointsDir, bus);
 
   try {

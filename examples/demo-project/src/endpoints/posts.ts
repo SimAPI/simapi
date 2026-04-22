@@ -4,7 +4,7 @@ import {
   type EndpointDefinition,
   z,
 } from "@simapi/simapi";
-import { makePost } from "../models/post.js";
+import { makePost } from "@/models/post.js";
 
 export const listPosts: EndpointDefinition = {
   path: "/api/posts",

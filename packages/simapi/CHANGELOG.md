@@ -1,5 +1,33 @@
 # @simapi/simapi
 
+## 0.0.6
+
+### src directory structure, dev mode & interactive CLI
+
+**Project structure**
+- `simapi init` now scaffolds endpoints and models inside a `src/` directory: `src/endpoints/` and `src/models/`
+- Auth handler is now scaffolded at `src/authHandler.ts`
+- Generated `tsconfig.json` now includes `baseUrl` and `paths` configuration enabling `@/` imports (e.g. `import { makeUser } from "@/models/user.js"`)
+- `simapi.config.ts` scaffolded with `endpointsDir: "src/endpoints"` explicitly set
+- `simapi serve`, `simapi build`, and `simapi import` default `endpointsDir` updated to `"src/endpoints"`; `simapi build` looks for auth handler at `src/authHandler.ts`
+
+**Dev mode**
+- Added `simapi dev [cwd]` — watches `src/` and `simapi.config.ts` for changes and automatically restarts the server (debounced 300 ms)
+- Scaffolded `package.json` now includes `"dev": "simapi dev"` script
+
+**Interactive mode**
+- Added `simapi interactive` — menu-driven CLI for common operations:
+  - **Setup**: configure deployment platform (Docker, Vercel, Netlify)
+  - **Console**: install or remove `@simapi/console`
+  - **Import**: generate endpoint stubs from an OpenAPI spec (output defaults to `src/endpoints/`)
+  - **Export**: export endpoints as OpenAPI YAML or JSON
+- Scaffolded `package.json` includes `"simapi": "simapi interactive"` — run with `npm run simapi`
+- Removed `import`, `export`, `setup:netlify`, `setup:vercel`, `console:add`, `console:remove` scripts from scaffolded `package.json`; all are accessible via `npm run simapi`
+
+**Docker setup**
+- `simapi setup docker` now generates a `Dockerfile` in the project root
+- Available both via `simapi setup docker` directly and through `npm run simapi` → Setup → Docker
+
 ## 0.0.5
 
 ### Serverless deployment support (Vercel & Netlify)

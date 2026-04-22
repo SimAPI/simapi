@@ -3,8 +3,8 @@ import {
   AppResponse,
   type EndpointDefinition,
 } from "@simapi/simapi";
-import { allCategories, makeCategory } from "../models/category.js";
-import { makePost } from "../models/post.js";
+import { allCategories, makeCategory } from "@/models/category.js";
+import { makePost } from "@/models/post.js";
 
 export const listCategories: EndpointDefinition = {
   path: "/api/categories",

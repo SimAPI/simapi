@@ -5,7 +5,7 @@ import {
   faker,
   z,
 } from "@simapi/simapi";
-import { makeReview } from "../models/review.js";
+import { makeReview } from "@/models/review.js";
 
 export const listReviews: EndpointDefinition = {
   path: "/api/products/:id/reviews",

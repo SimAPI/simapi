@@ -4,7 +4,7 @@ import {
   type EndpointDefinition,
   z,
 } from "@simapi/simapi";
-import { makeComment } from "../models/comment.js";
+import { makeComment } from "@/models/comment.js";
 
 export const listComments: EndpointDefinition = {
   path: "/api/posts/:postId/comments",

@@ -98,8 +98,8 @@ export async function runInit(name: string | undefined): Promise<void> {
   s.start("Scaffolding project");
 
   await Promise.all([
-    mkdir(join(dir, "endpoints"), { recursive: true }),
-    mkdir(join(dir, "models"), { recursive: true }),
+    mkdir(join(dir, "src", "endpoints"), { recursive: true }),
+    mkdir(join(dir, "src", "models"), { recursive: true }),
   ]);
 
   await Promise.all([
@@ -111,10 +111,10 @@ export async function runInit(name: string | undefined): Promise<void> {
       join(dir, "simapi.config.ts"),
       fill(withAuth ? SIMAPI_CONFIG_WITH_AUTH_TS : SIMAPI_CONFIG_TS, vars)
     ),
-    writeFile(join(dir, "endpoints", "hello-world.ts"), HELLO_WORLD_TS),
-    writeFile(join(dir, "models", "user.ts"), USER_MODEL_TS),
+    writeFile(join(dir, "src", "endpoints", "hello-world.ts"), HELLO_WORLD_TS),
+    writeFile(join(dir, "src", "models", "user.ts"), USER_MODEL_TS),
     withAuth
-      ? writeFile(join(dir, "authHandler.ts"), AUTH_HANDLER_TS)
+      ? writeFile(join(dir, "src", "authHandler.ts"), AUTH_HANDLER_TS)
       : Promise.resolve(),
     withDockerfile
       ? writeFile(join(dir, "Dockerfile"), DOCKERFILE)
@@ -140,7 +140,7 @@ export async function runInit(name: string | undefined): Promise<void> {
     );
   }
 
-  p.note(`cd ${projectName as string}\nnpm run serve`, "Next steps");
+  p.note(`cd ${projectName as string}\nnpm run dev`, "Next steps");
 
   p.outro("Happy mocking!");
 }

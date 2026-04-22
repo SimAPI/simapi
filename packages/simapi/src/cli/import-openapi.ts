@@ -139,7 +139,7 @@ export async function runImportOpenAPI(
 ): Promise<void> {
   const root = resolve(cwd ?? process.cwd());
   const absSpec = resolve(root, specPath);
-  const outputDir = resolve(root, opts.output ?? "endpoints");
+  const outputDir = resolve(root, opts.output ?? "src/endpoints");
 
   let raw: string;
   try {

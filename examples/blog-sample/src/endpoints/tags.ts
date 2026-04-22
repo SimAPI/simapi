@@ -3,8 +3,8 @@ import {
   AppResponse,
   type EndpointDefinition,
 } from "@simapi/simapi";
-import { makePost } from "../models/post.js";
-import { allTags, makeTag } from "../models/tag.js";
+import { makePost } from "@/models/post.js";
+import { allTags, makeTag } from "@/models/tag.js";
 
 export const listTags: EndpointDefinition = {
   path: "/api/tags",

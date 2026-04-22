@@ -4,7 +4,7 @@ import {
   type EndpointDefinition,
   z,
 } from "@simapi/simapi";
-import { makeCustomer } from "../models/customer.js";
+import { makeCustomer } from "@/models/customer.js";
 
 export const register: EndpointDefinition = {
   path: "/api/auth/register",

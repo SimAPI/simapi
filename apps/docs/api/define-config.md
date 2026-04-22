@@ -9,7 +9,7 @@ export default defineConfig({
   name: "my-api",
   description: "Mock backend for my app",
   port: 3000,
-  endpointsDir: "./endpoints",
+  endpointsDir: "src/endpoints",
   logEntries: true,
   consoleLog: false,
   autoThrowValidationErrors: "laravel",
@@ -27,7 +27,7 @@ export default defineConfig({
 | `name` | `string` | *(required)* | Project name — shown in the console UI and exported spec |
 | `description` | `string` | `""` | Short description |
 | `port` | `number` | `3000` | Port to listen on (overridden by `PORT` env var) |
-| `endpointsDir` | `string` | `"./endpoints"` | Directory scanned recursively for endpoint files |
+| `endpointsDir` | `string` | `"src/endpoints"` | Directory scanned recursively for endpoint files |
 | `logEntries` | `boolean` | `true` | Whether to write request logs to the database |
 | `consoleLog` | `boolean` | `false` | Log each request to stdout: `[SimAPI] GET /api/posts → 200 (4ms)` |
 | `autoThrowValidationErrors` | `"laravel" \| "zod" \| false \| null` | `false` | Automatically throw 422 before the handler when a `validator` fails |
@@ -91,7 +91,7 @@ export function authHandler(req: AppRequest) {
 Wire it up in your config:
 
 ```ts
-import { authHandler } from "./authHandler.js";
+import { authHandler } from "./src/authHandler.js";
 
 export default defineConfig({
   name: "my-api",
