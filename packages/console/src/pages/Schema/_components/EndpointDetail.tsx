@@ -16,12 +16,44 @@ export function EndpointDetail({
   auth: AuthState;
   onAuthChange: (auth: AuthState) => void;
 }) {
+  const [activeTab, setActiveTab] = useState<"docs" | "try">("docs");
+
   return (
     <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-white dark:bg-[#0d1117]">
+      {/* Mobile Tab Switcher */}
+      <div className="lg:hidden flex border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#0c1117] shrink-0">
+        <button
+          type="button"
+          onClick={() => setActiveTab("docs")}
+          className={`flex-1 py-3 text-xs font-black uppercase tracking-widest transition-colors ${
+            activeTab === "docs"
+              ? "text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400"
+              : "text-zinc-400"
+          }`}
+        >
+          Docs
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("try")}
+          className={`flex-1 py-3 text-xs font-black uppercase tracking-widest transition-colors ${
+            activeTab === "try"
+              ? "text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-600 dark:border-cyan-400"
+              : "text-zinc-400"
+          }`}
+        >
+          Try It
+        </button>
+      </div>
+
       {/* Left Column: Documentation */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 bg-white dark:bg-[#0c1117] border-r border-zinc-100 dark:border-zinc-800/60">
-        <div className="max-w-4xl mx-auto px-10 py-16">
-          <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-12 tracking-tight">
+      <div
+        className={`flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800 bg-white dark:bg-[#0c1117] border-r border-zinc-100 dark:border-zinc-800/60 ${
+          activeTab === "docs" ? "block" : "hidden lg:block"
+        }`}
+      >
+        <div className="max-w-4xl mx-auto px-6 sm:px-10 py-10 sm:py-16">
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-8 sm:mb-12 tracking-tight">
             {endpoint.title || "Endpoint"}
           </h1>
           <SchemaView endpoint={endpoint} />
@@ -29,12 +61,12 @@ export function EndpointDetail({
       </div>
 
       {/* Right Column: Console */}
-      <div className="lg:w-[450px] xl:w-[550px] shrink-0 bg-[#0d1117] flex flex-col h-full">
-        <TryPanel
-          endpoint={endpoint}
-          auth={auth}
-          onAuthChange={onAuthChange}
-        />
+      <div
+        className={`lg:w-[450px] xl:w-[550px] shrink-0 bg-[#0d1117] flex flex-col h-full ${
+          activeTab === "try" ? "block" : "hidden lg:block"
+        }`}
+      >
+        <TryPanel endpoint={endpoint} auth={auth} onAuthChange={onAuthChange} />
       </div>
     </div>
   );
