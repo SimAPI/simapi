@@ -16,65 +16,46 @@ export function EndpointDetail({
   auth: AuthState;
   onAuthChange: (auth: AuthState) => void;
 }) {
-  const [tab, setTab] = useState<DetailTab>("docs");
-
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-[#0c1117]">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800/60 bg-white dark:bg-zinc-900 shrink-0">
-        <div className="flex items-center justify-between mb-1">
-          <div className="flex items-center gap-3 min-w-0">
-            <span
-              className={`font-mono text-[10px] font-bold px-1.5 py-0.5 rounded border ${METHOD_ACCENT[endpoint.method] ?? "text-zinc-500"} border-current bg-current/5`}
-            >
-              {endpoint.method}
-            </span>
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">
-              {endpoint.title || endpoint.path}
-            </h2>
-          </div>
-          <div className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg shrink-0">
-            <button
-              type="button"
-              onClick={() => setTab("docs")}
-              className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${
-                tab === "docs"
-                  ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
-              }`}
-            >
-              Schema
-            </button>
-            <button
-              type="button"
-              onClick={() => setTab("try")}
-              className={`px-3 py-1 text-[10px] font-bold rounded-md transition-all ${
-                tab === "try"
-                  ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
-              }`}
-            >
-              Try it
-            </button>
-          </div>
+      <div className="px-6 py-8 border-b border-zinc-100 dark:border-zinc-800/60 bg-white dark:bg-[#0c1117] shrink-0">
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+          {endpoint.title || "Endpoint"}
+        </h1>
+        <div className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 w-fit">
+          <span
+            className={`font-mono text-[10px] font-bold px-2 py-1 rounded ${METHOD_ACCENT[endpoint.method] ?? "text-zinc-500"} bg-current/10 border border-current/20`}
+          >
+            {endpoint.method}
+          </span>
+          <code className="text-xs text-zinc-600 dark:text-zinc-300 font-mono">
+            {endpoint.path}
+          </code>
         </div>
-        <p className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500 truncate">
-          {endpoint.path}
-        </p>
+        {endpoint.description && (
+          <p className="mt-6 text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-2xl">
+            {endpoint.description}
+          </p>
+        )}
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-white dark:bg-zinc-900 px-6 py-6 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800">
-        <div className="max-w-3xl">
-          {tab === "docs" ? (
+      {/* Content Grid */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800">
+        <div className="flex flex-col lg:flex-row min-h-full">
+          {/* Left Column: Documentation */}
+          <div className="lg:w-[50%] flex-1 px-6 py-8 border-r border-zinc-100 dark:border-zinc-800/60">
             <SchemaView endpoint={endpoint} />
-          ) : (
+          </div>
+
+          {/* Right Column: Try it & Samples */}
+          <div className="w-full lg:w-[50%] bg-zinc-50/50 dark:bg-[#0d1117] px-6 py-8 space-y-6">
             <TryPanel
               endpoint={endpoint}
               auth={auth}
               onAuthChange={onAuthChange}
             />
-          )}
+          </div>
         </div>
       </div>
     </div>

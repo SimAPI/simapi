@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button } from "../../../components/ui/Button.js";
 import { Input, Textarea } from "../../../components/ui/Input.js";
-import { SectionLabel } from "../../../components/ui/SectionLabel.js";
 import { api } from "../../../lib/api.js";
 import type { EndpointInfo } from "../../../types.js";
-import { BODY_METHODS, METHOD_ACCENT } from "../_constants.js";
+import { BODY_METHODS } from "../_constants.js";
 import type { AuthState } from "../_types.js";
 import {
   buildAuthHeaders,
@@ -16,6 +15,8 @@ import {
   statusColor,
 } from "../_utils.js";
 import { AuthSection } from "./AuthSection.js";
+
+import { CurlSample } from "./CurlSample.js";
 
 export function TryPanel({
   endpoint,
@@ -29,7 +30,7 @@ export function TryPanel({
   const pathParamNames = extractPathParams(endpoint.path);
 
   const [pathParams, setPathParams] = useState<Record<string, string>>(() =>
-    Object.fromEntries(pathParamNames.map((param) => [param, ""]))
+    Object.fromEntries(pathParamNames.map((param) => [param, ""])),
   );
   const [headerRows, setHeaderRows] = useState<[string, string][]>(() => {
     const saved = localStorage.getItem("simapi-console-headers");
@@ -43,17 +44,19 @@ export function TryPanel({
     return buildDefaultRows(endpoint.headerSchema);
   });
   const [queryRows, setQueryRows] = useState<[string, string][]>(() =>
-    buildDefaultRows(endpoint.querySchema)
+    buildDefaultRows(endpoint.querySchema),
   );
   const [bodyType, setBodyType] = useState<"json" | "form">(() =>
-    endpoint.formSchema && !endpoint.schema ? "form" : "json"
+    endpoint.formSchema && !endpoint.schema ? "form" : "json",
   );
   const [bodyText, setBodyText] = useState(() =>
-    buildDefaultBody(endpoint, "json")
+    buildDefaultBody(endpoint, "json"),
   );
   const [formRows, setFormRows] = useState<[string, string][]>(() =>
-    buildDefaultRows(endpoint.formSchema)
+    buildDefaultRows(endpoint.formSchema),
   );
+  const [omittedFields, setOmittedFields] = useState<Set<string>>(new Set());
+
   const [response, setResponse] = useState<{
     status: number;
     body: string;
@@ -68,15 +71,25 @@ export function TryPanel({
   useEffect(() => {
     setPathParams(
       Object.fromEntries(
-        extractPathParams(endpoint.path).map((param) => [param, ""])
-      )
+        extractPathParams(endpoint.path).map((param) => [param, ""]),
+      ),
     );
     setQueryRows(buildDefaultRows(endpoint.querySchema));
     setBodyType(endpoint.formSchema && !endpoint.schema ? "form" : "json");
     setBodyText(buildDefaultBody(endpoint, "json"));
     setFormRows(buildDefaultRows(endpoint.formSchema));
+    setOmittedFields(new Set());
     setResponse(null);
   }, [endpoint]);
+
+  const toggleOmit = (key: string) => {
+    setOmittedFields((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   const buildUrl = () => {
     let url = endpoint.path;
@@ -84,7 +97,7 @@ export function TryPanel({
       url = url.replace(`:${key}`, encodeURIComponent(value || `:${key}`));
     }
     const queryParams = [...queryRows, ...buildAuthQuery(auth)].filter(
-      ([key]) => key
+      ([key]) => key && !omittedFields.has(`query:${key}`),
     );
     if (queryParams.length > 0) {
       const searchParams = new URLSearchParams(queryParams);
@@ -101,14 +114,22 @@ export function TryPanel({
       let body: unknown;
       let headers: Record<string, string> = buildAuthHeaders(auth);
       const customHeaders = Object.fromEntries(
-        headerRows.filter(([key]) => key)
+        headerRows.filter(
+          ([key]) => key && !omittedFields.has(`header:${key}`),
+        ),
       );
       headers = { ...headers, ...customHeaders };
 
       if (hasBody) {
         if (bodyType === "json") {
           try {
-            body = JSON.parse(bodyText);
+            const parsed = JSON.parse(bodyText);
+            const filtered = Object.fromEntries(
+              Object.entries(parsed).filter(
+                ([key]) => !omittedFields.has(`body:${key}`),
+              ),
+            );
+            body = filtered;
           } catch {
             body = bodyText;
           }
@@ -116,7 +137,8 @@ export function TryPanel({
         } else {
           const formData = new FormData();
           for (const [key, value] of formRows) {
-            if (key) formData.append(key, value);
+            if (key && !omittedFields.has(`body:${key}`))
+              formData.append(key, value);
           }
           body = formData;
         }
@@ -126,7 +148,7 @@ export function TryPanel({
         endpoint.method,
         buildUrl(),
         hasBody ? body : undefined,
-        Object.keys(headers).length > 0 ? headers : undefined
+        Object.keys(headers).length > 0 ? headers : undefined,
       );
       const text = await apiResponse.text();
       setResponse({
@@ -146,275 +168,152 @@ export function TryPanel({
   };
 
   return (
-    <div className="space-y-5">
-      {/* URL bar */}
-      <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 rounded-lg px-3 py-2">
-        <span
-          className={`font-mono text-xs font-bold shrink-0 ${METHOD_ACCENT[endpoint.method] ?? "text-zinc-500"}`}
-        >
-          {endpoint.method}
-        </span>
-        <code className="flex-1 text-xs text-zinc-500 dark:text-zinc-400 font-mono truncate">
-          {buildUrl()}
-        </code>
-        <Button onClick={send} disabled={loading} size="sm">
-          {loading ? "Sending…" : "Send"}
-        </Button>
-      </div>
-
-      {/* Authentication */}
-      <div>
-        <SectionLabel>Authentication</SectionLabel>
-        <AuthSection auth={auth} onChange={onAuthChange} />
-      </div>
-
-      {/* Headers */}
-      <div>
-        <SectionLabel>Headers</SectionLabel>
-        <div className="space-y-1.5">
-          {headerRows.map(([key, value], index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: positional row
-            <div key={index} className="flex gap-1.5">
-              <Input
-                className="w-36 shrink-0"
-                placeholder="Header-Name"
-                value={key}
-                onChange={(event) =>
-                  setHeaderRows((rows) =>
-                    rows.map((row, rowIndex) =>
-                      rowIndex === index ? [event.target.value, row[1]] : row
-                    )
-                  )
-                }
-              />
-              <Input
-                className="flex-1"
-                placeholder="value"
-                value={value}
-                onChange={(event) =>
-                  setHeaderRows((rows) =>
-                    rows.map((row, rowIndex) =>
-                      rowIndex === index ? [row[0], event.target.value] : row
-                    )
-                  )
-                }
-              />
-              {headerRows.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    setHeaderRows((rows) =>
-                      rows.filter((_, rowIndex) => rowIndex !== index)
-                    )
-                  }
-                  className="shrink-0 w-7 h-7 rounded-md text-zinc-300 dark:text-zinc-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors flex items-center justify-center text-base leading-none"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-          ))}
-          <button
-            type="button"
-            className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
-            onClick={() => setHeaderRows((rows) => [...rows, ["", ""]])}
-          >
-            + Add header
-          </button>
-        </div>
-      </div>
-
-      {/* Path Params */}
-      {pathParamNames.length > 0 && (
-        <div>
-          <SectionLabel>Path Parameters</SectionLabel>
-          <div className="space-y-1.5">
-            {pathParamNames.map((key) => (
-              <div key={key} className="flex items-center gap-2">
-                <code className="text-xs text-zinc-400 dark:text-zinc-500 font-mono w-24 shrink-0">
-                  :{key}
-                </code>
-                <Input
-                  className="flex-1"
-                  value={pathParams[key] ?? ""}
-                  onChange={(event) =>
-                    setPathParams((previousParams) => ({
-                      ...previousParams,
-                      [key]: event.target.value,
-                    }))
-                  }
-                  placeholder={key}
-                />
-              </div>
-            ))}
+    <div className="space-y-6">
+      {/* Body Section Card */}
+      <div className="bg-white dark:bg-[#161b22] border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+        <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-[#161b22] flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
+            <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">
+              Try API Request
+            </span>
           </div>
-        </div>
-      )}
-
-      {/* Query Params */}
-      <div>
-        <SectionLabel>Query Parameters</SectionLabel>
-        <div className="space-y-1.5">
-          {queryRows.map(([key, value], index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: positional row
-            <div key={index} className="flex gap-1.5">
-              <Input
-                className="flex-1"
-                placeholder="key"
-                value={key}
-                onChange={(event) =>
-                  setQueryRows((rows) =>
-                    rows.map((row, rowIndex) =>
-                      rowIndex === index ? [event.target.value, row[1]] : row
-                    )
-                  )
-                }
-              />
-              <Input
-                className="flex-1"
-                placeholder="value"
-                value={value}
-                onChange={(event) =>
-                  setQueryRows((rows) =>
-                    rows.map((row, rowIndex) =>
-                      rowIndex === index ? [row[0], event.target.value] : row
-                    )
-                  )
-                }
-              />
-            </div>
-          ))}
-          <button
-            type="button"
-            className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
-            onClick={() => setQueryRows((rows) => [...rows, ["", ""]])}
-          >
-            + Add parameter
-          </button>
-        </div>
-      </div>
-
-      {/* Body */}
-      {BODY_METHODS.has(endpoint.method) && (
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <SectionLabel>Request Body</SectionLabel>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setBodyType("json")}
-                className={`text-[10px] font-medium px-2 py-0.5 rounded transition-colors ${
-                  bodyType === "json"
-                    ? "bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800"
-                    : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
-                }`}
-              >
-                JSON
-              </button>
-              <button
-                type="button"
-                onClick={() => setBodyType("form")}
-                className={`text-[10px] font-medium px-2 py-0.5 rounded transition-colors ${
-                  bodyType === "form"
-                    ? "bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800"
-                    : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
-                }`}
-              >
-                Form
-              </button>
-            </div>
-          </div>
-
-          {bodyType === "json" ? (
-            <Textarea
-              className="w-full h-40 resize-none leading-relaxed"
-              value={bodyText}
-              onChange={(event) => setBodyText(event.target.value)}
-              spellCheck={false}
-            />
-          ) : (
-            <div className="space-y-1.5">
-              {formRows.map(([key, value], index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: positional row
-                <div key={index} className="flex gap-1.5">
-                  <Input
-                    className="flex-1"
-                    placeholder="key"
-                    value={key}
-                    onChange={(event) =>
-                      setFormRows((rows) =>
-                        rows.map((row, rowIndex) =>
-                          rowIndex === index
-                            ? [event.target.value, row[1]]
-                            : row
-                        )
-                      )
-                    }
-                  />
-                  <Input
-                    className="flex-1"
-                    placeholder="value"
-                    value={value}
-                    onChange={(event) =>
-                      setFormRows((rows) =>
-                        rows.map((row, rowIndex) =>
-                          rowIndex === index
-                            ? [row[0], event.target.value]
-                            : row
-                        )
-                      )
-                    }
-                  />
-                  {formRows.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormRows((rows) =>
-                          rows.filter((_, rowIndex) => rowIndex !== index)
-                        )
-                      }
-                      className="shrink-0 w-7 h-7 rounded-md text-zinc-300 dark:text-zinc-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors flex items-center justify-center text-base leading-none"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
-                onClick={() => setFormRows((rows) => [...rows, ["", ""]])}
-              >
-                + Add field
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Response */}
-      {response && (
-        <div className="space-y-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-          <div className="flex items-center justify-between">
-            <span
-              className={`font-mono text-xs font-bold ${statusColor(response.status)}`}
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={() => setBodyType("json")}
+              className={`px-2 py-0.5 text-[10px] font-bold rounded transition-colors ${
+                bodyType === "json"
+                  ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100"
+                  : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              }`}
             >
-              {response.status || "Error"}
-              <span className="ml-2 font-normal text-[10px] text-zinc-400 dark:text-zinc-500">
-                {response.elapsed}ms
-              </span>
+              JSON
+            </button>
+            <button
+              type="button"
+              onClick={() => setBodyType("form")}
+              className={`px-2 py-0.5 text-[10px] font-bold rounded transition-colors ${
+                bodyType === "form"
+                  ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100"
+                  : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              }`}
+            >
+              Form
+            </button>
+          </div>
+        </div>
+
+        <div className="p-5 space-y-4">
+          {/* Auth */}
+          <AuthSection auth={auth} onChange={onAuthChange} />
+
+          {/* Form Fields */}
+          <div className="space-y-3">
+            {bodyType === "json" ? (
+              <Textarea
+                className="w-full h-40 resize-none leading-relaxed text-[13px] font-mono bg-zinc-50/30 dark:bg-[#0d1117] border-zinc-200 dark:border-zinc-800"
+                value={bodyText}
+                onChange={(event) => setBodyText(event.target.value)}
+                spellCheck={false}
+              />
+            ) : (
+              <div className="space-y-2">
+                {formRows.map(([key, value], index) => (
+                  <div key={index} className="space-y-1.5">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 w-24 shrink-0 truncate">
+                        {key || "field"}
+                      </span>
+                      <span className="text-zinc-300 dark:text-zinc-700">
+                        :
+                      </span>
+                      <Input
+                        className="flex-1 h-8 text-[12px] bg-transparent border-transparent focus:border-cyan-500/50 focus:ring-0 p-0"
+                        placeholder="string, null"
+                        value={value}
+                        onChange={(event) =>
+                          setFormRows((rows) =>
+                            rows.map((row, rowIndex) =>
+                              rowIndex === index
+                                ? [row[0], event.target.value]
+                                : row,
+                            ),
+                          )
+                        }
+                      />
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer group w-fit ml-28">
+                      <input
+                        type="checkbox"
+                        checked={omittedFields.has(`body:${key}`)}
+                        onChange={() => toggleOmit(`body:${key}`)}
+                        className="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700 text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-transparent"
+                      />
+                      <span className="text-[10px] text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
+                        Omit {key || "field"}
+                      </span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <Button
+            onClick={send}
+            disabled={loading}
+            className="w-full h-9 text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-500/20"
+          >
+            {loading ? "Sending..." : "Send API Request"}
+          </Button>
+        </div>
+      </div>
+
+      {/* Code Sample Card */}
+      <CurlSample
+        endpoint={endpoint}
+        auth={auth}
+        pathParams={pathParams}
+        queryRows={queryRows}
+        bodyType={bodyType}
+        bodyText={bodyText}
+        formRows={formRows}
+        omittedFields={omittedFields}
+      />
+
+      {/* Response Card */}
+      {response && (
+        <div className="bg-white dark:bg-[#161b22] border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-4 py-2.5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-[#161b22] flex items-center justify-between">
+            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+              Response Example
             </span>
             <button
               type="button"
-              className="text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
               onClick={() => setResponse(null)}
+              className="text-[10px] text-zinc-400 hover:text-red-400 transition-colors"
             >
               Clear
             </button>
           </div>
-          <pre className="p-3 rounded-md bg-zinc-900 text-zinc-300 text-[11px] font-mono overflow-x-auto border border-zinc-800 max-h-80">
-            {fmtJson(response.body)}
-          </pre>
+          <div className="p-4 bg-[#f6f8fa] dark:bg-[#0d1117]">
+            <div className="flex items-center gap-3 mb-3">
+              <span
+                className={`font-mono text-xs font-bold ${statusColor(
+                  response.status,
+                )}`}
+              >
+                {response.status || "Error"}
+              </span>
+              <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">
+                {response.elapsed}ms
+              </span>
+            </div>
+            <pre className="text-[11px] font-mono text-zinc-700 dark:text-zinc-300 overflow-x-auto whitespace-pre leading-relaxed">
+              {fmtJson(response.body)}
+            </pre>
+          </div>
         </div>
       )}
     </div>

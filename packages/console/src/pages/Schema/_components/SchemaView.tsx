@@ -5,103 +5,148 @@ import { SchemaField } from "./SchemaField.js";
 
 export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
   return (
-    <div className="space-y-6">
-      {/* Description */}
-      {endpoint.description && (
-        <div>
-          <SectionLabel>Description</SectionLabel>
-          <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            {endpoint.description}
-          </p>
-        </div>
-      )}
-
+    <div className="space-y-12">
       {/* Request Body Schema */}
       {!!(endpoint.schema?.properties || endpoint.formSchema?.properties) && (
         <div>
-          <SectionLabel>Request Properties</SectionLabel>
-          <div className="rounded-lg border border-zinc-100 dark:border-zinc-800/60 overflow-hidden bg-zinc-50/30 dark:bg-zinc-900/20">
-            <div className="grid grid-cols-12 gap-2 px-4 py-2 bg-zinc-50 dark:bg-zinc-800/40 border-b border-zinc-100 dark:border-zinc-800 text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
-              <div className="col-span-4">Field</div>
-              <div className="col-span-3">Type</div>
-              <div className="col-span-2">Presence</div>
-              <div className="col-span-3">Constraints</div>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              Request Body
+            </h2>
+            <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 font-mono uppercase tracking-wider">
+              {endpoint.formSchema ? "multipart/form-data" : "application/json"}
+            </span>
+          </div>
+          <div className="border-t border-zinc-100 dark:border-zinc-800/60 pt-2">
             {endpoint.schema?.properties &&
-              Object.entries(endpoint.schema.properties).map(([k, p]) => (
+              Object.entries(endpoint.schema.properties).map(([key, prop]) => (
                 <SchemaField
-                  key={k}
-                  name={k}
-                  prop={p}
-                  required={endpoint.schema?.required?.includes(k) ?? false}
+                  key={key}
+                  name={key}
+                  prop={prop}
+                  required={endpoint.schema?.required?.includes(key) ?? false}
                 />
               ))}
             {endpoint.formSchema?.properties &&
-              Object.entries(endpoint.formSchema.properties).map(([k, p]) => (
-                <SchemaField
-                  key={k}
-                  name={k}
-                  prop={p}
-                  required={endpoint.formSchema?.required?.includes(k) ?? false}
-                />
-              ))}
+              Object.entries(endpoint.formSchema.properties).map(
+                ([key, prop]) => (
+                  <SchemaField
+                    key={key}
+                    name={key}
+                    prop={prop}
+                    required={
+                      endpoint.formSchema?.required?.includes(key) ?? false
+                    }
+                  />
+                )
+              )}
           </div>
         </div>
       )}
 
-      {/* Query/Header Schemas omitted for brevity if not present, but let's add them if they exist */}
+      {/* Query Parameters */}
       {!!endpoint.querySchema?.properties && (
         <div>
-          <SectionLabel>Query Parameters</SectionLabel>
-          <div className="rounded-lg border border-zinc-100 dark:border-zinc-800/60 overflow-hidden bg-zinc-50/30 dark:bg-zinc-900/20">
-            {Object.entries(endpoint.querySchema.properties).map(([k, p]) => (
-              <SchemaField
-                key={k}
-                name={k}
-                prop={p}
-                required={endpoint.querySchema?.required?.includes(k) ?? false}
-              />
-            ))}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              Query Parameters
+            </h2>
+          </div>
+          <div className="border-t border-zinc-100 dark:border-zinc-800/60 pt-2">
+            {Object.entries(endpoint.querySchema.properties).map(
+              ([key, prop]) => (
+                <SchemaField
+                  key={key}
+                  name={key}
+                  prop={prop}
+                  required={
+                    endpoint.querySchema?.required?.includes(key) ?? false
+                  }
+                />
+              )
+            )}
           </div>
         </div>
       )}
 
-      {/* Response Example */}
-      {!!endpoint.responseExample && (
+      {/* Header Parameters */}
+      {!!endpoint.headerSchema?.properties && (
         <div>
-          <SectionLabel>Example Response</SectionLabel>
-          <pre className="p-4 rounded-lg bg-zinc-900 text-zinc-300 text-xs font-mono overflow-x-auto leading-relaxed border border-zinc-800">
-            {JSON.stringify(endpoint.responseExample, null, 2)}
-          </pre>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              Headers
+            </h2>
+          </div>
+          <div className="border-t border-zinc-100 dark:border-zinc-800/60 pt-2">
+            {Object.entries(endpoint.headerSchema.properties).map(
+              ([key, prop]) => (
+                <SchemaField
+                  key={key}
+                  name={key}
+                  prop={prop}
+                  required={
+                    endpoint.headerSchema?.required?.includes(key) ?? false
+                  }
+                />
+              )
+            )}
+          </div>
         </div>
       )}
 
-      {/* Standard Responses */}
+      {/* Responses */}
       <div>
-        <SectionLabel>Possible Responses</SectionLabel>
-        <div className="grid sm:grid-cols-2 gap-3">
-          <ResponseRow
-            status="200"
-            description="Success — request completed normally."
-            color="bg-emerald-50/50 dark:bg-emerald-950/10 border-emerald-100/50 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400"
-          />
-          <ResponseRow
-            status="422"
-            description="Validation Error — invalid request data."
-            color="bg-orange-50/50 dark:bg-orange-950/10 border-orange-100/50 dark:border-orange-900/30 text-orange-700 dark:text-orange-400"
-          />
-          {endpoint.type === "secure" && (
-            <ResponseRow
-              status="401"
-              description="Unauthenticated — missing or invalid token."
-              color="bg-red-50/50 dark:bg-red-950/10 border-red-100/50 dark:border-red-900/30 text-red-700 dark:text-red-400"
-            />
+        <div className="flex items-center gap-4 mb-4">
+          <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            Responses
+          </h2>
+          <div className="flex gap-2">
+            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
+              200
+            </span>
+            <span className="px-2 py-0.5 rounded bg-orange-500/10 text-orange-600 dark:text-orange-400 text-[10px] font-bold border border-orange-500/20">
+              422
+            </span>
+            {endpoint.type === "secure" && (
+              <span className="px-2 py-0.5 rounded bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-bold border border-red-500/20">
+                401
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="border-t border-zinc-100 dark:border-zinc-800/60 pt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+              Body
+            </h3>
+            <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 font-mono uppercase tracking-wider">
+              application/json
+            </span>
+          </div>
+          {!!endpoint.responseExample && (
+            <div className="rounded-lg bg-zinc-900 border border-zinc-800 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-2 bg-zinc-800/50 border-b border-zinc-800">
+                <span className="text-[10px] text-zinc-400 font-mono">
+                  JSON Response
+                </span>
+                <button
+                  type="button"
+                  className="text-zinc-500 hover:text-zinc-300 transition-colors"
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      JSON.stringify(endpoint.responseExample, null, 2)
+                    )
+                  }
+                >
+                  <span className="text-xs">Copy</span>
+                </button>
+              </div>
+              <pre className="p-4 text-[11px] text-zinc-300 font-mono overflow-x-auto leading-relaxed scrollbar-thin scrollbar-thumb-zinc-700">
+                {JSON.stringify(endpoint.responseExample, null, 2)}
+              </pre>
+            </div>
           )}
-          <ResponseRow
-            status="500"
-            description="Server Error — simulated or unexpected failure."
-            color="bg-zinc-50/50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400"
-          />
         </div>
       </div>
     </div>
