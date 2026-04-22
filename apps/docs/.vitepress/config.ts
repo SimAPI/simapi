@@ -11,7 +11,7 @@ export default defineConfig({
   },
 
   themeConfig: {
-    logo: "/simapi.png",
+    logo: "https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png",
 
     search: { provider: "local" },
 

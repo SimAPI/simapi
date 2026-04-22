@@ -8,8 +8,12 @@ interface JsonViewProps {
 
 export function JsonView({ data, title, copyable = true }: JsonViewProps) {
   const [copied, setCopied] = useState(false);
-  const jsonString =
-    typeof data === "string" ? data : JSON.stringify(data, null, 2);
+
+  const jsonString = JSON.stringify(
+    typeof data === "string" ? JSON.parse(data) : data,
+    null,
+    2,
+  );
 
   const handleCopy = () => {
     navigator.clipboard.writeText(jsonString);
@@ -38,7 +42,7 @@ export function JsonView({ data, title, copyable = true }: JsonViewProps) {
           cls = "text-rose-500"; // null
         }
         return `<span class="${cls}">${match}</span>`;
-      }
+      },
     );
 
   return (

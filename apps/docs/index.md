@@ -6,7 +6,7 @@ hero:
   text: Ship frontend features before the backend exists.
   tagline: Define real API behaviour in TypeScript. Get a running mock server in seconds. No backend team required.
   image:
-    src: /simapi.png
+    src: https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png
     alt: SimAPI
   actions:
     - theme: brand
