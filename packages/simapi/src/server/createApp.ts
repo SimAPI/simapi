@@ -14,6 +14,7 @@ import type { LogBus } from "./logBus.js";
 interface RawRequest {
   headers: Record<string, string>;
   body: Record<string, unknown>;
+  form: Record<string, unknown>;
   query: Record<string, string>;
   urlParams: Record<string, string>;
 }
@@ -63,6 +64,7 @@ function registerEndpoint(
     const request = new AppRequest(
       raw.headers,
       raw.body,
+      raw.form,
       raw.query,
       raw.urlParams,
       errors
@@ -127,7 +129,7 @@ function registerEndpoint(
     } catch (err) {
       if (err instanceof ValidationError) {
         logStatus = 422;
-        logBody = formatValidationError(err);
+        logBody = formatValidationError(err, config);
       }
       throw err;
     } finally {
@@ -181,6 +183,7 @@ function runRequestValidation(
   }
 
   collect(request.body, raw.body);
+  collect(request.form, raw.form);
   collect(request.query, raw.query);
   collect(request.headers, raw.headers);
 
@@ -194,6 +197,7 @@ async function buildRawRequest(c: Context): Promise<RawRequest> {
   });
 
   let body: Record<string, unknown> = {};
+  const form: Record<string, unknown> = {};
   const contentType = c.req.header("content-type") ?? "";
   if (contentType.includes("application/json")) {
     body = await c.req.json<Record<string, unknown>>().catch(() => ({}));
@@ -201,10 +205,10 @@ async function buildRawRequest(c: Context): Promise<RawRequest> {
     contentType.includes("application/x-www-form-urlencoded") ||
     contentType.includes("multipart/form-data")
   ) {
-    const form = await c.req.formData().catch(() => null);
-    if (form) {
-      form.forEach((value, key) => {
-        body[key] = value;
+    const formData = await c.req.formData().catch(() => null);
+    if (formData) {
+      formData.forEach((value, key) => {
+        form[key] = value;
       });
     }
   }
@@ -217,12 +221,20 @@ async function buildRawRequest(c: Context): Promise<RawRequest> {
   return {
     headers,
     body,
+    form,
     query,
     urlParams: c.req.param() as Record<string, string>,
   };
 }
 
-function formatValidationError(err: ValidationError): unknown {
+function formatValidationError(
+  err: ValidationError,
+  config?: SimAPIConfig
+): unknown {
+  if (config?.validationErrorFormatter) {
+    return config.validationErrorFormatter(err.errorBag);
+  }
+
   if (err.format === "laravel") {
     return {
       message: "The given data was invalid.",

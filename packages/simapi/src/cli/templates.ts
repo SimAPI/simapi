@@ -181,9 +181,9 @@ export function makeUser(): User {
 }
 `;
 
-export const HELLO_WORLD_REQUEST_TS = `import { z } from "@simapi/simapi";
+export const HELLO_WORLD_REQUEST_TS = `import { RequestDefinition, z } from "@simapi/simapi";
 
-export const helloWorldRequest = {
+export const helloWorldRequest: RequestDefinition = {
   body: {
     name: z.string().min(2).max(100).default("John Doe"),
   },
@@ -195,7 +195,7 @@ export const HELLO_WORLD_TS = `import { AppResponse, type AppRequest, type Endpo
 import { makeUser } from "@/models/user.js";
 import { helloWorldRequest } from "@/requests/hello-world.js";
 
-export const helloGet: EndpointDefinition = {
+export const getHello: EndpointDefinition = {
   path: "/",
   method: "GET",
   type: "open",
@@ -206,7 +206,7 @@ export const helloGet: EndpointDefinition = {
   },
 };
 
-export const helloPost: EndpointDefinition = {
+export const postHello: EndpointDefinition = {
   path: "/",
   method: "POST",
   type: "secure",

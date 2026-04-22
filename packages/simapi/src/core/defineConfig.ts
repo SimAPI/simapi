@@ -82,6 +82,12 @@ export interface SimAPIConfig {
    * autoThrowValidationErrors: "laravel"
    */
   autoThrowValidationErrors?: ValidationFormat | false | null;
+
+  /**
+   * Custom validation error formatter.
+   * Receives the error bag (field -> messages) and should return an object.
+   */
+  validationErrorFormatter?: (errors: Record<string, string[]>) => object;
 }
 
 /**

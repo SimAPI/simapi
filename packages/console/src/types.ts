@@ -15,6 +15,7 @@ export interface JsonSchemaProperty {
   maximum?: number;
   items?: JsonSchemaProperty;
   properties?: Record<string, JsonSchemaProperty>;
+  default?: unknown;
 }
 
 export interface JsonSchema {
@@ -30,6 +31,9 @@ export interface EndpointInfo {
   title?: string;
   description?: string;
   schema?: JsonSchema;
+  formSchema?: JsonSchema;
+  headerSchema?: JsonSchema;
+  querySchema?: JsonSchema;
   responseExample?: unknown;
 }
 

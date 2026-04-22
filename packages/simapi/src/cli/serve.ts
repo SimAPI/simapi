@@ -71,10 +71,12 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
   startServer(app, port);
 
   for (const signal of ["SIGINT", "SIGTERM"] as const) {
-    process.once(signal, () => {
-      bus
-        .close()
-        .catch((err) => console.error("[SimAPI] shutdown error:", err));
+    process.once(signal, async () => {
+      if (!bus) process.exit(0);
+
+      await bus.close().catch((err) => {
+        console.error("[SimAPI] shutdown error:", err);
+      });
     });
   }
 }

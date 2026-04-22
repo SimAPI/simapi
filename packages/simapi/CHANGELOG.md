@@ -1,5 +1,15 @@
 # @simapi/simapi
 
+## 0.0.8 - Console overhaul & validation improvements
+
+- **Console:** Authenticated state and custom headers are now persisted to `localStorage` — no more re-entering tokens on refresh
+- **Console:** Support for Form data (multipart/form-data and urlencoded) in the Try-it panel — switch between JSON and Form inputs
+- **Console:** Schema documentation and test inputs now automatically utilize `default` values from Zod schemas
+- **Validation:** Added `form` field to `RequestDefinition` — separate validation for form data from JSON body
+- **Validation:** Added `validationErrorFormatter` to config — customize the response structure for 422 errors
+- **Fix:** Server now terminates properly on SIGTERM/SIGINT, resolving issues where the dev server would move to a new port because the old one wasn't released
+- **Docs:** Added [FAQ](/guide/faq) section and updated documentation for new features
+
 ## 0.0.7 - Request validation — body, query, and headers
 
 - Added `RequestDefinition` interface — replaces the single `validator` field with separate `body`, `query`, and `headers` Zod shapes, enabling validation across all three input sources

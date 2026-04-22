@@ -9,7 +9,7 @@ export const login: EndpointDefinition = {
     "Authenticate with email and password. Returns a bearer token on success.",
   request: {
     body: {
-      email: z.string().email(),
+      email: z.string().email().default("johndoe@simapi.com"),
       password: z.string().min(8),
     },
   },

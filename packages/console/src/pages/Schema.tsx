@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { api } from "../lib/api.js";
-import type { EndpointInfo, JsonSchemaProperty } from "../types.js";
+import type { EndpointInfo, JsonSchema, JsonSchemaProperty } from "../types.js";
 
 // ─── auth types ───────────────────────────────────────────────────────────────
 
@@ -98,18 +98,38 @@ function statusColor(s: number): string {
   return "text-emerald-500 dark:text-emerald-400";
 }
 
-function buildDefaultBody(ep: EndpointInfo): string {
-  if (!BODY_METHODS.has(ep.method) || !ep.schema?.properties) return "{}";
+function buildDefaultBody(
+  ep: EndpointInfo,
+  type: "json" | "form" = "json"
+): string {
+  const schema = type === "json" ? ep.schema : ep.formSchema;
+  if (!schema?.properties) return "{}";
   const example: Record<string, unknown> = {};
-  for (const [k, prop] of Object.entries(ep.schema.properties)) {
-    example[k] =
-      prop.type === "number" || prop.type === "integer"
-        ? 0
-        : prop.type === "boolean"
-          ? false
-          : "";
+  for (const [k, prop] of Object.entries(schema.properties)) {
+    if (prop.default !== undefined) {
+      example[k] = prop.default;
+    } else {
+      example[k] =
+        prop.type === "number" || prop.type === "integer"
+          ? 0
+          : prop.type === "boolean"
+            ? false
+            : "";
+    }
   }
   return JSON.stringify(example, null, 2);
+}
+
+function buildDefaultRows(schema?: JsonSchema): [string, string][] {
+  if (!schema?.properties) return [["", ""]];
+
+  const rows: [string, string][] = Object.entries(schema.properties).map(
+    ([k, prop]) => {
+      return [k, prop.default !== undefined ? String(prop.default) : ""];
+    }
+  );
+
+  return rows.length > 0 ? rows : [["", ""]];
 }
 
 function buildAuthHeaders(auth: AuthState): Record<string, string> {
@@ -187,6 +207,11 @@ function SchemaField({
       </div>
       <div className="col-span-3 text-[10px] text-zinc-400 dark:text-zinc-500">
         {constraints.join(", ")}
+        {prop.default !== undefined && (
+          <div className="mt-0.5 text-[9px] text-zinc-400 dark:text-zinc-500 italic">
+            default: {JSON.stringify(prop.default)}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -331,9 +356,29 @@ function TryPanel({
   const [pathParams, setPathParams] = useState<Record<string, string>>(() =>
     Object.fromEntries(pathParamNames.map((p) => [p, ""]))
   );
-  const [headerRows, setHeaderRows] = useState<[string, string][]>([["", ""]]);
-  const [queryRows, setQueryRows] = useState<[string, string][]>([["", ""]]);
-  const [bodyText, setBodyText] = useState(() => buildDefaultBody(endpoint));
+  const [headerRows, setHeaderRows] = useState<[string, string][]>(() => {
+    const saved = localStorage.getItem("simapi-console-headers");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        // ignore
+      }
+    }
+    return buildDefaultRows(endpoint.headerSchema);
+  });
+  const [queryRows, setQueryRows] = useState<[string, string][]>(() =>
+    buildDefaultRows(endpoint.querySchema)
+  );
+  const [bodyType, setBodyType] = useState<"json" | "form">(() =>
+    endpoint.formSchema && !endpoint.schema ? "form" : "json"
+  );
+  const [bodyText, setBodyText] = useState(() =>
+    buildDefaultBody(endpoint, "json")
+  );
+  const [formRows, setFormRows] = useState<[string, string][]>(() =>
+    buildDefaultRows(endpoint.formSchema)
+  );
   const [response, setResponse] = useState<{
     status: number;
     body: string;
@@ -342,12 +387,19 @@ function TryPanel({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    localStorage.setItem("simapi-console-headers", JSON.stringify(headerRows));
+  }, [headerRows]);
+
+  useEffect(() => {
     setPathParams(
       Object.fromEntries(extractPathParams(endpoint.path).map((p) => [p, ""]))
     );
-    setHeaderRows([["", ""]]);
-    setQueryRows([["", ""]]);
-    setBodyText(buildDefaultBody(endpoint));
+    // Note: headerRows persists, so we don't reset it here unless desired.
+    // But we should probably merge defaults if it's empty.
+    setQueryRows(buildDefaultRows(endpoint.querySchema));
+    setBodyType(endpoint.formSchema && !endpoint.schema ? "form" : "json");
+    setBodyText(buildDefaultBody(endpoint, "json"));
+    setFormRows(buildDefaultRows(endpoint.formSchema));
     setResponse(null);
   }, [endpoint]);
 
@@ -370,21 +422,33 @@ function TryPanel({
     try {
       const hasBody = BODY_METHODS.has(endpoint.method);
       let body: unknown;
+      let headers: Record<string, string> = buildAuthHeaders(auth);
+      const customHeaders = Object.fromEntries(headerRows.filter(([k]) => k));
+      headers = { ...headers, ...customHeaders };
+
       if (hasBody) {
-        try {
-          body = JSON.parse(bodyText);
-        } catch {
-          body = bodyText;
+        if (bodyType === "json") {
+          try {
+            body = JSON.parse(bodyText);
+          } catch {
+            body = bodyText;
+          }
+          headers["content-type"] = "application/json";
+        } else {
+          const fd = new FormData();
+          for (const [k, v] of formRows) {
+            if (k) fd.append(k, v);
+          }
+          body = fd;
+          // Let the browser set the content-type for FormData (multipart/form-data)
         }
       }
-      const authHeaders = buildAuthHeaders(auth);
-      const customHeaders = Object.fromEntries(headerRows.filter(([k]) => k));
-      const allHeaders = { ...authHeaders, ...customHeaders };
+
       const res = await api.send(
         endpoint.method,
         buildUrl(),
         hasBody ? body : undefined,
-        Object.keys(allHeaders).length > 0 ? allHeaders : undefined
+        Object.keys(headers).length > 0 ? headers : undefined
       );
       const text = await res.text();
       setResponse({
@@ -543,13 +607,91 @@ function TryPanel({
       {/* Body */}
       {BODY_METHODS.has(endpoint.method) && (
         <div>
-          <SectionLabel>Request Body (JSON)</SectionLabel>
-          <textarea
-            className={`w-full h-40 ${inputCls} resize-none leading-relaxed`}
-            value={bodyText}
-            onChange={(e) => setBodyText(e.target.value)}
-            spellCheck={false}
-          />
+          <div className="flex items-center justify-between mb-2">
+            <SectionLabel>Request Body</SectionLabel>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setBodyType("json")}
+                className={`text-[10px] font-medium px-2 py-0.5 rounded transition-colors ${
+                  bodyType === "json"
+                    ? "bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800"
+                    : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
+                }`}
+              >
+                JSON
+              </button>
+              <button
+                type="button"
+                onClick={() => setBodyType("form")}
+                className={`text-[10px] font-medium px-2 py-0.5 rounded transition-colors ${
+                  bodyType === "form"
+                    ? "bg-cyan-50 dark:bg-cyan-950/40 text-cyan-600 dark:text-cyan-400 border border-cyan-200 dark:border-cyan-800"
+                    : "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300"
+                }`}
+              >
+                Form
+              </button>
+            </div>
+          </div>
+
+          {bodyType === "json" ? (
+            <textarea
+              className={`w-full h-40 ${inputCls} resize-none leading-relaxed`}
+              value={bodyText}
+              onChange={(e) => setBodyText(e.target.value)}
+              spellCheck={false}
+            />
+          ) : (
+            <div className="space-y-1.5">
+              {formRows.map(([k, v], i) => (
+                <div key={i} className="flex gap-1.5">
+                  <input
+                    className={`flex-1 ${inputCls}`}
+                    placeholder="key"
+                    value={k}
+                    onChange={(ev) =>
+                      setFormRows((rows) =>
+                        rows.map((r, j) =>
+                          j === i ? [ev.target.value, r[1]] : r
+                        )
+                      )
+                    }
+                  />
+                  <input
+                    className={`flex-1 ${inputCls}`}
+                    placeholder="value"
+                    value={v}
+                    onChange={(ev) =>
+                      setFormRows((rows) =>
+                        rows.map((r, j) =>
+                          j === i ? [r[0], ev.target.value] : r
+                        )
+                      )
+                    }
+                  />
+                  {formRows.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFormRows((rows) => rows.filter((_, j) => j !== i))
+                      }
+                      className="shrink-0 w-7 h-7 rounded-md text-zinc-300 dark:text-zinc-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors flex items-center justify-center text-base leading-none"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                className="text-xs text-zinc-400 dark:text-zinc-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                onClick={() => setFormRows((rows) => [...rows, ["", ""]])}
+              >
+                + Add field
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -789,7 +931,21 @@ export default function Schema() {
   const [endpoints, setEndpoints] = useState<EndpointInfo[]>([]);
   const [selected, setSelected] = useState<EndpointInfo | null>(null);
   const [search, setSearch] = useState("");
-  const [auth, setAuth] = useState<AuthState>({ ...DEFAULT_AUTH });
+  const [auth, setAuth] = useState<AuthState>(() => {
+    const saved = localStorage.getItem("simapi-console-auth");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        // ignore
+      }
+    }
+    return { ...DEFAULT_AUTH };
+  });
+
+  useEffect(() => {
+    localStorage.setItem("simapi-console-auth", JSON.stringify(auth));
+  }, [auth]);
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
 

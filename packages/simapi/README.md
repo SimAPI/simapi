@@ -103,7 +103,7 @@ export const createPost: EndpointDefinition = {
 | `method`      | ✓        | `GET` `POST` `PUT` `PATCH` `DELETE` `HEAD` `OPTIONS`             |
 | `type`        | ✓        | `"open"` (no auth) or `"secure"` (runs `authHandler` first)      |
 | `handler`     | ✓        | `(req: AppRequest) => AppResponse`                               |
-| `request`     |          | `RequestDefinition` — Zod shapes for `body`, `query`, `headers`  |
+| `request`     |          | `RequestDefinition` — Zod shapes for `body`, `form`, `query`, `headers` |
 | `title`       |          | Display name — shown in Console and exported OpenAPI             |
 | `description` |          | Longer description — same                                        |
 | `authHandler` |          | Per-endpoint auth check (runs after global handler)              |
@@ -188,16 +188,19 @@ handler: (req) => {
 
 `z` is re-exported directly from `@simapi/simapi` — no separate `zod` install needed.
 
-Define shared `RequestDefinition` objects in `src/requests/` to reuse validation logic across endpoints:
+Define shared `RequestDefinition` objects in `src/requests/` to reuse validation logic across endpoints. SimAPI supports `body` (JSON), `form` (multipart/urlencoded), `query`, and `headers`:
 
 ```ts
 // src/requests/postRequest.ts
 import { z, type RequestDefinition } from "@simapi/simapi";
 
 export const postRequest: RequestDefinition = {
-  body: {
+  body: { // for application/json
     title: z.string().min(3),
     body:  z.string().min(10),
+  },
+  form: { // for multipart/form-data or application/x-www-form-urlencoded
+    category: z.string().optional(),
   },
 };
 ```
@@ -331,6 +334,8 @@ npx simapi console:add
 ```
 
 Then open **http://localhost:3000/__simapi/console/** while `simapi serve` is running.
+
+Version 0.0.8+: The console now persists your Authentication state and custom Headers to `localStorage` and supports switching between JSON and Form inputs for testing.
 
 See [`@simapi/console`](../console) for details.
 
