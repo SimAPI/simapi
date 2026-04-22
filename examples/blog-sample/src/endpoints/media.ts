@@ -4,7 +4,7 @@ import {
   type EndpointDefinition,
   z,
 } from "@simapi/simapi";
-import { makeMedia } from "../models/media.js";
+import { makeMedia } from "@/models/media.js";
 
 export const listMedia: EndpointDefinition = {
   path: "/api/media",

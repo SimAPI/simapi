@@ -7,10 +7,10 @@ The fastest way to start a SimAPI project:
 ```sh
 npx @simapi/simapi@latest init my-api
 cd my-api
-npm run serve
+npm run dev
 ```
 
-Your mock server is running at **http://localhost:3000**.
+Your mock server is running at **http://localhost:3000**. Edit any file in `src/` and the server restarts automatically.
 
 ## Manual setup
 
@@ -23,29 +23,31 @@ npx @simapi/simapi@latest init
 
 ## Project structure
 
-A well-organized SimAPI project groups endpoints by resource and defines reusable data factories in a `models/` directory:
+A well-organized SimAPI project keeps endpoints and models inside `src/`:
 
 ```
 my-api/
-├── endpoints/          # Grouped by resource — every named export is auto-discovered
-│   ├── posts.ts        # listPosts, getPost, createPost, …
-│   ├── users.ts        # listUsers, getUser, createUser, …
-│   └── comments.ts     # listComments, createComment, …
-├── models/             # Shared data factories — keeps endpoints DRY
-│   ├── post.ts         # Post interface + makePost() factory
-│   └── user.ts         # User interface + makeUser() factory
+├── src/
+│   ├── endpoints/          # Grouped by resource — every named export is auto-discovered
+│   │   ├── posts.ts        # listPosts, getPost, createPost, …
+│   │   ├── users.ts        # listUsers, getUser, createUser, …
+│   │   └── comments.ts     # listComments, createComment, …
+│   ├── models/             # Shared data factories — keeps endpoints DRY
+│   │   ├── post.ts         # Post interface + makePost() factory
+│   │   └── user.ts         # User interface + makeUser() factory
+│   └── authHandler.ts      # Optional — global auth handler
 ├── simapi.config.ts
 └── package.json
 ```
 
-You can put as many endpoints as you like in one file. SimAPI discovers every named export from every `.ts` file inside `endpoints/` automatically — no registration required.
+You can put as many endpoints as you like in one file. SimAPI discovers every named export from every `.ts` file inside `src/endpoints/` automatically — no registration required.
 
 ## Defining models
 
 A model file exports a TypeScript interface and a factory function that generates realistic fake data:
 
 ```ts
-// models/post.ts
+// src/models/post.ts
 import { faker } from "@simapi/simapi";
 
 export interface Post {
@@ -69,12 +71,12 @@ export function makePost(): Post {
 
 ## Grouping endpoints
 
-Multiple endpoints can live in a single file. Importing from your model keeps the handler clean:
+Multiple endpoints can live in a single file.
 
 ```ts
-// endpoints/posts.ts
+// src/endpoints/posts.ts
 import { z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
-import { makePost } from "../models/post.js";
+import { makePost } from "@/models/post.js";
 
 export const listPosts: EndpointDefinition = {
   path: "/api/posts",
@@ -109,9 +111,11 @@ export const createPost: EndpointDefinition = {
 ## Development workflow
 
 ```sh
-npm run serve    # Start dev server with live reload
+npm run dev      # Start dev server with file watching — auto-restarts on changes
+npm run serve    # Start dev server once (no watching)
 npm run build    # Compile to .simapi/dist/ for deployment
 npm run start    # Run the compiled production server
+npm run simapi   # Interactive CLI — setup, console, import/export
 ```
 
 ## Demo project
@@ -121,7 +125,13 @@ A complete example with posts, users, and comments is available in the
 
 ## Adding the console
 
-Install the optional request inspector:
+Install the optional request inspector via the interactive CLI:
+
+```sh
+npm run simapi   # → Console → Add
+```
+
+Or directly:
 
 ```sh
 npx simapi console:add

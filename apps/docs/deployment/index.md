@@ -16,9 +16,12 @@ The server reads the `PORT` environment variable, falling back to the port in `s
 Use `simapi setup` to generate the right configuration file for your target platform:
 
 ```sh
+simapi setup docker    # creates Dockerfile
 simapi setup vercel    # creates vercel.json
 simapi setup netlify   # creates netlify.toml
 ```
+
+Or run `npm run simapi` → **Setup** to pick a platform interactively.
 
 ## Securing the console
 

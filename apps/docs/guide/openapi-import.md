@@ -8,21 +8,21 @@ If a backend spec already exists but the implementation is still in progress, `s
 
 ```sh
 simapi import openapi.yaml
-simapi import openapi.json --output endpoints/
+simapi import openapi.json --output src/endpoints/
 ```
 
 Both YAML and JSON specs are supported.
 
-| Option | Default | Description |
-|---|---|---|
-| `--output`, `-o` | `endpoints/` | Directory to write generated files |
+| Option           | Default          | Description                        |
+| ---------------- | ---------------- | ---------------------------------- |
+| `--output`, `-o` | `src/endpoints/` | Directory to write generated files |
 
 ### What gets generated
 
 Given a spec with `/api/posts` and `/api/users`, SimAPI creates:
 
 ```
-endpoints/
+src/endpoints/
 ├── posts.ts
 └── users.ts
 ```
@@ -30,7 +30,7 @@ endpoints/
 Each file contains typed, grouped stubs:
 
 ```ts
-// endpoints/posts.ts  (generated)
+// src/endpoints/posts.ts  (generated)
 import { z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
 
 export const listPosts: EndpointDefinition = {
@@ -88,8 +88,8 @@ paths:
 
 ```sh
 simapi import openapi.yaml
-# [SimAPI] Wrote endpoints/posts.ts
-# [SimAPI] Import complete — 1 file(s) written to endpoints/
+# [SimAPI] Wrote src/endpoints/posts.ts
+# [SimAPI] Import complete — 1 file(s) written to src/endpoints/
 ```
 
 ---
@@ -99,17 +99,17 @@ simapi import openapi.yaml
 `simapi export` introspects your endpoint definitions (including Zod validators) and produces an OpenAPI 3 spec you can share with your team or feed into documentation tools.
 
 ```sh
-npm run export
+npm run simapi   # → Export (interactive)
 # or directly:
 simapi export
 simapi export --output docs/api.yaml
 simapi export --output api.json --format json
 ```
 
-| Option | Default | Description |
-|---|---|---|
-| `--output`, `-o` | `openapi.yaml` | Output file path |
-| `--format` | `yaml` (or `json` if path ends in `.json`) | `yaml` or `json` |
+| Option           | Default                                    | Description      |
+| ---------------- | ------------------------------------------ | ---------------- |
+| `--output`, `-o` | `openapi.yaml`                             | Output file path |
+| `--format`       | `yaml` (or `json` if path ends in `.json`) | `yaml` or `json` |
 
 ### What gets generated
 

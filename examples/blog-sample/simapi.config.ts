@@ -5,6 +5,7 @@ export default defineConfig({
   description:
     "A realistic blog platform API — posts, authors, comments, categories, tags, media and analytics.",
   port: 3001,
+  endpointsDir: "src/endpoints",
   logEntries: true,
   consoleLog: true,
   authHandler: AuthHandlers.bearer(),

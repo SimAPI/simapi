@@ -16,7 +16,7 @@ Your mock API is live at `https://your-project.up.railway.app` (or a custom doma
 
 ## With a Dockerfile
 
-If you selected a Dockerfile during `simapi init`, Railway uses it automatically:
+If you included a Dockerfile (via `simapi init` or `simapi setup docker`), Railway uses it automatically:
 
 ```dockerfile
 FROM node:20-alpine

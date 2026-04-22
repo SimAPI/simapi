@@ -5,7 +5,7 @@ import {
   faker,
   z,
 } from "@simapi/simapi";
-import { makeProduct } from "../models/product.js";
+import { makeProduct } from "@/models/product.js";
 
 function makeCartItem() {
   const product = makeProduct();

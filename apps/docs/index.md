@@ -45,20 +45,20 @@ features:
 
 ## A full mock API in under a minute
 
-One command to scaffold, one command to serve:
+One command to scaffold, one command to start:
 
 ```sh
 npx @simapi/simapi@latest init my-api
 cd my-api
-npm run serve
+npm run dev
 ```
 
-Your API is live at `http://localhost:3000`. Now define endpoints.
+Your API is live at `http://localhost:3000`. Files in `src/` are watched — the server restarts automatically on every save.
 
 ## Endpoints are just TypeScript
 
 ```ts
-// endpoints/posts.ts
+// src/endpoints/posts.ts
 import { faker, z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
 
 export const listPosts: EndpointDefinition = {

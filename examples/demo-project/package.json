@@ -6,9 +6,10 @@
   "description": "Demo project showing SimAPI patterns",
   "scripts": {
     "serve": "simapi serve",
+    "dev": "simapi dev",
     "build": "simapi build",
     "start": "simapi start",
-    "export": "simapi export"
+    "simapi": "simapi interactive"
   },
   "dependencies": {
     "@simapi/simapi": "*"

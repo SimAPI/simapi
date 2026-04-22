@@ -31,16 +31,16 @@ export const myEndpoint: EndpointDefinition = {
 };
 ```
 
-SimAPI discovers every named export from every `.ts` file inside `endpoints/` (or your configured `endpointsDir`). No registration needed.
+SimAPI discovers every named export from every `.ts` file inside `src/endpoints/` (or your configured `endpointsDir`). No registration needed.
 
 ## Grouping endpoints
 
 Multiple endpoints can live in one file — group by resource:
 
 ```ts
-// endpoints/posts.ts
+// src/endpoints/posts.ts
 import { AppResponse, type EndpointDefinition } from "@simapi/simapi";
-import { makePost } from "../models/post.js";
+import { makePost } from "@/models/post.js";
 
 export const listPosts: EndpointDefinition = {
   path: "/api/posts",
@@ -66,10 +66,10 @@ export const deletePost: EndpointDefinition = {
 
 ## Models
 
-Define data factories in a `models/` directory and import them across endpoints:
+Define data factories in `src/models/` and import them across endpoints using the `@/` alias:
 
 ```ts
-// models/post.ts
+// src/models/post.ts
 import { faker } from "@simapi/simapi";
 
 export interface Post {
@@ -90,8 +90,8 @@ export function makePost(): Post {
 ```
 
 ```ts
-// endpoints/posts.ts
-import { makePost } from "../models/post.js";
+// src/endpoints/posts.ts
+import { makePost } from "@/models/post.js";
 
 handler: () => AppResponse.success({ data: AppResponse.array(5, makePost) }),
 ```

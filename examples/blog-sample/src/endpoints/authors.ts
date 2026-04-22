@@ -4,8 +4,8 @@ import {
   type EndpointDefinition,
   z,
 } from "@simapi/simapi";
-import { makeAuthor } from "../models/author.js";
-import { makePost } from "../models/post.js";
+import { makeAuthor } from "@/models/author.js";
+import { makePost } from "@/models/post.js";
 
 export const listAuthors: EndpointDefinition = {
   path: "/api/authors",

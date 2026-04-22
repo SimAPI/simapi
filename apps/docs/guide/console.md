@@ -4,6 +4,14 @@
 
 ## Installation
 
+Use the interactive CLI (recommended):
+
+```sh
+npm run simapi   # → Console → Add
+```
+
+Or install directly:
+
 ```sh
 npx simapi console:add
 ```
@@ -11,6 +19,8 @@ npx simapi console:add
 This installs `@simapi/console` and adds it as a dependency. To remove it:
 
 ```sh
+npm run simapi   # → Console → Remove
+# or directly:
 npx simapi console:remove
 ```
 
@@ -36,13 +46,13 @@ Every request logged to your database appears here in real time via a Server-Sen
 
 ### Log columns
 
-| Column | Description |
-|---|---|
-| **Time** | Timestamp of the request |
-| **Method** | HTTP method badge (color-coded) |
-| **Path** | The matched route path including query string |
+| Column     | Description                                           |
+| ---------- | ----------------------------------------------------- |
+| **Time**   | Timestamp of the request                              |
+| **Method** | HTTP method badge (color-coded)                       |
+| **Path**   | The matched route path including query string         |
 | **Status** | Response status code (green 2xx, yellow 4xx, red 5xx) |
-| **ms** | Duration from request received to response sent |
+| **ms**     | Duration from request received to response sent       |
 
 ### Log detail modal
 
@@ -128,5 +138,7 @@ export default defineConfig({
 To run without the console even when it's installed:
 
 ```sh
+npm run simapi   # → Console → Remove
+# or directly:
 npx simapi console:remove
 ```
