@@ -8,6 +8,7 @@
   "homepage": "https://simapi.mayrlabs.com",
   "scripts": {
     "build": "turbo run build",
+    "changelog:sync": "cp packages/console/CHANGELOG.md apps/docs/changelog/console.md && cp packages/simapi/CHANGELOG.md apps/docs/changelog/simapi.md",
     "dev": "turbo run dev",
     "serve": "turbo run serve",
     "lint": "biome lint .",
