@@ -1,0 +1,18 @@
+import { useEffect, useState } from "react";
+
+export function useDarkMode() {
+  const [dark, setDark] = useState(() => {
+    const stored = localStorage.getItem("simapi-theme");
+
+    if (stored) return stored === "dark";
+
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("simapi-theme", dark ? "dark" : "light");
+  }, [dark]);
+
+  return [dark, setDark] as const;
+}
