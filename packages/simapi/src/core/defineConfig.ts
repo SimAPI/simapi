@@ -43,7 +43,7 @@ export interface SimAPIConfig {
 
   /**
    * Directory (relative to the project root) that SimAPI scans for endpoint
-   * files. Defaults to `"endpoints"`.
+   * files. Defaults to `"src/endpoints"`.
    */
   endpointsDir?: string;
 

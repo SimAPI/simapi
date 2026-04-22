@@ -1,9 +1,11 @@
 import { cac } from "cac";
 import { type Platform, runBuild } from "./build.js";
 import { runConsoleAdd, runConsoleRemove } from "./console.js";
+import { runDev } from "./dev.js";
 import { runExportOpenAPI } from "./export-openapi.js";
 import { runImportOpenAPI } from "./import-openapi.js";
 import { runInit } from "./init.js";
+import { runInteractive } from "./interactive.js";
 import { runServe } from "./serve.js";
 import { runSetup } from "./setup.js";
 import { runStart } from "./start.js";
@@ -23,6 +25,19 @@ cli
   .action((cwd: string | undefined) => {
     runServe(cwd).catch(fatal);
   });
+
+cli
+  .command(
+    "dev [cwd]",
+    "Start the dev server with file watching and auto-restart"
+  )
+  .action((cwd: string | undefined) => {
+    runDev(cwd).catch(fatal);
+  });
+
+cli.command("interactive", "Launch the interactive CLI menu").action(() => {
+  runInteractive().catch(fatal);
+});
 
 cli
   .command("build [cwd]", "Compile the project to .simapi/dist/")

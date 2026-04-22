@@ -56,8 +56,11 @@ export async function runBuild(
 
   const { outDir, entryName } = getPlatformConfig(cwd, platform);
   const tmpDir = resolve(cwd, ".simapi", "_build");
-  const endpointsDir = resolve(cwd, userConfig?.endpointsDir ?? "endpoints");
-  const authHandlerPath = resolve(cwd, "authHandler.ts");
+  const endpointsDir = resolve(
+    cwd,
+    userConfig?.endpointsDir ?? "src/endpoints"
+  );
+  const authHandlerPath = resolve(cwd, "src/authHandler.ts");
 
   const s = p.spinner();
   s.start("Compiling project");

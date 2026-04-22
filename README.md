@@ -26,8 +26,10 @@ Build frontend features against real API behavior — before your backend exists
 ```sh
 npx @simapi/simapi@latest init my-api
 cd my-api
-npm run serve
+npm run dev
 ```
+
+Once running, use `npm run simapi` for the interactive CLI — setup deployments, manage the console, import/export OpenAPI specs.
 
 ## Development
 
