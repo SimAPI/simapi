@@ -84,8 +84,9 @@ database: { type: "none" }
 
 The auth handler runs before every `secure` endpoint. Return an `AppResponse` to reject the request, or return nothing to allow it:
 
-```ts
-// src/authHandler.ts
+::: code-group
+
+```ts [src/authHandler.ts]
 import { AppResponse, type AppRequest } from "@simapi/simapi";
 
 export function authHandler(req: AppRequest) {
@@ -99,13 +100,13 @@ export function authHandler(req: AppRequest) {
 }
 ```
 
-Wire it up in your config:
-
-```ts
-import { authHandler } from "@/authHandler.js";
+```ts [simapi.config.ts]
+import { authHandler } from "@/authHandler.js"; // [!code ++]
 
 export default defineConfig({
   name: "my-api",
-  authHandler,
+  authHandler, // [!code ++]
 });
 ```
+
+:::

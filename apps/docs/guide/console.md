@@ -1,5 +1,7 @@
 # Debug Console
 
+<!-- @todo: Add images here -->
+
 `@simapi/console` is an optional browser-based UI for inspecting live requests, browsing your endpoint schema, and firing test requests — all without leaving the browser.
 
 ## Installation

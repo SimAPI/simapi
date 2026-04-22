@@ -1,8 +1,6 @@
 # @simapi/simapi
 
-## 0.0.7
-
-### Request validation — body, query, and headers
+## 0.0.7 - Request validation — body, query, and headers
 
 - Added `RequestDefinition` interface — replaces the single `validator` field with separate `body`, `query`, and `headers` Zod shapes, enabling validation across all three input sources
 - **Breaking:** `validator?: ZodRawShape` removed from `EndpointDefinition`; use `request: { body: { ... } }` instead
@@ -43,9 +41,7 @@ request: {
 },
 ```
 
-## 0.0.6
-
-### src directory structure, dev mode & interactive CLI
+## 0.0.6 - src directory structure, dev mode & interactive CLI
 
 **Project structure**
 - `simapi init` now scaffolds endpoints and models inside a `src/` directory: `src/endpoints/` and `src/models/`
@@ -71,9 +67,7 @@ request: {
 - `simapi setup docker` now generates a `Dockerfile` in the project root
 - Available both via `simapi setup docker` directly and through `npm run simapi` → Setup → Docker
 
-## 0.0.5
-
-### Serverless deployment support (Vercel & Netlify)
+## 0.0.5 - Serverless deployment support (Vercel & Netlify)
 
 - `simapi build` now auto-detects the target platform from CI environment variables (`VERCEL=1`, `NETLIFY=true`) and generates the correct output:
   - **Node.js** (default): `.simapi/dist/server.mjs` — long-running server, unchanged
@@ -84,33 +78,25 @@ request: {
 - Updated `.gitignore` template to exclude `/api/index.mjs` and `/netlify/functions/api.mjs` (serverless build artifacts)
 - Added `NETLIFY_TOML` and `VERCEL_JSON` templates to the internal template library
 
-## 0.0.4
-
-### Starter scaffold & port fallback
+## 0.0.4 - Starter scaffold & port fallback
 
 - `simapi init` now scaffolds `endpoints/hello-world.ts` — a GET `/` (open) and POST `/` (secure) endpoint as a working example
 - `simapi init` now scaffolds `models/user.ts` — a typed `User` interface with a `makeUser()` faker factory
 - Fixed `EADDRINUSE` crash: the dev server now automatically retries on the next available port (up to 10 attempts) instead of throwing an unhandled error
 
-## 0.0.3
-
-### Bug fixes & init improvements
+## 0.0.3 - Bug fixes & init improvements
 
 - Fixed all example files importing from `"simapi"` — now correctly import from `"@simapi/simapi"`
 - Fixed scaffolded `simapi.config.ts`, `authHandler.ts`, and endpoint templates importing from `"simapi"` — updated to `"@simapi/simapi"`
 - `simapi init` now installs `@simapi/simapi` (and `@simapi/console`) via `npm install` directly instead of pre-writing them into `package.json` — ensures the latest published version is always fetched from the registry
 
-## 0.0.2
-
-### Package rename & build fix
+## 0.0.2 - Package rename & build fix
 
 - Renamed package from `simapi` to `@simapi/simapi` — install with `npm install @simapi/simapi`
 - Added `prepublishOnly` build step to ensure `dist/` is always included when publishing
 - Fixed `ERR_MODULE_NOT_FOUND` error on `npx @simapi/simapi init` caused by missing `dist/cli.mjs` in the published package
 
-## 0.0.1
-
-### Initial release
+## 0.0.1 - Initial release
 
 **Core API**
 

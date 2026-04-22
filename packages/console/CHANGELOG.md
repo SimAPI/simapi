@@ -1,44 +1,30 @@
 # @simapi/console
 
-## 0.0.7
-
-### Version bump
+## 0.0.7 - Version bump
 
 - Bumped in sync with `@simapi/simapi` 0.0.7
 
-## 0.0.6
-
-### Version bump
+## 0.0.6 - Version bump
 
 - Bumped in sync with `@simapi/simapi` 0.0.6
 
-## 0.0.5
-
-### Version bump
+## 0.0.5 - Version bump
 
 - Bumped in sync with `@simapi/simapi` 0.0.5
 
-## 0.0.4
-
-### Version bump
+## 0.0.4 - Version bump
 
 - Bumped in sync with `@simapi/simapi` 0.0.4
 
-## 0.0.3
-
-### Version bump
+## 0.0.3 - Version bump
 
 - Bumped in sync with `@simapi/simapi` 0.0.3
 
-## 0.0.2
-
-### Version bump
+## 0.0.2 - Version bump
 
 - Bumped in sync with `@simapi/simapi` 0.0.2
 
-## 0.0.1
-
-### Initial release
+## 0.0.1 - Initial release
 
 - Debug UI served at `/__simapi/console/` when installed alongside `simapi`
 - **Overview** — server health, version, and endpoint count

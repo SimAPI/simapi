@@ -4,7 +4,7 @@ Vercel is a great choice for lightweight SimAPI deployments — free tier, insta
 
 SimAPI is built on [Hono](https://hono.dev) and **auto-detects Vercel's build environment**, compiling to a serverless handler (`api/index.mjs`) instead of a long-running Node.js server.
 
-> [!NOTE] Serverless platform
+> [!WARNING] Serverless platform
 > Vercel does **not** run a persistent Node.js process. There is no "Start Command". SQLite does not persist between requests (ephemeral filesystem).
 >
 > Set `logEntries: false` in `simapi.config.ts`, or switch to [Turso](https://turso.tech) for persistent request logging.

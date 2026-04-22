@@ -61,6 +61,13 @@ export default defineConfig({
           { text: "Shop API", link: "/examples/shop-sample" },
         ],
       },
+      {
+        text: "Changelog",
+        items: [
+          { text: "@simapi/simapi", link: "/changelog/simapi" },
+          { text: "@simapi/console", link: "/changelog/console" },
+        ],
+      },
     ],
 
     socialLinks: [{ icon: "github", link: "https://github.com/SimAPI/simapi" }],
