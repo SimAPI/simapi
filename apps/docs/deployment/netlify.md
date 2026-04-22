@@ -2,7 +2,7 @@
 
 Netlify is a solid option for teams already using it for frontend hosting. Like Vercel, it is a serverless platform — SimAPI **auto-detects Netlify's build environment** and compiles a Netlify Function (`netlify/functions/api.mjs`) instead of a long-running Node.js server.
 
-> 🚧 Serverless platform
+> [!WARNING] Serverless platform
 > Netlify does **not** run a persistent Node.js process. SQLite does not persist between requests (ephemeral filesystem).
 >
 > Set `logEntries: false` in `simapi.config.ts`, or switch to [Turso](https://turso.tech) for persistent request logging.
@@ -44,7 +44,7 @@ The `[[redirects]]` rule proxies all incoming requests to the Netlify Function t
 
 When Netlify runs the build it sets `NETLIFY=true` in the environment. SimAPI detects this and outputs `netlify/functions/api.mjs` — a [Netlify Functions](https://docs.netlify.com/functions/overview/) handler that receives all proxied requests and routes them through your mock API.
 
-> ℹ️ netlify/functions/api.mjs is a build artifact
+> [!INFO] netlify/functions/api.mjs is a build artifact
 > `netlify/functions/api.mjs` is generated during the Netlify build — it is **not** to be committed to your repository. The `.gitignore` that `simapi init` creates already excludes it.
 
 ## Environment variables
