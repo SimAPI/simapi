@@ -185,7 +185,7 @@ export const HELLO_WORLD_REQUEST_TS = `import { z } from "@simapi/simapi";
 
 export const helloWorldRequest = {
   body: {
-    name: z.string().min(2).max(100).default('John Doe'),
+    name: z.string().min(2).max(100).default("John Doe"),
   },
 };
 `;
@@ -214,7 +214,7 @@ export const helloPost: EndpointDefinition = {
   description: "Returns a greeting with a sample user. Requires authentication.",
   request: helloWorldRequest,
   handler: (req: AppRequest) => {
-    const name = req.body<string>('name');
+    const name = req.body<string>("name");
 
     return AppResponse.created({
       message: \`Hello \${name} from behind the wall!\`,

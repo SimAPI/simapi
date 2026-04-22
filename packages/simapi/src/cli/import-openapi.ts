@@ -99,9 +99,11 @@ function zodFromSchema(schema: OASchema): string {
 
 function buildRequestBlock(schema: OASchema): string | null {
   if (schema.type !== "object" || !schema.properties) return null;
+  const isIdentifier = (key: string) => /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key);
   const lines = Object.entries(schema.properties).map(([key, prop]) => {
     const required = schema.required?.includes(key) ?? false;
-    return `      ${key}: ${zodFromSchema(prop)}${required ? "" : ".optional()"}`;
+    const propName = isIdentifier(key) ? key : `"${key}"`;
+    return `      ${propName}: ${zodFromSchema(prop)}${required ? "" : ".optional()"}`;
   });
   return `  request: {\n    body: {\n${lines.join(",\n")},\n    },\n  },`;
 }

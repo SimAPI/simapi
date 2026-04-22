@@ -303,6 +303,92 @@ describe("createApp", () => {
       const json = await res.json();
       expect(json).toHaveProperty("errors");
     });
+
+    it("populates req.errors when query validation fails", async () => {
+      let capturedErrors: AppRequest["errors"] | undefined;
+
+      const app = await buildApp([
+        {
+          path: "/api/posts",
+          method: "GET",
+          type: "open",
+          request: { query: { sort: z.enum(["asc", "desc"]) } },
+          handler: (req: AppRequest) => {
+            capturedErrors = req.errors;
+            return AppResponse.success({});
+          },
+        },
+      ]);
+
+      await app.request("/api/posts?sort=invalid");
+
+      expect(capturedErrors?.hasError).toBe(true);
+      expect(capturedErrors?.errorFields).toContain("sort");
+    });
+
+    it("populates req.errors when header validation fails", async () => {
+      let capturedErrors: AppRequest["errors"] | undefined;
+
+      const app = await buildApp([
+        {
+          path: "/api/posts",
+          method: "GET",
+          type: "open",
+          request: { headers: { "x-api-key": z.string().min(5) } },
+          handler: (req: AppRequest) => {
+            capturedErrors = req.errors;
+            return AppResponse.success({});
+          },
+        },
+      ]);
+
+      await app.request("/api/posts", {
+        headers: { "x-api-key": "123" },
+      });
+
+      expect(capturedErrors?.hasError).toBe(true);
+      expect(capturedErrors?.errorFields).toContain("x-api-key");
+    });
+
+    it("autoThrowValidationErrors returns 422 for query failure", async () => {
+      const app = await buildApp(
+        [
+          {
+            path: "/api/posts",
+            method: "GET",
+            type: "open",
+            request: { query: { sort: z.enum(["asc", "desc"]) } },
+            handler: () => AppResponse.success({}),
+          },
+        ],
+        { name: "test", autoThrowValidationErrors: "laravel" }
+      );
+
+      const res = await app.request("/api/posts?sort=invalid");
+
+      expect(res.status).toBe(422);
+    });
+
+    it("autoThrowValidationErrors returns 422 for header failure", async () => {
+      const app = await buildApp(
+        [
+          {
+            path: "/api/posts",
+            method: "GET",
+            type: "open",
+            request: { headers: { "x-api-key": z.string().min(5) } },
+            handler: () => AppResponse.success({}),
+          },
+        ],
+        { name: "test", autoThrowValidationErrors: "laravel" }
+      );
+
+      const res = await app.request("/api/posts", {
+        headers: { "x-api-key": "123" },
+      });
+
+      expect(res.status).toBe(422);
+    });
   });
 
   describe("failRate", () => {

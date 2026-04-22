@@ -197,7 +197,10 @@ async function buildRawRequest(c: Context): Promise<RawRequest> {
   const contentType = c.req.header("content-type") ?? "";
   if (contentType.includes("application/json")) {
     body = await c.req.json<Record<string, unknown>>().catch(() => ({}));
-  } else if (contentType.includes("application/x-www-form-urlencoded")) {
+  } else if (
+    contentType.includes("application/x-www-form-urlencoded") ||
+    contentType.includes("multipart/form-data")
+  ) {
     const form = await c.req.formData().catch(() => null);
     if (form) {
       form.forEach((value, key) => {
