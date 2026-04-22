@@ -21,8 +21,8 @@ export function StatCell({
           accent === true
             ? "text-emerald-600 dark:text-emerald-400"
             : accent === false
-            ? "text-zinc-400 dark:text-zinc-500"
-            : "text-zinc-900 dark:text-zinc-100"
+              ? "text-zinc-400 dark:text-zinc-500"
+              : "text-zinc-900 dark:text-zinc-100"
         } ${mono ? "font-mono" : ""}`}
       >
         {value}

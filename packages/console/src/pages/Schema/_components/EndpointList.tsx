@@ -44,7 +44,9 @@ export function EndpointList({
               {endpoint.method}
             </span>
             <div className="min-w-0 flex-1 space-y-0.5">
-              <p className={`text-[13px] font-mono truncate ${isSelected ? "text-zinc-900 dark:text-zinc-100 font-bold" : "text-zinc-600 dark:text-zinc-400"}`}>
+              <p
+                className={`text-[13px] font-mono truncate ${isSelected ? "text-zinc-900 dark:text-zinc-100 font-bold" : "text-zinc-600 dark:text-zinc-400"}`}
+              >
                 {endpoint.path}
               </p>
               {endpoint.title && (

@@ -26,7 +26,9 @@ export function MobileNav({
               : "text-zinc-400 dark:text-zinc-600 active:scale-95"
           }`}
         >
-          <span className={`text-xl leading-none ${currentTab === item.id ? "opacity-100" : "opacity-40"}`}>
+          <span
+            className={`text-xl leading-none ${currentTab === item.id ? "opacity-100" : "opacity-40"}`}
+          >
             {item.icon}
           </span>
           <span className="text-[10px] uppercase tracking-widest font-black">

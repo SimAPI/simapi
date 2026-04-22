@@ -53,7 +53,9 @@ export function CurlSample({
         try {
           const parsed = JSON.parse(bodyText);
           const filtered = Object.fromEntries(
-            Object.entries(parsed).filter(([key]) => !omittedFields.has(`body:${key}`))
+            Object.entries(parsed).filter(
+              ([key]) => !omittedFields.has(`body:${key}`)
+            )
           );
           parts.push("--data", `'${JSON.stringify(filtered)}'`);
         } catch {

@@ -21,7 +21,9 @@ export function typeLabel(prop: JsonSchemaProperty): string {
   if (!prop.type) return "any";
 
   if (Array.isArray(prop.type)) {
-    return prop.type.map((t) => (typeof t === "string" ? t : "any")).join(" or ");
+    return prop.type
+      .map((t) => (typeof t === "string" ? t : "any"))
+      .join(" or ");
   }
 
   if (prop.type === "array" && prop.items) return `${typeLabel(prop.items)}[]`;
