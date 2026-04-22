@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import { Hono } from "hono";
-import { z } from "zod";
+import { type ZodRawShape, z } from "zod";
 
 import { AppRequest } from "../core/AppRequest.js";
 import { AppResponse } from "../core/AppResponse.js";
@@ -167,7 +167,7 @@ function runRequestValidation(
   const bag: Record<string, string[]> = {};
 
   function collect(
-    shape: Record<string, unknown> | undefined,
+    shape: ZodRawShape | undefined,
     data: Record<string, unknown>
   ) {
     if (!shape) return;
@@ -180,9 +180,9 @@ function runRequestValidation(
     }
   }
 
-  collect(request.body as Record<string, unknown> | undefined, raw.body);
-  collect(request.query as Record<string, unknown> | undefined, raw.query);
-  collect(request.headers as Record<string, unknown> | undefined, raw.headers);
+  collect(request.body, raw.body);
+  collect(request.query, raw.query);
+  collect(request.headers, raw.headers);
 
   return new ValidationErrors(bag);
 }
