@@ -76,6 +76,16 @@ export default defineConfig({
       message: "Released under the MIT License.",
       copyright: "Copyright © 2026 - Present MayR Labs",
     },
+
+    editLink: {
+      pattern: "https://github.com/SimAPI/simapi/edit/main/apps/docs/:path",
+      text: "Edit this page on GitHub",
+    },
+
+    outline: {
+      level: [2, 3],
+      label: "Outline",
+    },
   },
 
   ignoreDeadLinks: "localhostLinks",
