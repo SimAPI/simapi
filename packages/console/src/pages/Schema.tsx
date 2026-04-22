@@ -645,6 +645,7 @@ function TryPanel({
           ) : (
             <div className="space-y-1.5">
               {formRows.map(([k, v], i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: positional row
                 <div key={i} className="flex gap-1.5">
                   <input
                     className={`flex-1 ${inputCls}`}

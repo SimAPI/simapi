@@ -34,3 +34,34 @@ export default defineConfig({
   }
 });
 ```
+
+## Development
+
+### How do I handle CORS?
+SimAPI enables CORS by default, allowing all origins, methods, and headers. This ensures that your frontend applications running on different ports (e.g., `localhost:5173`) can communicate with the SimAPI server without additional configuration.
+
+### How do I handle file uploads?
+SimAPI handles `multipart/form-data` automatically. You can validate the presence of fields using the `form` field in your `RequestDefinition`.
+
+```ts
+request: {
+  form: {
+    avatar_url: z.string().url(),
+  }
+}
+```
+> [!INFO] File upload <Badge type="tip" text="Coming Soon" />
+> Currently, SimAPI does not support binary file storage. We recommend using `faker.image.url()` to return a mock URL for uploaded files in your responses.
+
+### How do I use environment variables?
+SimAPI supports `.env` files automatically. You can access your environment variables using `process.env` in your config or endpoint handlers.
+
+```ts
+// simapi.config.ts
+export default defineConfig({
+  database: {
+    type: "postgres",
+    url: process.env.DATABASE_URL!
+  }
+});
+```

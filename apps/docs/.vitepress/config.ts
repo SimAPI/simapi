@@ -49,6 +49,8 @@ export default defineConfig({
         text: "API Reference",
         items: [
           { text: "EndpointDefinition", link: "/api/endpoint-definition" },
+          { text: "RequestDefinition", link: "/api/request-definition" },
+          { text: "AuthHandler", link: "/api/auth-handler" },
           { text: "AppRequest", link: "/api/app-request" },
           { text: "AppResponse", link: "/api/app-response" },
           { text: "Validation", link: "/api/validator" },
