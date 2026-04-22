@@ -6,14 +6,14 @@ import type {
 import type { AuthState } from "./_types.js";
 
 export function extractPathParams(path: string): string[] {
-  return (path.match(/:(\w+)/g) ?? []).map((m) => m.slice(1));
+  return (path.match(/:(\w+)/g) ?? []).map((match) => match.slice(1));
 }
 
-export function fmtJson(s: string): string {
+export function fmtJson(jsonString: string): string {
   try {
-    return JSON.stringify(JSON.parse(s), null, 2);
+    return JSON.stringify(JSON.parse(jsonString), null, 2);
   } catch {
-    return s;
+    return jsonString;
   }
 }
 
@@ -23,24 +23,24 @@ export function typeLabel(prop: JsonSchemaProperty): string {
   return prop.type;
 }
 
-export function statusColor(s: number): string {
-  if (s >= 500) return "text-red-500 dark:text-red-400";
-  if (s >= 400) return "text-yellow-500 dark:text-yellow-400";
+export function statusColor(status: number): string {
+  if (status >= 500) return "text-red-500 dark:text-red-400";
+  if (status >= 400) return "text-yellow-500 dark:text-yellow-400";
   return "text-emerald-500 dark:text-emerald-400";
 }
 
 export function buildDefaultBody(
-  ep: EndpointInfo,
+  endpoint: EndpointInfo,
   type: "json" | "form" = "json"
 ): string {
-  const schema = type === "json" ? ep.schema : ep.formSchema;
+  const schema = type === "json" ? endpoint.schema : endpoint.formSchema;
   if (!schema?.properties) return "{}";
   const example: Record<string, unknown> = {};
-  for (const [k, prop] of Object.entries(schema.properties)) {
+  for (const [key, prop] of Object.entries(schema.properties)) {
     if (prop.default !== undefined) {
-      example[k] = prop.default;
+      example[key] = prop.default;
     } else {
-      example[k] =
+      example[key] =
         prop.type === "number" || prop.type === "integer"
           ? 0
           : prop.type === "boolean"
@@ -54,8 +54,8 @@ export function buildDefaultBody(
 export function buildDefaultRows(schema?: JsonSchema): [string, string][] {
   if (!schema?.properties) return [["", ""]];
   const rows: [string, string][] = Object.entries(schema.properties).map(
-    ([k, prop]) => {
-      return [k, prop.default !== undefined ? String(prop.default) : ""];
+    ([key, prop]) => {
+      return [key, prop.default !== undefined ? String(prop.default) : ""];
     }
   );
   return rows.length > 0 ? rows : [["", ""]];
@@ -93,8 +93,8 @@ export function buildAuthQuery(auth: AuthState): [string, string][] {
 
 export function downloadBlob(content: string, filename: string, type: string) {
   const blob = new Blob([content], { type });
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
+  const anchor = document.createElement("a");
+  anchor.href = URL.createObjectURL(blob);
+  anchor.download = filename;
+  anchor.click();
 }

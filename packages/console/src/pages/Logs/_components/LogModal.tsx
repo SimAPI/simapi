@@ -18,8 +18,8 @@ export function LogModal({
   const headers = fmtHeaders(log.requestHeaders);
 
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -42,8 +42,8 @@ export function LogModal({
       ref={overlayRef}
       role="presentation"
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/30 dark:bg-black/50 backdrop-blur-[2px]"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose();
+      onClick={(event) => {
+        if (event.target === overlayRef.current) onClose();
       }}
     >
       <div className="w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden flex flex-col max-h-[85vh]">
@@ -87,16 +87,16 @@ export function LogModal({
           <Section title="Request Headers">
             {headers ? (
               <div className="rounded-lg border border-zinc-100 dark:border-zinc-800 overflow-hidden">
-                {Object.entries(headers).map(([k, v]) => (
+                {Object.entries(headers).map(([key, value]) => (
                   <div
-                    key={k}
+                    key={key}
                     className="grid grid-cols-5 gap-2 px-3 py-2 border-b border-zinc-50 dark:border-zinc-800/60 last:border-0 text-xs"
                   >
                     <span className="col-span-2 text-zinc-500 dark:text-zinc-400 font-mono truncate">
-                      {k}
+                      {key}
                     </span>
                     <span className="col-span-3 text-zinc-700 dark:text-zinc-300 font-mono break-all">
-                      {v}
+                      {value}
                     </span>
                   </div>
                 ))}

@@ -18,8 +18,8 @@ export function ClearLogsModal({
   const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -40,8 +40,8 @@ export function ClearLogsModal({
       ref={overlayRef}
       role="presentation"
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/30 dark:bg-black/50 backdrop-blur-[2px]"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose();
+      onClick={(event) => {
+        if (event.target === overlayRef.current) onClose();
       }}
     >
       <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
@@ -72,18 +72,24 @@ export function ClearLogsModal({
           </div>
 
           <div>
-            <label className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1.5">
+            <label
+              htmlFor="clear-logs-pin"
+              className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1.5"
+            >
               Enter PIN to confirm
             </label>
             <Input
+              id="clear-logs-pin"
               autoFocus
               type="text"
               inputMode="numeric"
               maxLength={6}
               value={input}
-              onChange={(e) => setInput(e.target.value.replace(/\D/g, ""))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && input === pin) handleConfirm();
+              onChange={(event) =>
+                setInput(event.target.value.replace(/\D/g, ""))
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && input === pin) handleConfirm();
               }}
               placeholder="______"
               className="w-full text-center text-lg tracking-[0.25em]"

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { api } from "../../../lib/api.js";
-import type { EndpointInfo } from "../../../types.js";
 import { Button } from "../../../components/ui/Button.js";
 import { Input, Textarea } from "../../../components/ui/Input.js";
 import { SectionLabel } from "../../../components/ui/SectionLabel.js";
+import { api } from "../../../lib/api.js";
+import type { EndpointInfo } from "../../../types.js";
 import { BODY_METHODS, METHOD_ACCENT } from "../_constants.js";
 import type { AuthState } from "../_types.js";
 import {
@@ -29,7 +29,7 @@ export function TryPanel({
   const pathParamNames = extractPathParams(endpoint.path);
 
   const [pathParams, setPathParams] = useState<Record<string, string>>(() =>
-    Object.fromEntries(pathParamNames.map((p) => [p, ""]))
+    Object.fromEntries(pathParamNames.map((param) => [param, ""]))
   );
   const [headerRows, setHeaderRows] = useState<[string, string][]>(() => {
     const saved = localStorage.getItem("simapi-console-headers");
@@ -67,7 +67,9 @@ export function TryPanel({
 
   useEffect(() => {
     setPathParams(
-      Object.fromEntries(extractPathParams(endpoint.path).map((p) => [p, ""]))
+      Object.fromEntries(
+        extractPathParams(endpoint.path).map((param) => [param, ""])
+      )
     );
     setQueryRows(buildDefaultRows(endpoint.querySchema));
     setBodyType(endpoint.formSchema && !endpoint.schema ? "form" : "json");
@@ -78,25 +80,29 @@ export function TryPanel({
 
   const buildUrl = () => {
     let url = endpoint.path;
-    for (const [k, v] of Object.entries(pathParams)) {
-      url = url.replace(`:${k}`, encodeURIComponent(v || `:${k}`));
+    for (const [key, value] of Object.entries(pathParams)) {
+      url = url.replace(`:${key}`, encodeURIComponent(value || `:${key}`));
     }
-    const q = [...queryRows, ...buildAuthQuery(auth)].filter(([k]) => k);
-    if (q.length > 0) {
-      const sp = new URLSearchParams(q);
-      url += `?${sp.toString()}`;
+    const queryParams = [...queryRows, ...buildAuthQuery(auth)].filter(
+      ([key]) => key
+    );
+    if (queryParams.length > 0) {
+      const searchParams = new URLSearchParams(queryParams);
+      url += `?${searchParams.toString()}`;
     }
     return url;
   };
 
   const send = async () => {
     setLoading(true);
-    const t0 = Date.now();
+    const startTime = Date.now();
     try {
       const hasBody = BODY_METHODS.has(endpoint.method);
       let body: unknown;
       let headers: Record<string, string> = buildAuthHeaders(auth);
-      const customHeaders = Object.fromEntries(headerRows.filter(([k]) => k));
+      const customHeaders = Object.fromEntries(
+        headerRows.filter(([key]) => key)
+      );
       headers = { ...headers, ...customHeaders };
 
       if (hasBody) {
@@ -108,28 +114,32 @@ export function TryPanel({
           }
           headers["content-type"] = "application/json";
         } else {
-          const fd = new FormData();
-          for (const [k, v] of formRows) {
-            if (k) fd.append(k, v);
+          const formData = new FormData();
+          for (const [key, value] of formRows) {
+            if (key) formData.append(key, value);
           }
-          body = fd;
+          body = formData;
         }
       }
 
-      const res = await api.send(
+      const apiResponse = await api.send(
         endpoint.method,
         buildUrl(),
         hasBody ? body : undefined,
         Object.keys(headers).length > 0 ? headers : undefined
       );
-      const text = await res.text();
+      const text = await apiResponse.text();
       setResponse({
-        status: res.status,
+        status: apiResponse.status,
         body: text,
-        elapsed: Date.now() - t0,
+        elapsed: Date.now() - startTime,
       });
-    } catch (err) {
-      setResponse({ status: 0, body: String(err), elapsed: Date.now() - t0 });
+    } catch (error) {
+      setResponse({
+        status: 0,
+        body: String(error),
+        elapsed: Date.now() - startTime,
+      });
     } finally {
       setLoading(false);
     }
@@ -162,26 +172,30 @@ export function TryPanel({
       <div>
         <SectionLabel>Headers</SectionLabel>
         <div className="space-y-1.5">
-          {headerRows.map(([k, v], i) => (
+          {headerRows.map(([key, value], index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: positional row
-            <div key={i} className="flex gap-1.5">
+            <div key={index} className="flex gap-1.5">
               <Input
                 className="w-36 shrink-0"
                 placeholder="Header-Name"
-                value={k}
-                onChange={(ev) =>
+                value={key}
+                onChange={(event) =>
                   setHeaderRows((rows) =>
-                    rows.map((r, j) => (j === i ? [ev.target.value, r[1]] : r))
+                    rows.map((row, rowIndex) =>
+                      rowIndex === index ? [event.target.value, row[1]] : row
+                    )
                   )
                 }
               />
               <Input
                 className="flex-1"
                 placeholder="value"
-                value={v}
-                onChange={(ev) =>
+                value={value}
+                onChange={(event) =>
                   setHeaderRows((rows) =>
-                    rows.map((r, j) => (j === i ? [r[0], ev.target.value] : r))
+                    rows.map((row, rowIndex) =>
+                      rowIndex === index ? [row[0], event.target.value] : row
+                    )
                   )
                 }
               />
@@ -189,7 +203,9 @@ export function TryPanel({
                 <button
                   type="button"
                   onClick={() =>
-                    setHeaderRows((rows) => rows.filter((_, j) => j !== i))
+                    setHeaderRows((rows) =>
+                      rows.filter((_, rowIndex) => rowIndex !== index)
+                    )
                   }
                   className="shrink-0 w-7 h-7 rounded-md text-zinc-300 dark:text-zinc-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors flex items-center justify-center text-base leading-none"
                 >
@@ -213,18 +229,21 @@ export function TryPanel({
         <div>
           <SectionLabel>Path Parameters</SectionLabel>
           <div className="space-y-1.5">
-            {pathParamNames.map((k) => (
-              <div key={k} className="flex items-center gap-2">
+            {pathParamNames.map((key) => (
+              <div key={key} className="flex items-center gap-2">
                 <code className="text-xs text-zinc-400 dark:text-zinc-500 font-mono w-24 shrink-0">
-                  :{k}
+                  :{key}
                 </code>
                 <Input
                   className="flex-1"
-                  value={pathParams[k] ?? ""}
-                  onChange={(ev) =>
-                    setPathParams((p) => ({ ...p, [k]: ev.target.value }))
+                  value={pathParams[key] ?? ""}
+                  onChange={(event) =>
+                    setPathParams((previousParams) => ({
+                      ...previousParams,
+                      [key]: event.target.value,
+                    }))
                   }
-                  placeholder={k}
+                  placeholder={key}
                 />
               </div>
             ))}
@@ -236,26 +255,30 @@ export function TryPanel({
       <div>
         <SectionLabel>Query Parameters</SectionLabel>
         <div className="space-y-1.5">
-          {queryRows.map(([k, v], i) => (
+          {queryRows.map(([key, value], index) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: positional row
-            <div key={i} className="flex gap-1.5">
+            <div key={index} className="flex gap-1.5">
               <Input
                 className="flex-1"
                 placeholder="key"
-                value={k}
-                onChange={(ev) =>
+                value={key}
+                onChange={(event) =>
                   setQueryRows((rows) =>
-                    rows.map((r, j) => (j === i ? [ev.target.value, r[1]] : r))
+                    rows.map((row, rowIndex) =>
+                      rowIndex === index ? [event.target.value, row[1]] : row
+                    )
                   )
                 }
               />
               <Input
                 className="flex-1"
                 placeholder="value"
-                value={v}
-                onChange={(ev) =>
+                value={value}
+                onChange={(event) =>
                   setQueryRows((rows) =>
-                    rows.map((r, j) => (j === i ? [r[0], ev.target.value] : r))
+                    rows.map((row, rowIndex) =>
+                      rowIndex === index ? [row[0], event.target.value] : row
+                    )
                   )
                 }
               />
@@ -306,22 +329,24 @@ export function TryPanel({
             <Textarea
               className="w-full h-40 resize-none leading-relaxed"
               value={bodyText}
-              onChange={(e) => setBodyText(e.target.value)}
+              onChange={(event) => setBodyText(event.target.value)}
               spellCheck={false}
             />
           ) : (
             <div className="space-y-1.5">
-              {formRows.map(([k, v], i) => (
+              {formRows.map(([key, value], index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: positional row
-                <div key={i} className="flex gap-1.5">
+                <div key={index} className="flex gap-1.5">
                   <Input
                     className="flex-1"
                     placeholder="key"
-                    value={k}
-                    onChange={(ev) =>
+                    value={key}
+                    onChange={(event) =>
                       setFormRows((rows) =>
-                        rows.map((r, j) =>
-                          j === i ? [ev.target.value, r[1]] : r
+                        rows.map((row, rowIndex) =>
+                          rowIndex === index
+                            ? [event.target.value, row[1]]
+                            : row
                         )
                       )
                     }
@@ -329,11 +354,13 @@ export function TryPanel({
                   <Input
                     className="flex-1"
                     placeholder="value"
-                    value={v}
-                    onChange={(ev) =>
+                    value={value}
+                    onChange={(event) =>
                       setFormRows((rows) =>
-                        rows.map((r, j) =>
-                          j === i ? [r[0], ev.target.value] : r
+                        rows.map((row, rowIndex) =>
+                          rowIndex === index
+                            ? [row[0], event.target.value]
+                            : row
                         )
                       )
                     }
@@ -342,7 +369,9 @@ export function TryPanel({
                     <button
                       type="button"
                       onClick={() =>
-                        setFormRows((rows) => rows.filter((_, j) => j !== i))
+                        setFormRows((rows) =>
+                          rows.filter((_, rowIndex) => rowIndex !== index)
+                        )
                       }
                       className="shrink-0 w-7 h-7 rounded-md text-zinc-300 dark:text-zinc-600 hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors flex items-center justify-center text-base leading-none"
                     >

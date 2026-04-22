@@ -1,7 +1,7 @@
-import { Select } from "../../../components/ui/Select.js";
 import { Input } from "../../../components/ui/Input.js";
+import { Select } from "../../../components/ui/Select.js";
 import { AUTH_OPTIONS } from "../_constants.js";
-import { DEFAULT_AUTH, type AuthPreset, type AuthState } from "../_types.js";
+import { type AuthPreset, type AuthState, DEFAULT_AUTH } from "../_types.js";
 
 export function AuthSection({
   auth,
@@ -10,20 +10,24 @@ export function AuthSection({
   auth: AuthState;
   onChange: (auth: AuthState) => void;
 }) {
-  const set = (patch: Partial<AuthState>) => onChange({ ...auth, ...patch });
+  const updateAuth = (patch: Partial<AuthState>) =>
+    onChange({ ...auth, ...patch });
 
   return (
     <div className="space-y-2">
       <Select
         value={auth.preset}
-        onChange={(e) =>
-          onChange({ ...DEFAULT_AUTH, preset: e.target.value as AuthPreset })
+        onChange={(event) =>
+          onChange({
+            ...DEFAULT_AUTH,
+            preset: event.target.value as AuthPreset,
+          })
         }
         className="w-full"
       >
-        {AUTH_OPTIONS.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
+        {AUTH_OPTIONS.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </Select>
@@ -33,7 +37,7 @@ export function AuthSection({
           className="w-full"
           placeholder="Token"
           value={auth.token}
-          onChange={(e) => set({ token: e.target.value })}
+          onChange={(event) => updateAuth({ token: event.target.value })}
         />
       )}
 
@@ -43,14 +47,14 @@ export function AuthSection({
             className="flex-1"
             placeholder="Username"
             value={auth.username}
-            onChange={(e) => set({ username: e.target.value })}
+            onChange={(event) => updateAuth({ username: event.target.value })}
           />
           <Input
             className="flex-1"
             placeholder="Password"
             type="password"
             value={auth.password}
-            onChange={(e) => set({ password: e.target.value })}
+            onChange={(event) => updateAuth({ password: event.target.value })}
           />
         </div>
       )}
@@ -63,13 +67,13 @@ export function AuthSection({
             className="flex-1"
             placeholder="Key Name"
             value={auth.keyName}
-            onChange={(e) => set({ keyName: e.target.value })}
+            onChange={(event) => updateAuth({ keyName: event.target.value })}
           />
           <Input
             className="flex-1"
             placeholder="Value"
             value={auth.keyValue}
-            onChange={(e) => set({ keyValue: e.target.value })}
+            onChange={(event) => updateAuth({ keyValue: event.target.value })}
           />
         </div>
       )}

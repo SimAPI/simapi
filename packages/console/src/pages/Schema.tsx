@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { Input } from "../components/ui/Input.js";
 import { api } from "../lib/api.js";
 import type { EndpointInfo } from "../types.js";
 import { EndpointDetail } from "./Schema/_components/EndpointDetail.js";
 import { EndpointList } from "./Schema/_components/EndpointList.js";
-import { DEFAULT_AUTH, type AuthState } from "./Schema/_types.js";
+import { type AuthState, DEFAULT_AUTH } from "./Schema/_types.js";
 import { downloadBlob } from "./Schema/_utils.js";
-import { Input } from "../components/ui/Input.js";
 
 export default function Schema() {
   const [endpoints, setEndpoints] = useState<EndpointInfo[]>([]);
@@ -36,8 +36,11 @@ export default function Schema() {
 
   useEffect(() => {
     if (!exportOpen) return;
-    function onClickOutside(e: MouseEvent) {
-      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+    function onClickOutside(event: MouseEvent) {
+      if (
+        exportRef.current &&
+        !exportRef.current.contains(event.target as Node)
+      ) {
         setExportOpen(false);
       }
     }
@@ -48,21 +51,21 @@ export default function Schema() {
   const exportAs = async (format: "json" | "yaml") => {
     setExportOpen(false);
     try {
-      const res = await fetch(`/__simapi/openapi.${format}`);
-      const text = await res.text();
+      const response = await fetch(`/__simapi/openapi.${format}`);
+      const text = await response.text();
       const mime = format === "json" ? "application/json" : "text/yaml";
       downloadBlob(text, `simapi-openapi.${format}`, mime);
-    } catch (err) {
-      console.error("[SimAPI] Export failed:", err);
+    } catch (error) {
+      console.error("[SimAPI] Export failed:", error);
     }
   };
 
   const filtered = search
     ? endpoints.filter(
-        (e) =>
-          e.path.toLowerCase().includes(search.toLowerCase()) ||
-          e.method.toLowerCase().includes(search.toLowerCase()) ||
-          (e.title ?? "").toLowerCase().includes(search.toLowerCase())
+        (endpoint) =>
+          endpoint.path.toLowerCase().includes(search.toLowerCase()) ||
+          endpoint.method.toLowerCase().includes(search.toLowerCase()) ||
+          (endpoint.title ?? "").toLowerCase().includes(search.toLowerCase())
       )
     : endpoints;
 
@@ -87,7 +90,7 @@ export default function Schema() {
               <div ref={exportRef} className="relative">
                 <button
                   type="button"
-                  onClick={() => setExportOpen((o) => !o)}
+                  onClick={() => setExportOpen((isOpen) => !isOpen)}
                   className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 px-2 py-1 rounded border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors"
                 >
                   Export ▾
@@ -117,7 +120,7 @@ export default function Schema() {
             className="w-full"
             placeholder="Search endpoints…"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(event) => setSearch(event.target.value)}
           />
         </div>
 

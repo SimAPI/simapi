@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { api, connectSSE } from "../lib/api.js";
-import type { RequestLog } from "../types.js";
 import { Button } from "../components/ui/Button.js";
 import { Input } from "../components/ui/Input.js";
+import { api, connectSSE } from "../lib/api.js";
+import type { RequestLog } from "../types.js";
 import { ClearLogsModal } from "./Logs/_components/ClearLogsModal.js";
 import { LogModal } from "./Logs/_components/LogModal.js";
 import { LogTable } from "./Logs/_components/LogTable.js";
@@ -17,21 +17,21 @@ export default function Logs() {
   useEffect(() => {
     api
       .logs(200)
-      .then((r) => setLogs(r.data))
+      .then((response) => setLogs(response.data))
       .catch(console.error);
 
-    const disconnect = connectSSE((entry) => {
-      setLogs((prev) => [entry, ...prev].slice(0, 500));
+    const disconnectSSE = connectSSE((entry) => {
+      setLogs((previousLogs) => [entry, ...previousLogs].slice(0, 500));
     });
 
-    return disconnect;
+    return disconnectSSE;
   }, []);
 
   const filtered = filter
     ? logs.filter(
-        (l) =>
-          l.path.includes(filter) ||
-          l.method.toLowerCase().startsWith(filter.toLowerCase()),
+        (log) =>
+          log.path.includes(filter) ||
+          log.method.toLowerCase().startsWith(filter.toLowerCase())
       )
     : logs;
 
@@ -39,12 +39,12 @@ export default function Logs() {
     downloadBlob(
       JSON.stringify(filtered, null, 2),
       "simapi-logs.json",
-      "application/json",
+      "application/json"
     );
   };
 
   const handleDelete = (id: number) => {
-    setLogs((prev) => prev.filter((l) => l.id !== id));
+    setLogs((previousLogs) => previousLogs.filter((log) => log.id !== id));
   };
 
   const handleClearAll = async () => {
@@ -64,7 +64,7 @@ export default function Logs() {
           className="flex-1 sm:flex-none sm:w-48"
           placeholder="Filter…"
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(event) => setFilter(event.target.value)}
         />
         <Button variant="secondary" size="sm" onClick={exportJson}>
           Export
