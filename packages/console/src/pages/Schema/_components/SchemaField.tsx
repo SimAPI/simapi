@@ -18,49 +18,41 @@ export function SchemaField({
   if (prop.format) constraints.push(prop.format);
 
   return (
-    <div className="relative pl-8 py-4 border-l border-zinc-100 dark:border-zinc-800/60 first:mt-2 last:mb-2">
-      {/* Connector line */}
-      <div className="absolute left-0 top-7 w-4 h-px bg-zinc-100 dark:border-zinc-800/60" />
-
-      <div className="flex items-start justify-between">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono">
+    <div className="py-5 border-b border-zinc-100 dark:border-zinc-800/60 last:border-0 group">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span className="text-[13px] font-bold text-zinc-900 dark:text-zinc-100 font-mono tracking-tight">
               {name}
             </span>
-            <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono">
+            <span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-mono">
               {typeLabel(prop)}
             </span>
+            {required && (
+              <span className="text-[9px] font-black text-orange-500/90 dark:text-orange-400/80 uppercase tracking-widest bg-orange-500/5 px-1.5 py-0.5 rounded border border-orange-500/10">
+                Required
+              </span>
+            )}
           </div>
 
-          {constraints.length > 0 && (
-            <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {constraints.map((c) => (
-                <span
-                  key={c}
-                  className="px-1.5 py-0.5 rounded bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-700/50 text-[10px] text-zinc-500 dark:text-zinc-400 font-mono"
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {prop.default !== undefined && (
-            <div className="mt-1.5 text-[10px] text-zinc-400 dark:text-zinc-500 italic">
-              default:{" "}
-              <code className="text-zinc-500 dark:text-zinc-300">
-                {JSON.stringify(prop.default)}
-              </code>
-            </div>
-          )}
+          <div className="flex flex-wrap gap-x-3 gap-y-1.5">
+            {constraints.map((c) => (
+              <span
+                key={c}
+                className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono flex items-center gap-1.5"
+              >
+                <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                {c}
+              </span>
+            ))}
+            {prop.default !== undefined && (
+              <span className="text-[11px] text-zinc-400 dark:text-zinc-500 italic flex items-center gap-1.5">
+                <span className="w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                default: {JSON.stringify(prop.default)}
+              </span>
+            )}
+          </div>
         </div>
-
-        {required && (
-          <span className="text-[10px] font-bold text-orange-600 dark:text-orange-500/80 uppercase tracking-wider bg-orange-50/50 dark:bg-orange-500/5 px-1.5 py-0.5 rounded">
-            required
-          </span>
-        )}
       </div>
     </div>
   );

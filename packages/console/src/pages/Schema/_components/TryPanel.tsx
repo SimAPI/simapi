@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../../../components/ui/Button.js";
 import { Input, Textarea } from "../../../components/ui/Input.js";
 import { api } from "../../../lib/api.js";
@@ -15,8 +15,6 @@ import {
   statusColor,
 } from "../_utils.js";
 import { AuthSection } from "./AuthSection.js";
-
-import { CurlSample } from "./CurlSample.js";
 
 export function TryPanel({
   endpoint,
@@ -168,154 +166,190 @@ export function TryPanel({
   };
 
   return (
-    <div className="space-y-6">
-      {/* Body Section Card */}
-      <div className="bg-white dark:bg-[#161b22] border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
-        <div className="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-[#161b22] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-cyan-500" />
-            <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">
-              Try API Request
-            </span>
-          </div>
-          <div className="flex gap-1">
-            <button
-              type="button"
-              onClick={() => setBodyType("json")}
-              className={`px-2 py-0.5 text-[10px] font-bold rounded transition-colors ${
-                bodyType === "json"
-                  ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-              }`}
-            >
-              JSON
-            </button>
-            <button
-              type="button"
-              onClick={() => setBodyType("form")}
-              className={`px-2 py-0.5 text-[10px] font-bold rounded transition-colors ${
-                bodyType === "form"
-                  ? "bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-              }`}
-            >
-              Form
-            </button>
-          </div>
-        </div>
-
-        <div className="p-5 space-y-4">
-          {/* Auth */}
+    <div className="flex flex-col h-full bg-[#0d1117] text-zinc-300 font-mono text-[13px]">
+      <div className="flex-1 overflow-y-auto p-6 space-y-10 scrollbar-thin scrollbar-thumb-zinc-800">
+        {/* Authentication Section */}
+        <section className="space-y-4">
+          <ConsoleLabel>Authentication</ConsoleLabel>
           <AuthSection auth={auth} onChange={onAuthChange} />
+        </section>
 
-          {/* Form Fields */}
-          <div className="space-y-3">
+        {/* Parameters Section */}
+        {(pathParamNames.length > 0 || queryRows.length > 0) && (
+          <section className="space-y-4">
+            <ConsoleLabel>Parameters</ConsoleLabel>
+            <div className="space-y-4">
+              {pathParamNames.map((key) => (
+                <div key={key} className="flex items-center gap-4">
+                  <span className="w-24 text-zinc-500 shrink-0">:{key}</span>
+                  <input
+                    className="flex-1 bg-transparent border-b border-zinc-800 focus:border-cyan-500 outline-none py-1 transition-colors"
+                    placeholder="value"
+                    value={pathParams[key] ?? ""}
+                    onChange={(event) =>
+                      setPathParams((previous) => ({
+                        ...previous,
+                        [key]: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              ))}
+              {queryRows.map(([key, value], index) => (
+                <div key={index} className="flex items-center gap-4">
+                  <span className="w-24 text-zinc-500 shrink-0 truncate">
+                    {key}
+                  </span>
+                  <input
+                    className="flex-1 bg-transparent border-b border-zinc-800 focus:border-cyan-500 outline-none py-1 transition-colors"
+                    placeholder="value"
+                    value={value}
+                    onChange={(event) =>
+                      setQueryRows((rows) =>
+                        rows.map((row, i) =>
+                          i === index ? [row[0], event.target.value] : row,
+                        ),
+                      )
+                    }
+                  />
+                  <input
+                    type="checkbox"
+                    checked={omittedFields.has(`query:${key}`)}
+                    onChange={() => toggleOmit(`query:${key}`)}
+                    className="w-3 h-3 rounded border-zinc-700 bg-transparent text-cyan-600 focus:ring-0"
+                    title="Omit from request"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Body Section */}
+        {BODY_METHODS.has(endpoint.method) && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <ConsoleLabel>Body</ConsoleLabel>
+              <div className="flex gap-3 text-[11px] font-bold">
+                <button
+                  type="button"
+                  onClick={() => setBodyType("json")}
+                  className={
+                    bodyType === "json" ? "text-cyan-400" : "text-zinc-600"
+                  }
+                >
+                  JSON
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBodyType("form")}
+                  className={
+                    bodyType === "form" ? "text-cyan-400" : "text-zinc-600"
+                  }
+                >
+                  FORM
+                </button>
+              </div>
+            </div>
+
             {bodyType === "json" ? (
-              <Textarea
-                className="w-full h-40 resize-none leading-relaxed text-[13px] font-mono bg-zinc-50/30 dark:bg-[#0d1117] border-zinc-200 dark:border-zinc-800"
+              <textarea
+                className="w-full h-48 bg-[#161b22] rounded-lg p-4 outline-none border border-zinc-800 focus:border-zinc-700 resize-none leading-relaxed"
                 value={bodyText}
                 onChange={(event) => setBodyText(event.target.value)}
                 spellCheck={false}
               />
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {formRows.map(([key, value], index) => (
-                  <div key={index} className="space-y-1.5">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[11px] font-mono font-medium text-zinc-500 dark:text-zinc-400 w-24 shrink-0 truncate">
-                        {key || "field"}
+                  <div key={index} className="space-y-2">
+                    <div className="flex items-center gap-4">
+                      <span className="w-24 text-zinc-500 shrink-0 truncate font-bold">
+                        {key}
                       </span>
-                      <span className="text-zinc-300 dark:text-zinc-700">
-                        :
-                      </span>
-                      <Input
-                        className="flex-1 h-8 text-[12px] bg-transparent border-transparent focus:border-cyan-500/50 focus:ring-0 p-0"
-                        placeholder="string, null"
+                      <input
+                        className="flex-1 bg-transparent border-b border-zinc-800 focus:border-cyan-500 outline-none py-1 transition-colors"
+                        placeholder="value"
                         value={value}
                         onChange={(event) =>
                           setFormRows((rows) =>
-                            rows.map((row, rowIndex) =>
-                              rowIndex === index
-                                ? [row[0], event.target.value]
-                                : row,
+                            rows.map((row, i) =>
+                              i === index ? [row[0], event.target.value] : row,
                             ),
                           )
                         }
                       />
-                    </div>
-                    <label className="flex items-center gap-2 cursor-pointer group w-fit ml-28">
                       <input
                         type="checkbox"
                         checked={omittedFields.has(`body:${key}`)}
                         onChange={() => toggleOmit(`body:${key}`)}
-                        className="w-3 h-3 rounded border-zinc-300 dark:border-zinc-700 text-cyan-500 focus:ring-0 focus:ring-offset-0 bg-transparent"
+                        className="w-3 h-3 rounded border-zinc-700 bg-transparent text-cyan-600 focus:ring-0"
+                        title="Omit from request"
                       />
-                      <span className="text-[10px] text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-                        Omit {key || "field"}
-                      </span>
-                    </label>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
-          </div>
+          </section>
+        )}
 
-          <Button
-            onClick={send}
-            disabled={loading}
-            className="w-full h-9 text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white shadow-lg shadow-cyan-500/20"
-          >
-            {loading ? "Sending..." : "Send API Request"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Code Sample Card */}
-      <CurlSample
-        endpoint={endpoint}
-        auth={auth}
-        pathParams={pathParams}
-        queryRows={queryRows}
-        bodyType={bodyType}
-        bodyText={bodyText}
-        formRows={formRows}
-        omittedFields={omittedFields}
-      />
-
-      {/* Response Card */}
-      {response && (
-        <div className="bg-white dark:bg-[#161b22] border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
-          <div className="px-4 py-2.5 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-[#161b22] flex items-center justify-between">
-            <span className="text-[11px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-              Response Example
-            </span>
-            <button
-              type="button"
-              onClick={() => setResponse(null)}
-              className="text-[10px] text-zinc-400 hover:text-red-400 transition-colors"
-            >
-              Clear
-            </button>
-          </div>
-          <div className="p-4 bg-[#f6f8fa] dark:bg-[#0d1117]">
-            <div className="flex items-center gap-3 mb-3">
-              <span
-                className={`font-mono text-xs font-bold ${statusColor(
-                  response.status,
-                )}`}
-              >
-                {response.status || "Error"}
-              </span>
-              <span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono">
-                {response.elapsed}ms
-              </span>
+        {/* Response Area */}
+        {response && (
+          <section className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-center justify-between">
+              <ConsoleLabel>Response</ConsoleLabel>
+              <div className="flex items-center gap-3 text-[11px]">
+                <span className={statusColor(response.status)}>
+                  {response.status}
+                </span>
+                <span className="text-zinc-600">{response.elapsed}ms</span>
+                <button
+                  type="button"
+                  onClick={() => setResponse(null)}
+                  className="text-zinc-600 hover:text-zinc-400 transition-colors"
+                >
+                  CLEAR
+                </button>
+              </div>
             </div>
-            <pre className="text-[11px] font-mono text-zinc-700 dark:text-zinc-300 overflow-x-auto whitespace-pre leading-relaxed">
+            <pre className="w-full bg-[#161b22] rounded-lg p-4 border border-zinc-800 overflow-x-auto text-[12px] leading-relaxed">
               {fmtJson(response.body)}
             </pre>
-          </div>
-        </div>
-      )}
+          </section>
+        )}
+      </div>
+
+      {/* Footer / Send Button */}
+      <div className="p-6 border-t border-zinc-800 bg-[#0d1117]/80 backdrop-blur-sm sticky bottom-0">
+        <button
+          onClick={send}
+          disabled={loading}
+          className="w-full h-11 bg-cyan-600 hover:bg-cyan-500 disabled:bg-zinc-800 text-white font-bold rounded-lg transition-all active:scale-[0.98] shadow-lg shadow-cyan-500/10 flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <span className="animate-pulse">EXECUTING...</span>
+          ) : (
+            <>
+              <span>SEND REQUEST</span>
+              <span className="text-[10px] bg-cyan-700 px-1.5 py-0.5 rounded ml-2">
+                ⌘ ↵
+              </span>
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ConsoleLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-4">
+      <h3 className="text-[11px] font-black text-zinc-600 uppercase tracking-widest whitespace-nowrap">
+        {children}
+      </h3>
+      <div className="h-px bg-zinc-800 flex-1" />
     </div>
   );
 }

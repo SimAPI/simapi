@@ -19,7 +19,7 @@ export function EndpointList({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto py-1">
+    <div className="flex-1 overflow-y-auto py-2">
       {endpoints.map((endpoint) => {
         const isSelected =
           selected?.path === endpoint.path &&
@@ -29,31 +29,30 @@ export function EndpointList({
             key={`${endpoint.method}-${endpoint.path}`}
             type="button"
             onClick={() => onSelect(endpoint)}
-            className={`w-full flex items-start gap-2 px-3 py-3 sm:py-2.5 text-left transition-colors border-r-2 active:bg-zinc-100 dark:active:bg-zinc-800 ${
+            className={`w-full flex items-start gap-3 px-4 py-3.5 text-left transition-all border-l-2 ${
               isSelected
-                ? "bg-cyan-50 dark:bg-cyan-950/30 border-cyan-500"
-                : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border-transparent"
+                ? "bg-zinc-100 dark:bg-zinc-800/40 border-cyan-500"
+                : "hover:bg-zinc-50/50 dark:hover:bg-zinc-800/20 border-transparent"
             }`}
           >
             <span
-              className={`mt-0.5 w-12 text-center text-[10px] font-bold px-1 py-0.5 rounded border font-mono shrink-0 ${METHOD_COLORS[endpoint.method] ?? "bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-100 dark:border-zinc-700"}`}
+              className={`mt-0.5 w-12 text-center text-[10px] font-black px-1.5 py-0.5 rounded border font-mono shrink-0 uppercase tracking-tighter ${
+                METHOD_COLORS[endpoint.method] ??
+                "bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-100 dark:border-zinc-700"
+              }`}
             >
               {endpoint.method}
             </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-mono text-zinc-700 dark:text-zinc-200 truncate">
+            <div className="min-w-0 flex-1 space-y-0.5">
+              <p className={`text-[13px] font-mono truncate ${isSelected ? "text-zinc-900 dark:text-zinc-100 font-bold" : "text-zinc-600 dark:text-zinc-400"}`}>
                 {endpoint.path}
               </p>
               {endpoint.title && (
-                <p className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-0.5 truncate">
+                <p className="text-[11px] text-zinc-400 dark:text-zinc-500 truncate leading-tight">
                   {endpoint.title}
                 </p>
               )}
             </div>
-            {/* Mobile chevron */}
-            <span className="sm:hidden text-zinc-300 dark:text-zinc-600 text-xs mt-1 shrink-0">
-              ›
-            </span>
           </button>
         );
       })}
