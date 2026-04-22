@@ -56,8 +56,8 @@ export default function Logs() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Toolbar */}
-      <div className="px-4 sm:px-6 py-3 border-b border-zinc-200 dark:border-zinc-800 flex flex-wrap items-center gap-2 bg-white dark:bg-zinc-900 shrink-0">
-        <h1 className="font-semibold text-zinc-900 dark:text-zinc-100 mr-1">
+      <div className="px-4 sm:px-6 py-3 border-b border-border flex flex-wrap items-center gap-2 bg-card shrink-0">
+        <h1 className="font-black text-foreground mr-1 uppercase tracking-tight">
           Request Logs
         </h1>
         <Input
@@ -66,7 +66,12 @@ export default function Logs() {
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
         />
-        <Button variant="secondary" size="sm" onClick={exportJson}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={exportJson}
+          className="font-black"
+        >
           Export
         </Button>
         {logs.length > 0 && (
@@ -74,21 +79,22 @@ export default function Logs() {
             variant="danger"
             size="sm"
             onClick={() => setClearPin(genPin())}
+            className="font-black"
           >
             Clear All
           </Button>
         )}
-        <span className="text-xs text-zinc-400 dark:text-zinc-500 font-mono ml-auto">
+        <span className="text-xs text-muted-foreground/50 font-black font-mono ml-auto tracking-widest uppercase">
           {filtered.length} entries
         </span>
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto bg-background">
         {filtered.length === 0 ? (
           <div className="px-4 py-20 text-center">
-            <p className="text-zinc-300 dark:text-zinc-600 text-3xl mb-3">≡</p>
-            <p className="text-zinc-400 dark:text-zinc-500 text-sm">
+            <p className="text-border text-3xl mb-3">≡</p>
+            <p className="text-muted-foreground text-sm font-black uppercase tracking-tight">
               {filter
                 ? "No entries match your filter."
                 : "No requests logged yet — make a request to your API."}

@@ -1,20 +1,19 @@
-export function Logo({ size = "md" }: { size?: "sm" | "md" }) {
-  const boxSize = size === "sm" ? "w-6 h-6" : "w-7 h-7";
-  const textSize = size === "sm" ? "text-[10px]" : "text-xs";
-
+export function Logo() {
   return (
-    <div className="flex items-center gap-2.5">
-      <div
-        className={`${boxSize} rounded-lg bg-linear-to-br from-cyan-400 to-cyan-600 flex items-center justify-center text-white font-bold ${textSize} shrink-0 shadow-sm`}
-      >
-        S
+    <div className="flex items-center gap-3">
+      <div className="size-8 rounded-xl overflow-hidden shrink-0 shadow-sm border border-border/10">
+        <img
+          src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png"
+          alt="SimAPI"
+          className="size-full object-cover"
+        />
       </div>
-      <div>
-        <p className="font-semibold text-sm text-zinc-900 dark:text-zinc-100 leading-none">
+      <div className="hidden group-hover/sidebar:block animate-in fade-in slide-in-from-left-2 duration-300">
+        <p className="font-black text-sm text-foreground leading-none tracking-tight">
           SimAPI
         </p>
-        <p className="text-[10px] text-zinc-400 dark:text-zinc-500 leading-none mt-0.5 font-mono tracking-wide">
-          CONSOLE
+        <p className="text-[9px] text-muted-foreground leading-none mt-1 font-black tracking-[0.2em] uppercase">
+          Console
         </p>
       </div>
     </div>

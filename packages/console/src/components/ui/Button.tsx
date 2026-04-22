@@ -17,12 +17,11 @@ export function Button({
     "inline-flex items-center justify-center rounded-md font-medium transition-colors disabled:opacity-50 disabled:pointer-events-none";
 
   const variants = {
-    primary: "bg-cyan-500 hover:bg-cyan-400 active:bg-cyan-600 text-white",
+    primary: "bg-primary text-background hover:opacity-90 active:scale-[0.98]",
     secondary:
-      "bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700",
-    danger: "bg-red-500 hover:bg-red-400 active:bg-red-600 text-white",
-    ghost:
-      "text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300",
+      "bg-secondary border border-border text-foreground hover:bg-border transition-all active:scale-[0.98]",
+    danger: "bg-error text-background hover:opacity-90 active:scale-[0.98]",
+    ghost: "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
   };
 
   const sizes = {

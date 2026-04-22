@@ -57,15 +57,15 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
         {endpoint.querySchema?.properties && (
           <section className="space-y-10">
             <div className="flex items-center gap-6">
-              <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter">
+              <h2 className="text-2xl font-black text-foreground tracking-tighter">
                 Parameters
               </h2>
-              <div className="h-px flex-1 bg-zinc-100 dark:bg-white/5" />
-              <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-600 uppercase tracking-widest bg-zinc-50 dark:bg-white/2 px-3 py-1 rounded-full border border-zinc-100 dark:border-white/5">
+              <div className="h-px flex-1 bg-border/50" />
+              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest bg-secondary px-3 py-1 rounded-full border border-border">
                 Query
               </span>
             </div>
-            <div className="divide-y divide-zinc-50 dark:divide-white/2">
+            <div className="divide-y divide-border/20">
               {Object.entries(endpoint.querySchema.properties).map(
                 ([key, prop]) => (
                   <SchemaField
@@ -86,12 +86,12 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
         {endpoint.headerSchema?.properties && (
           <section className="space-y-10">
             <div className="flex items-center gap-6">
-              <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter">
+              <h2 className="text-2xl font-black text-foreground tracking-tighter">
                 Headers
               </h2>
-              <div className="h-px flex-1 bg-zinc-100 dark:bg-white/5" />
+              <div className="h-px flex-1 bg-border/50" />
             </div>
-            <div className="divide-y divide-zinc-50 dark:divide-white/2">
+            <div className="divide-y divide-border/20">
               {Object.entries(endpoint.headerSchema.properties).map(
                 ([key, prop]) => (
                   <SchemaField
@@ -112,19 +112,19 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
       {/* Response Specification */}
       <section className="space-y-12">
         <div className="flex items-center justify-between gap-6">
-          <h2 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tighter">
+          <h2 className="text-3xl font-black text-foreground tracking-tighter">
             Responses
           </h2>
           <div className="flex gap-2">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/10 dark:border-emerald-500/20">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 font-mono">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-success/5 border border-success/10">
+              <div className="size-1.5 rounded-full bg-success shadow-[0_0_8px_var(--color-success)]" />
+              <span className="text-[10px] font-black text-success font-mono uppercase tracking-widest">
                 200 OK
               </span>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/5 dark:bg-orange-500/10 border border-orange-500/10 dark:border-orange-500/20">
-              <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-              <span className="text-[10px] font-black text-orange-600 dark:text-orange-400 font-mono">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-warning/5 border border-warning/10">
+              <div className="size-1.5 rounded-full bg-warning shadow-[0_0_8px_var(--color-warning)]" />
+              <span className="text-[10px] font-black text-warning font-mono uppercase tracking-widest">
                 422 ERROR
               </span>
             </div>

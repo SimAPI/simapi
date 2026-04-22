@@ -12,7 +12,7 @@ export function EndpointList({
 }) {
   if (endpoints.length === 0) {
     return (
-      <p className="px-4 py-8 text-xs text-zinc-400 dark:text-zinc-500 text-center">
+      <p className="px-4 py-8 text-xs text-muted-foreground text-center font-black uppercase tracking-widest">
         No endpoints discovered.
       </p>
     );

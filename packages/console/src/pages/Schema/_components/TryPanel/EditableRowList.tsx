@@ -57,7 +57,7 @@ export function EditableRowList({
                 onClick={() => onToggleOmit(`${type}:${key}`)}
                 className={`p-1.5 rounded-lg transition-colors ${
                   isOmitted
-                    ? "text-rose-500 bg-rose-500/10"
+                    ? "text-error bg-error/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                 }`}
                 title={isOmitted ? "Include in request" : "Omit from request"}
@@ -67,6 +67,8 @@ export function EditableRowList({
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  role="img"
+                  aria-label={isOmitted ? "Include" : "Omit"}
                 >
                   <title>{isOmitted ? "Include" : "Omit"}</title>
                   {isOmitted ? (
@@ -89,7 +91,7 @@ export function EditableRowList({
               <button
                 type="button"
                 onClick={() => removeRow(index)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-error hover:bg-error/10 transition-colors"
                 title="Remove row"
               >
                 <svg
@@ -97,6 +99,8 @@ export function EditableRowList({
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  role="img"
+                  aria-label="Remove row"
                 >
                   <title>Remove</title>
                   <path

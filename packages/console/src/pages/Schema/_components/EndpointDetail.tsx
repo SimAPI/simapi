@@ -52,7 +52,7 @@ export function EndpointDetail({
       >
         <div className="max-w-4xl mx-auto px-8 sm:px-16 py-16 sm:py-24 space-y-24">
           <header className="relative">
-            <div className="absolute -left-8 top-0 bottom-0 w-px bg-linear-to-b from-cyan-500/50 via-transparent to-transparent hidden sm:block" />
+            <div className="absolute -left-8 top-0 bottom-0 w-px bg-linear-to-b from-primary/50 via-transparent to-transparent hidden sm:block" />
             <div className="flex items-center gap-4 mb-8">
               <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
                 Endpoint Reference

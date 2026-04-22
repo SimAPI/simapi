@@ -44,17 +44,19 @@ export function ClearLogsModal({
         if (event.target === overlayRef.current) onClose();
       }}
     >
-      <div className="w-full max-w-sm bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
-        <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+      <div className="w-full max-w-sm bg-card rounded-2xl shadow-2xl border border-card-border overflow-hidden">
+        <div className="px-5 py-4 border-b border-border">
           <div className="flex items-center gap-2.5">
-            <span className="text-red-500 text-lg leading-none">⊗</span>
-            <h2 className="font-semibold text-zinc-900 dark:text-zinc-100 text-sm">
+            <span className="text-error text-lg leading-none font-black tracking-tighter">
+              ⊗
+            </span>
+            <h2 className="font-black text-foreground text-sm uppercase tracking-tight">
               Clear all logs
             </h2>
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1.5 leading-relaxed">
+          <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
             This will permanently delete{" "}
-            <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+            <span className="font-black text-foreground">
               {count} {count === 1 ? "entry" : "entries"}
             </span>
             . This cannot be undone.
@@ -62,11 +64,11 @@ export function ClearLogsModal({
         </div>
 
         <div className="px-5 py-5 space-y-4">
-          <div className="rounded-xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700 px-4 py-4 text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+          <div className="rounded-xl bg-secondary border border-border px-4 py-4 text-center">
+            <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-2">
               Confirmation PIN
             </p>
-            <p className="font-mono text-3xl font-bold tracking-[0.25em] text-zinc-900 dark:text-zinc-100">
+            <p className="font-mono text-3xl font-black tracking-[0.25em] text-foreground">
               {pin}
             </p>
           </div>
@@ -74,7 +76,7 @@ export function ClearLogsModal({
           <div>
             <label
               htmlFor="clear-logs-pin"
-              className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 block mb-1.5"
+              className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-2"
             >
               Enter PIN to confirm
             </label>
@@ -92,7 +94,7 @@ export function ClearLogsModal({
                 if (event.key === "Enter" && input === pin) handleConfirm();
               }}
               placeholder="______"
-              className="w-full text-center text-lg tracking-[0.25em]"
+              className="w-full text-center text-lg tracking-[0.25em] font-black"
             />
           </div>
 

@@ -27,24 +27,22 @@ export function SchemaField({
         <div className="flex items-center gap-3">
           <span
             className={`text-sm font-black tracking-tight font-mono ${
-              required
-                ? "text-zinc-900 dark:text-white"
-                : "text-zinc-500 dark:text-zinc-400"
+              required ? "text-foreground" : "text-muted-foreground"
             }`}
           >
             {name}
           </span>
           {required && (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-orange-500/5 dark:bg-orange-500/10 border border-orange-500/10 dark:border-orange-500/20">
-              <div className="w-1 h-1 rounded-full bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
-              <span className="text-[9px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-warning/5 border border-warning/10">
+              <div className="size-1 rounded-full bg-warning shadow-[0_0_8px_var(--color-warning)]" />
+              <span className="text-[9px] font-black text-warning uppercase tracking-widest">
                 Required
               </span>
             </div>
           )}
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[11px] font-black font-mono text-cyan-600 dark:text-cyan-400 uppercase tracking-widest bg-cyan-500/5 dark:bg-cyan-500/10 px-2 py-0.5 rounded">
+          <span className="text-[11px] font-black font-mono text-primary uppercase tracking-widest bg-primary/5 px-2 py-0.5 rounded border border-primary/10">
             {typeLabel(prop)}
           </span>
         </div>
@@ -53,14 +51,14 @@ export function SchemaField({
       <div className="mt-4 flex flex-wrap gap-4">
         {constraints.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest">
+            <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest">
               Constraints
             </span>
             <div className="flex gap-1.5">
               {constraints.map((c) => (
                 <span
                   key={c}
-                  className="text-[11px] font-mono text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-white/2 px-2 py-0.5 rounded border border-zinc-100 dark:border-white/3"
+                  className="text-[11px] font-mono text-muted-foreground bg-secondary px-2 py-0.5 rounded border border-border"
                 >
                   {c}
                 </span>
@@ -71,17 +69,17 @@ export function SchemaField({
 
         {prop.default !== undefined && (
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest">
+            <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest">
               Default
             </span>
-            <span className="text-[11px] font-mono text-zinc-400 dark:text-zinc-500 italic bg-zinc-50 dark:bg-white/2 px-2 py-0.5 rounded border border-zinc-100 dark:border-white/3">
+            <span className="text-[11px] font-mono text-muted-foreground/60 italic bg-secondary px-2 py-0.5 rounded border border-border">
               {JSON.stringify(prop.default)}
             </span>
           </div>
         )}
       </div>
 
-      <div className="absolute -left-8 top-8 bottom-8 w-[2px] bg-cyan-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-full hidden sm:block" />
+      <div className="absolute -left-8 top-8 bottom-8 w-[2px] bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-full hidden sm:block" />
     </div>
   );
 }

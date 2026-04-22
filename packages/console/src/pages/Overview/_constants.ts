@@ -37,8 +37,7 @@ export const INTERNAL_ENDPOINTS = [
 ];
 
 export const METHOD_COLORS: Record<string, string> = {
-  GET: "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-900",
-  POST: "bg-green-50 dark:bg-green-950/60 text-green-700 dark:text-green-300 border-green-100 dark:border-green-900",
-  DELETE:
-    "bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-100 dark:border-red-900",
+  GET: "bg-method-get/5 text-method-get border-method-get/10",
+  POST: "bg-method-post/5 text-method-post border-method-post/10",
+  DELETE: "bg-method-delete/5 text-method-delete border-method-delete/10",
 };

@@ -172,8 +172,11 @@ export function TryPanel({
 
   return (
     <div
-      className="flex flex-col h-full bg-background text-muted-foreground font-mono text-[13px] relative overflow-hidden"
+      className="flex flex-col h-full bg-background text-muted-foreground font-mono text-[13px] relative overflow-hidden focus:outline-none"
       onKeyDown={handleKeyDown}
+      role="region"
+      aria-label="API Try Panel"
+      tabIndex={-1}
     >
       {/* Dynamic Header Glow */}
       <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-primary/50 to-transparent opacity-50" />
@@ -292,7 +295,7 @@ export function TryPanel({
                   value={bodyText}
                   onChange={(event) => setBodyText(event.target.value)}
                   spellCheck={false}
-                  placeholder={` \"payload\": \"...\" `}
+                  placeholder={` "payload": "..." `}
                 />
               </div>
             ) : (

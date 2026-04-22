@@ -1,15 +1,15 @@
 export function statusColor(s: number): string {
-  if (s >= 500) return "text-red-500 dark:text-red-400";
-  if (s >= 400) return "text-yellow-500 dark:text-yellow-400";
-  if (s >= 300) return "text-blue-500 dark:text-blue-400";
-  return "text-emerald-500 dark:text-emerald-400";
+  if (s >= 500) return "text-error";
+  if (s >= 400) return "text-warning";
+  if (s >= 300) return "text-info";
+  return "text-success";
 }
 
 export function statusDot(s: number): string {
-  if (s >= 500) return "bg-red-400";
-  if (s >= 400) return "bg-yellow-400";
-  if (s >= 300) return "bg-blue-400";
-  return "bg-emerald-400";
+  if (s >= 500) return "bg-error";
+  if (s >= 400) return "bg-warning";
+  if (s >= 300) return "bg-info";
+  return "bg-success";
 }
 
 export function fmtJson(s: string): string {

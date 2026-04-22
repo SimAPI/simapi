@@ -14,9 +14,9 @@ export function ResponseTerminal({ response, onClear }: ResponseTerminalProps) {
   if (!response) return null;
 
   const statusColor = (status: number) => {
-    if (status >= 200 && status < 300) return "text-emerald-500";
-    if (status >= 400) return "text-rose-500";
-    return "text-amber-500";
+    if (status >= 200 && status < 300) return "text-success";
+    if (status >= 400) return "text-error";
+    return "text-warning";
   };
 
   return (
@@ -45,14 +45,17 @@ export function ResponseTerminal({ response, onClear }: ResponseTerminalProps) {
           <button
             type="button"
             onClick={onClear}
-            className="text-muted-foreground hover:text-rose-500 transition-colors"
+            className="text-muted-foreground hover:text-error transition-colors"
           >
             <svg
               className="size-4"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
+              role="img"
+              aria-label="Clear response"
             >
+              <title>Clear</title>
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
