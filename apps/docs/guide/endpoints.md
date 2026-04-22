@@ -16,9 +16,11 @@ export const myEndpoint: EndpointDefinition = {
   title: "Get Post",
   description: "Returns a single post by ID.",
 
-  // Optional — Zod shape validated before handler runs
-  validator: {
-    title: z.string().min(3),
+  // Optional — Zod shapes validated before handler runs
+  request: {
+    body: {
+      title: z.string().min(3),
+    },
   },
 
   // Optional — probability (0–1) of returning 500 before handler runs
@@ -131,7 +133,7 @@ const all = req.bodyAll<{ title: string; age: number }>();
 
 ## Validation with Zod
 
-Add a `validator` field — SimAPI runs it before your handler and populates `req.errors`:
+Add a `request` field — SimAPI validates `body`, `query`, and/or `headers` before your handler runs and populates `req.errors`:
 
 ```ts
 import { z, AppResponse, type AppRequest, type EndpointDefinition } from "@simapi/simapi";
@@ -140,10 +142,12 @@ export const createUser: EndpointDefinition = {
   path: "/api/users",
   method: "POST",
   type: "open",
-  validator: {
-    email:    z.string().email(),
-    password: z.string().min(8),
-    age:      z.number().int().min(18).optional(),
+  request: {
+    body: {
+      email:    z.string().email(),
+      password: z.string().min(8),
+      age:      z.number().int().min(18).optional(),
+    },
   },
   handler: (req: AppRequest) => {
     // throws 422 only when hasError is true — unconditional call is safe

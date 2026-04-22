@@ -41,11 +41,14 @@ npm install @simapi/simapi
 
 ```
 my-api/
-├── endpoints/          # Every named export is auto-discovered — no registration
-│   ├── posts.ts
-│   └── users.ts
-├── models/             # Shared data factories
-│   └── post.ts
+├── src/
+│   ├── endpoints/      # Every named export is auto-discovered — no registration
+│   │   ├── posts.ts
+│   │   └── users.ts
+│   ├── models/         # Shared data factories
+│   │   └── post.ts
+│   └── requests/       # Optional — shared RequestDefinition objects
+│       └── postRequest.ts
 ├── simapi.config.ts
 └── package.json
 ```
@@ -57,9 +60,9 @@ my-api/
 An endpoint is a plain TypeScript object. Export it and SimAPI discovers it automatically.
 
 ```ts
-// endpoints/posts.ts
+// src/endpoints/posts.ts
 import { z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
-import { makePost } from "../models/post.js";
+import { makePost } from "@/models/post.js";
 
 export const listPosts: EndpointDefinition = {
   path: "/api/posts",
@@ -79,9 +82,11 @@ export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "secure",          // runs authHandler before the handler
-  validator: {
-    title: z.string().min(3),
-    body:  z.string().min(10),
+  request: {
+    body: {
+      title: z.string().min(3),
+      body:  z.string().min(10),
+    },
   },
   handler: (req) => {
     req.errors.throwValidationError();   // throws 422 only when validation failed
@@ -92,18 +97,18 @@ export const createPost: EndpointDefinition = {
 
 ### EndpointDefinition fields
 
-| Field         | Required | Description                                                 |
-| ------------- | -------- | ----------------------------------------------------------- |
-| `path`        | ✓        | Hono-style route pattern — `:param`, `/nested/path`         |
-| `method`      | ✓        | `GET` `POST` `PUT` `PATCH` `DELETE` `HEAD` `OPTIONS`        |
-| `type`        | ✓        | `"open"` (no auth) or `"secure"` (runs `authHandler` first) |
-| `handler`     | ✓        | `(req: AppRequest) => AppResponse`                          |
-| `validator`   |          | Zod shape validated before the handler runs                 |
-| `title`       |          | Display name — shown in Console and exported OpenAPI        |
-| `description` |          | Longer description — same                                   |
-| `authHandler` |          | Per-endpoint auth check (runs after global handler)         |
-| `failRate`    |          | `0`–`1` probability of returning a simulated 500            |
-| `delay`       |          | Milliseconds to wait before the handler runs                |
+| Field         | Required | Description                                                      |
+| ------------- | -------- | ---------------------------------------------------------------- |
+| `path`        | ✓        | Hono-style route pattern — `:param`, `/nested/path`              |
+| `method`      | ✓        | `GET` `POST` `PUT` `PATCH` `DELETE` `HEAD` `OPTIONS`             |
+| `type`        | ✓        | `"open"` (no auth) or `"secure"` (runs `authHandler` first)      |
+| `handler`     | ✓        | `(req: AppRequest) => AppResponse`                               |
+| `request`     |          | `RequestDefinition` — Zod shapes for `body`, `query`, `headers`  |
+| `title`       |          | Display name — shown in Console and exported OpenAPI             |
+| `description` |          | Longer description — same                                        |
+| `authHandler` |          | Per-endpoint auth check (runs after global handler)              |
+| `failRate`    |          | `0`–`1` probability of returning a simulated 500                 |
+| `delay`       |          | Milliseconds to wait before the handler runs                     |
 
 ---
 
@@ -160,15 +165,20 @@ AppResponse.error({ message: "..." })            // 500
 
 ## Validation
 
-Add a `validator` field with a Zod shape — SimAPI validates the body before your handler runs:
+Add a `request` field with Zod shapes for `body`, `query`, and/or `headers`:
 
 ```ts
 import { z } from "@simapi/simapi";
 
-validator: {
-  email:    z.string().email(),
-  password: z.string().min(8),
-  role:     z.enum(["admin", "member"]).optional(),
+request: {
+  body: {
+    email:    z.string().email(),
+    password: z.string().min(8),
+    role:     z.enum(["admin", "member"]).optional(),
+  },
+  query: {
+    page: z.coerce.number().int().min(1).optional(),
+  },
 },
 handler: (req) => {
   req.errors.throwValidationError("laravel");  // throws 422 only when hasError is true
@@ -177,6 +187,20 @@ handler: (req) => {
 ```
 
 `z` is re-exported directly from `@simapi/simapi` — no separate `zod` install needed.
+
+Define shared `RequestDefinition` objects in `src/requests/` to reuse validation logic across endpoints:
+
+```ts
+// src/requests/postRequest.ts
+import { z, type RequestDefinition } from "@simapi/simapi";
+
+export const postRequest: RequestDefinition = {
+  body: {
+    title: z.string().min(3),
+    body:  z.string().min(10),
+  },
+};
+```
 
 ### Auto-throw
 
@@ -285,7 +309,7 @@ export default defineConfig({
 
 ```sh
 simapi import openapi.yaml
-simapi import openapi.json --output endpoints/
+simapi import openapi.json --output src/endpoints/
 ```
 
 **Export** — produce an OpenAPI 3 spec from your endpoints:
@@ -314,16 +338,19 @@ See [`@simapi/console`](../console) for details.
 
 ## CLI reference
 
-| Command                 | Description                                  |
-| ----------------------- | -------------------------------------------- |
-| `simapi serve`          | Start dev server with live TypeScript reload |
-| `simapi build`          | Compile project to `.simapi/dist/server.mjs` |
-| `simapi start`          | Run the compiled production server           |
-| `simapi init [name]`    | Scaffold a new SimAPI project                |
-| `simapi import <spec>`  | Generate endpoint stubs from an OpenAPI spec |
-| `simapi export`         | Export endpoints as an OpenAPI 3 spec        |
-| `simapi console:add`    | Install `@simapi/console`                    |
-| `simapi console:remove` | Uninstall `@simapi/console`                  |
+| Command                 | Description                                              |
+| ----------------------- | -------------------------------------------------------- |
+| `simapi serve`          | Start dev server with live TypeScript reload             |
+| `simapi dev`            | Start dev server with file watching — auto-restarts      |
+| `simapi build`          | Compile project to `.simapi/dist/server.mjs`             |
+| `simapi start`          | Run the compiled production server                       |
+| `simapi init [name]`    | Scaffold a new SimAPI project                            |
+| `simapi interactive`    | Menu-driven CLI — setup, console, import/export          |
+| `simapi import <spec>`  | Generate endpoint stubs from an OpenAPI spec             |
+| `simapi export`         | Export endpoints as an OpenAPI 3 spec                    |
+| `simapi setup <target>` | Generate config files (`docker`, `vercel`, `netlify`)    |
+| `simapi console:add`    | Install `@simapi/console`                                |
+| `simapi console:remove` | Uninstall `@simapi/console`                              |
 
 ---
 

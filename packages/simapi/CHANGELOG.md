@@ -1,5 +1,48 @@
 # @simapi/simapi
 
+## 0.0.7
+
+### Request validation — body, query, and headers
+
+- Added `RequestDefinition` interface — replaces the single `validator` field with separate `body`, `query`, and `headers` Zod shapes, enabling validation across all three input sources
+- **Breaking:** `validator?: ZodRawShape` removed from `EndpointDefinition`; use `request: { body: { ... } }` instead
+- Body, query string, and header validation errors are merged into a single `req.errors` bag — existing error-handling code (`throwValidationError`, `autoThrowValidationErrors`) works unchanged
+- `RequestDefinition` is now exported from `@simapi/simapi` — define once in `src/requests/`, import in multiple endpoints for shared validation logic
+- `simapi import` now generates `request: { body: { ... } }` stubs instead of `validator`
+- Production build entry updated to collect validation errors from all three sources
+- All examples, templates, and docs updated to use `request.body`
+
+**Migration**
+
+```ts
+// before
+validator: {
+  email: z.string().email(),
+  password: z.string().min(8),
+},
+
+// after
+request: {
+  body: {
+    email: z.string().email(),
+    password: z.string().min(8),
+  },
+},
+```
+
+Query and header validation:
+
+```ts
+request: {
+  query: {
+    page: z.coerce.number().int().min(1).optional(),
+  },
+  headers: {
+    "x-api-key": z.string().min(1),
+  },
+},
+```
+
 ## 0.0.6
 
 ### src directory structure, dev mode & interactive CLI

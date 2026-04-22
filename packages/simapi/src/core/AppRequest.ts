@@ -5,7 +5,7 @@ import { ValidationErrors } from "./ValidationErrors.js";
  * endpoint handler and auth handler.
  */
 export class AppRequest {
-  /** Validation errors produced by the endpoint's `validator` field. */
+  /** Validation errors produced by the endpoint's `request` field. */
   readonly errors: ValidationErrors;
 
   constructor(

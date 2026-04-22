@@ -7,9 +7,11 @@ export const login: EndpointDefinition = {
   title: "Login",
   description:
     "Authenticate with email and password. Returns a bearer token on success.",
-  validator: {
-    email: z.string().email(),
-    password: z.string().min(8),
+  request: {
+    body: {
+      email: z.string().email(),
+      password: z.string().min(8),
+    },
   },
   handler: () =>
     AppResponse.success({
@@ -39,8 +41,10 @@ export const refreshToken: EndpointDefinition = {
   type: "open",
   title: "Refresh Token",
   description: "Exchange a refresh token for a new access token.",
-  validator: {
-    refreshToken: z.string().min(10),
+  request: {
+    body: {
+      refreshToken: z.string().min(10),
+    },
   },
   handler: () =>
     AppResponse.success({

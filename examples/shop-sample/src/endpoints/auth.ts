@@ -12,10 +12,12 @@ export const register: EndpointDefinition = {
   type: "open",
   title: "Register",
   description: "Create a new customer account.",
-  validator: {
-    name: z.string().min(2).max(100),
-    email: z.string().email(),
-    password: z.string().min(8),
+  request: {
+    body: {
+      name: z.string().min(2).max(100),
+      email: z.string().email(),
+      password: z.string().min(8),
+    },
   },
   handler: (req: AppRequest) =>
     AppResponse.created({
@@ -30,9 +32,11 @@ export const login: EndpointDefinition = {
   type: "open",
   title: "Login",
   description: "Authenticate with email and password.",
-  validator: {
-    email: z.string().email(),
-    password: z.string().min(8),
+  request: {
+    body: {
+      email: z.string().email(),
+      password: z.string().min(8),
+    },
   },
   handler: () =>
     AppResponse.success({
@@ -57,10 +61,12 @@ export const updateMe: EndpointDefinition = {
   type: "secure",
   title: "Update Profile",
   description: "Update name, email or phone number.",
-  validator: {
-    name: z.string().min(2).max(100).optional(),
-    email: z.string().email().optional(),
-    phone: z.string().optional(),
+  request: {
+    body: {
+      name: z.string().min(2).max(100).optional(),
+      email: z.string().email().optional(),
+      phone: z.string().optional(),
+    },
   },
   handler: () => AppResponse.success({ data: makeCustomer() }),
 };

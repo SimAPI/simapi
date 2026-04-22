@@ -97,13 +97,13 @@ function zodFromSchema(schema: OASchema): string {
   }
 }
 
-function buildValidatorBlock(schema: OASchema): string | null {
+function buildRequestBlock(schema: OASchema): string | null {
   if (schema.type !== "object" || !schema.properties) return null;
   const lines = Object.entries(schema.properties).map(([key, prop]) => {
     const required = schema.required?.includes(key) ?? false;
-    return `    ${key}: ${zodFromSchema(prop)}${required ? "" : ".optional()"}`;
+    return `      ${key}: ${zodFromSchema(prop)}${required ? "" : ".optional()"}`;
   });
-  return `  validator: {\n${lines.join(",\n")},\n  },`;
+  return `  request: {\n    body: {\n${lines.join(",\n")},\n    },\n  },`;
 }
 
 function buildEndpoint(method: string, path: string, op: OAOperation): string {
@@ -113,7 +113,7 @@ function buildEndpoint(method: string, path: string, op: OAOperation): string {
   const methodUpper = method.toUpperCase();
 
   const bodySchema = op.requestBody?.content?.["application/json"]?.schema;
-  const validatorBlock = bodySchema ? buildValidatorBlock(bodySchema) : null;
+  const validatorBlock = bodySchema ? buildRequestBlock(bodySchema) : null;
 
   const handlerBody = validatorBlock
     ? `(req) => {\n    req.errors.throwValidationError();\n    return AppResponse.created({ data: {} });\n  }`

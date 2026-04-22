@@ -22,17 +22,17 @@ export default defineConfig({
 
 ## SimAPIConfig options
 
-| Field | Type | Default | Description |
-|---|---|---|---|
-| `name` | `string` | *(required)* | Project name — shown in the console UI and exported spec |
-| `description` | `string` | `""` | Short description |
-| `port` | `number` | `3000` | Port to listen on (overridden by `PORT` env var) |
-| `endpointsDir` | `string` | `"src/endpoints"` | Directory scanned recursively for endpoint files |
-| `logEntries` | `boolean` | `true` | Whether to write request logs to the database |
-| `consoleLog` | `boolean` | `false` | Log each request to stdout: `[SimAPI] GET /api/posts → 200 (4ms)` |
-| `autoThrowValidationErrors` | `"laravel" \| "zod" \| false \| null` | `false` | Automatically throw 422 before the handler when a `validator` fails |
-| `database` | `DatabaseConfig` | `undefined` | Where to store request logs (see below) |
-| `authHandler` | `AuthHandler` | `undefined` | Called before every `type: "secure"` endpoint |
+| Field                       | Type                                  | Default           | Description                                                                |
+| --------------------------- | ------------------------------------- | ----------------- | -------------------------------------------------------------------------- |
+| `name`                      | `string`                              | *(required)*      | Project name — shown in the console UI and exported spec                   |
+| `description`               | `string`                              | `""`              | Short description                                                          |
+| `port`                      | `number`                              | `3000`            | Port to listen on (overridden by `PORT` env var)                           |
+| `endpointsDir`              | `string`                              | `"src/endpoints"` | Directory scanned recursively for endpoint files                           |
+| `logEntries`                | `boolean`                             | `true`            | Whether to write request logs to the database                              |
+| `consoleLog`                | `boolean`                             | `false`           | Log each request to stdout: `[SimAPI] GET /api/posts → 200 (4ms)`          |
+| `autoThrowValidationErrors` | `"laravel" \| "zod" \| false \| null` | `false`           | Automatically throw 422 before the handler when `request` validation fails |
+| `database`                  | `DatabaseConfig`                      | `undefined`       | Where to store request logs (see below)                                    |
+| `authHandler`               | `AuthHandler`                         | `undefined`       | Called before every `type: "secure"` endpoint                              |
 
 ## DatabaseConfig
 

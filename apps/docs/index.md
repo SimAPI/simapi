@@ -36,7 +36,7 @@ features:
   - icon:
       src: /console-feature.svg
     title: Validation without boilerplate
-    details: Add a `validator` field with a Zod shape. SimAPI validates the body before your handler runs and formats errors automatically.
+    details: Add a `request` field with Zod shapes for body, query, and headers. SimAPI validates all three before your handler runs and formats errors automatically.
   - icon:
       src: /deploy-feature.svg
     title: Deploy when you're ready
@@ -80,9 +80,11 @@ export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "secure",
-  validator: {
-    title: z.string().min(3),
-    body:  z.string().min(10),
+  request: {
+    body: {
+      title: z.string().min(3),
+      body:  z.string().min(10),
+    },
   },
   handler: (req) => {
     req.errors.throwValidationError();

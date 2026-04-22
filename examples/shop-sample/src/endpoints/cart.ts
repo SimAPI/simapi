@@ -55,10 +55,12 @@ export const addToCart: EndpointDefinition = {
   title: "Add to Cart",
   description:
     "Adds a product to the cart. If the product is already in the cart the quantity is incremented.",
-  validator: {
-    productId: z.string(),
-    quantity: z.number().int().min(1).max(99),
-    variantId: z.string().optional(),
+  request: {
+    body: {
+      productId: z.string(),
+      quantity: z.number().int().min(1).max(99),
+      variantId: z.string().optional(),
+    },
   },
   handler: () => AppResponse.created({ data: makeCartItem() }),
 };
@@ -70,8 +72,10 @@ export const updateCartItem: EndpointDefinition = {
   title: "Update Cart Item",
   description:
     "Change the quantity of a cart line. Set quantity to 0 to remove the item.",
-  validator: {
-    quantity: z.number().int().min(0).max(99),
+  request: {
+    body: {
+      quantity: z.number().int().min(0).max(99),
+    },
   },
   handler: (req: AppRequest) =>
     AppResponse.success({

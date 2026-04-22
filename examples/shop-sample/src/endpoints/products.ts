@@ -69,13 +69,15 @@ export const createProduct: EndpointDefinition = {
   type: "secure",
   title: "Create Product",
   description: "Creates a new product as a draft.",
-  validator: {
-    name: z.string().min(3).max(200),
-    description: z.string().min(10),
-    price: z.number().positive(),
-    categoryId: z.string(),
-    sku: z.string().min(4),
-    inventory: z.number().int().min(0),
+  request: {
+    body: {
+      name: z.string().min(3).max(200),
+      description: z.string().min(10),
+      price: z.number().positive(),
+      categoryId: z.string(),
+      sku: z.string().min(4),
+      inventory: z.number().int().min(0),
+    },
   },
   handler: (req: AppRequest) =>
     AppResponse.created({
@@ -93,12 +95,14 @@ export const updateProduct: EndpointDefinition = {
   type: "secure",
   title: "Update Product",
   description: "Update product details, pricing or inventory.",
-  validator: {
-    name: z.string().min(3).max(200).optional(),
-    description: z.string().min(10).optional(),
-    price: z.number().positive().optional(),
-    inventory: z.number().int().min(0).optional(),
-    status: z.enum(["active", "draft", "out_of_stock"]).optional(),
+  request: {
+    body: {
+      name: z.string().min(3).max(200).optional(),
+      description: z.string().min(10).optional(),
+      price: z.number().positive().optional(),
+      inventory: z.number().int().min(0).optional(),
+      status: z.enum(["active", "draft", "out_of_stock"]).optional(),
+    },
   },
   handler: (req: AppRequest) =>
     AppResponse.success({ data: { ...makeProduct(), id: req.urlParam("id") } }),

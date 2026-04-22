@@ -93,13 +93,15 @@ export const createPost: EndpointDefinition = {
   type: "secure",
   title: "Create Post",
   description: "Creates a new post as a draft. Requires editor or admin role.",
-  validator: {
-    title: z.string().min(5).max(200),
-    excerpt: z.string().min(10).max(500),
-    body: z.string().min(50),
-    categorySlug: z.string(),
-    tags: z.array(z.string()).min(1).max(10),
-    coverImage: z.string().url().optional(),
+  request: {
+    body: {
+      title: z.string().min(5).max(200),
+      excerpt: z.string().min(10).max(500),
+      body: z.string().min(50),
+      categorySlug: z.string(),
+      tags: z.array(z.string()).min(1).max(10),
+      coverImage: z.string().url().optional(),
+    },
   },
   handler: (req: AppRequest) =>
     AppResponse.created({
@@ -118,13 +120,15 @@ export const updatePost: EndpointDefinition = {
   type: "secure",
   title: "Update Post",
   description: "Updates an existing post. Partial updates are supported.",
-  validator: {
-    title: z.string().min(5).max(200).optional(),
-    excerpt: z.string().min(10).max(500).optional(),
-    body: z.string().min(50).optional(),
-    categorySlug: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    coverImage: z.string().url().optional(),
+  request: {
+    body: {
+      title: z.string().min(5).max(200).optional(),
+      excerpt: z.string().min(10).max(500).optional(),
+      body: z.string().min(50).optional(),
+      categorySlug: z.string().optional(),
+      tags: z.array(z.string()).optional(),
+      coverImage: z.string().url().optional(),
+    },
   },
   handler: (req: AppRequest) =>
     AppResponse.success({

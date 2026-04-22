@@ -97,9 +97,11 @@ export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "secure",
-  validator: {
-    title: z.string().min(3),
-    body: z.string().min(10),
+  request: {
+    body: {
+      title: z.string().min(3),
+      body: z.string().min(10),
+    },
   },
   handler: (req) => {
     req.errors.throwValidationError();

@@ -227,7 +227,7 @@ describe("createApp", () => {
     });
   });
 
-  describe("Zod validation via validator field", () => {
+  describe("Zod validation via request field", () => {
     it("populates req.errors when validation fails", async () => {
       let capturedErrors: AppRequest["errors"] | undefined;
 
@@ -236,7 +236,7 @@ describe("createApp", () => {
           path: "/api/posts",
           method: "POST",
           type: "open",
-          validator: { title: z.string().min(3) },
+          request: { body: { title: z.string().min(3) } },
           handler: (req: AppRequest) => {
             capturedErrors = req.errors;
             return AppResponse.success({});
@@ -262,7 +262,7 @@ describe("createApp", () => {
           path: "/api/posts",
           method: "POST",
           type: "open",
-          validator: { title: z.string().min(3) },
+          request: { body: { title: z.string().min(3) } },
           handler: (req: AppRequest) => {
             capturedErrors = req.errors;
             return AppResponse.success({});
@@ -286,7 +286,7 @@ describe("createApp", () => {
             path: "/api/posts",
             method: "POST",
             type: "open",
-            validator: { title: z.string() },
+            request: { body: { title: z.string() } },
             handler: () => AppResponse.success({}),
           },
         ],

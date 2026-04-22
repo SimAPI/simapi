@@ -30,10 +30,12 @@ export const uploadMedia: EndpointDefinition = {
   title: "Upload Media",
   description:
     "Upload a new media file. Accepts images (jpg, png, webp), videos and documents.",
-  validator: {
-    filename: z.string().min(3),
-    mimeType: z.string(),
-    size: z.number().int().positive().max(52428800),
+  request: {
+    body: {
+      filename: z.string().min(3),
+      mimeType: z.string(),
+      size: z.number().int().positive().max(52428800),
+    },
   },
   delay: 600,
   handler: (req: AppRequest) =>

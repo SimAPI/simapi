@@ -19,8 +19,8 @@ export class ValidationError extends Error {
 }
 
 /**
- * Holds the result of running an endpoint's `validator` against the request
- * body. Available as `req.errors` inside every handler and auth handler.
+ * Holds the result of running an endpoint's `request` validation against the
+ * body, query, and headers. Available as `req.errors` inside every handler.
  */
 export class ValidationErrors {
   /** `true` if at least one field failed validation. */

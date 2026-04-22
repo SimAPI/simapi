@@ -49,8 +49,8 @@ export async function registerInternalRoutes(
       type: e.type,
       title: e.title,
       description: e.description,
-      schema: e.validator
-        ? zodShapeToJsonSchema(e.validator as Record<string, unknown>)
+      schema: e.request?.body
+        ? zodShapeToJsonSchema(e.request.body as Record<string, unknown>)
         : undefined,
       responseExample: await getResponseExample(e),
     }))

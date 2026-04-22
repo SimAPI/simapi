@@ -202,8 +202,10 @@ export const helloPost: EndpointDefinition = {
   type: "secure",
   title: "Hello (Authenticated)",
   description: "Returns a greeting with a sample user. Requires authentication.",
-  validator: {
-    name: z.string().min(2).max(100).default('John Doe'),
+  request: {
+    body: {
+      name: z.string().min(2).max(100).default('John Doe'),
+    },
   },
   handler: (req: AppRequest) => {
     const name = req.body<string>('name');

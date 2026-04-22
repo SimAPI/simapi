@@ -59,7 +59,7 @@ function registerEndpoint(
     const start = Date.now();
     const raw = await buildRawRequest(c);
 
-    const errors = runZodValidation(endpoint.validator, raw.body);
+    const errors = runRequestValidation(endpoint.request, raw);
     const request = new AppRequest(
       raw.headers,
       raw.body,
@@ -106,7 +106,7 @@ function registerEndpoint(
         );
       }
 
-      if (config.autoThrowValidationErrors && endpoint.validator) {
+      if (config.autoThrowValidationErrors && endpoint.request) {
         errors.throwValidationError(config.autoThrowValidationErrors);
       }
 
@@ -158,21 +158,32 @@ function registerEndpoint(
   });
 }
 
-function runZodValidation(
-  validator: EndpointDefinition["validator"],
-  body: Record<string, unknown>
+function runRequestValidation(
+  request: EndpointDefinition["request"],
+  raw: RawRequest
 ): ValidationErrors {
-  if (!validator) return new ValidationErrors({});
-
-  const result = z.object(validator).safeParse(body);
-  if (result.success) return new ValidationErrors({});
+  if (!request) return new ValidationErrors({});
 
   const bag: Record<string, string[]> = {};
-  for (const issue of result.error.issues) {
-    const field = String(issue.path[0] ?? "_");
-    if (!bag[field]) bag[field] = [];
-    bag[field].push(issue.message);
+
+  function collect(
+    shape: Record<string, unknown> | undefined,
+    data: Record<string, unknown>
+  ) {
+    if (!shape) return;
+    const result = z.object(shape).safeParse(data);
+    if (result.success) return;
+    for (const issue of result.error.issues) {
+      const field = String(issue.path[0] ?? "_");
+      if (!bag[field]) bag[field] = [];
+      bag[field].push(issue.message);
+    }
   }
+
+  collect(request.body as Record<string, unknown> | undefined, raw.body);
+  collect(request.query as Record<string, unknown> | undefined, raw.query);
+  collect(request.headers as Record<string, unknown> | undefined, raw.headers);
+
   return new ValidationErrors(bag);
 }
 
