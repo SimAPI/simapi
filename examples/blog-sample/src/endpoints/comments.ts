@@ -30,11 +30,13 @@ export const addComment: EndpointDefinition = {
   title: "Add Comment",
   description:
     "Adds a comment to a post. Comments are held for moderation before appearing.",
-  validator: {
-    authorName: z.string().min(2).max(80),
-    authorEmail: z.string().email(),
-    body: z.string().min(5).max(2000),
-    parentId: z.string().optional(),
+  request: {
+    body: {
+      authorName: z.string().min(2).max(80),
+      authorEmail: z.string().email(),
+      body: z.string().min(5).max(2000),
+      parentId: z.string().optional(),
+    },
   },
   handler: (req: AppRequest) =>
     AppResponse.created({

@@ -24,17 +24,17 @@ export default defineConfig({
 
 ## Options
 
-| Field                       | Type                          | Default           | Description                                                                 |
-| --------------------------- | ----------------------------- | ----------------- | --------------------------------------------------------------------------- |
-| `name`                      | `string`                      | —                 | Project name (required)                                                     |
-| `description`               | `string`                      | `""`              | Short description                                                           |
-| `port`                      | `number`                      | `3000`            | Port to listen on (overridden by `PORT` env var)                            |
-| `endpointsDir`              | `string`                      | `"src/endpoints"` | Directory scanned for endpoint files                                        |
-| `logEntries`                | `boolean`                     | `true`            | Whether to write request logs to the database                               |
-| `consoleLog`                | `boolean`                     | `false`           | Log each request to stdout: `[SimAPI] GET /api/posts → 200 (4ms)`           |
-| `autoThrowValidationErrors` | `"laravel" \| "zod" \| false` | `false`           | Automatically throw a 422 when a `validator` fails, before the handler runs |
-| `database`                  | `DatabaseConfig`              | —                 | Where to store request logs                                                 |
-| `authHandler`               | `AuthHandler`                 | —                 | Called for every `secure` endpoint                                          |
+| Field                       | Type                          | Default           | Description                                                                        |
+| --------------------------- | ----------------------------- | ----------------- | ---------------------------------------------------------------------------------- |
+| `name`                      | `string`                      | —                 | Project name (required)                                                            |
+| `description`               | `string`                      | `""`              | Short description                                                                  |
+| `port`                      | `number`                      | `3000`            | Port to listen on (overridden by `PORT` env var)                                   |
+| `endpointsDir`              | `string`                      | `"src/endpoints"` | Directory scanned for endpoint files                                               |
+| `logEntries`                | `boolean`                     | `true`            | Whether to write request logs to the database                                      |
+| `consoleLog`                | `boolean`                     | `false`           | Log each request to stdout: `[SimAPI] GET /api/posts → 200 (4ms)`                  |
+| `autoThrowValidationErrors` | `"laravel" \| "zod" \| false` | `false`           | Automatically throw a 422 when `request` validation fails, before the handler runs |
+| `database`                  | `DatabaseConfig`              | —                 | Where to store request logs                                                        |
+| `authHandler`               | `AuthHandler`                 | —                 | Called for every `secure` endpoint                                                 |
 
 ## Database adapters
 
@@ -84,8 +84,9 @@ database: { type: "none" }
 
 The auth handler runs before every `secure` endpoint. Return an `AppResponse` to reject the request, or return nothing to allow it:
 
-```ts
-// src/authHandler.ts
+::: code-group
+
+```ts [src/authHandler.ts]
 import { AppResponse, type AppRequest } from "@simapi/simapi";
 
 export function authHandler(req: AppRequest) {
@@ -99,13 +100,13 @@ export function authHandler(req: AppRequest) {
 }
 ```
 
-Wire it up in your config:
-
-```ts
-import { authHandler } from "@/authHandler.js";
+```ts [simapi.config.ts]
+import { authHandler } from "@/authHandler.js"; // [!code ++]
 
 export default defineConfig({
   name: "my-api",
-  authHandler,
+  authHandler, // [!code ++]
 });
 ```
+
+:::

@@ -246,19 +246,23 @@ for (const endpoint of endpoints) {
     const query: Record<string, string> = {};
     new URL(c.req.url).searchParams.forEach((v, k) => { query[k] = v; });
 
-    let _errors = new ValidationErrors({});
-    if (endpoint.validator) {
-      const _result = z.object(endpoint.validator).safeParse(body);
-      if (!_result.success) {
-        const _bag: Record<string, string[]> = {};
-        for (const _issue of _result.error.issues) {
-          const _f = String(_issue.path[0] ?? "_");
-          if (!_bag[_f]) _bag[_f] = [];
-          _bag[_f].push(_issue.message);
-        }
-        _errors = new ValidationErrors(_bag);
+    const _bag: Record<string, string[]> = {};
+    function _collect(_shape: Record<string, unknown> | undefined, _data: Record<string, unknown>) {
+      if (!_shape) return;
+      const _r = z.object(_shape).safeParse(_data);
+      if (_r.success) return;
+      for (const _i of _r.error.issues) {
+        const _f = String(_i.path[0] ?? "_");
+        if (!_bag[_f]) _bag[_f] = [];
+        _bag[_f].push(_i.message);
       }
     }
+    if (endpoint.request) {
+      _collect(endpoint.request.body, body);
+      _collect(endpoint.request.query, query);
+      _collect(endpoint.request.headers, headers);
+    }
+    const _errors = new ValidationErrors(_bag);
 
     const req = new AppRequest(headers, body, query, c.req.param() as Record<string, string>, _errors);
 
@@ -267,7 +271,7 @@ for (const endpoint of endpoints) {
       if (ar instanceof AppResponse) return c.json(ar.body, ar.status as never);
     }
 
-    if (config.autoThrowValidationErrors && endpoint.validator) {
+    if (config.autoThrowValidationErrors && endpoint.request) {
       _errors.throwValidationError(config.autoThrowValidationErrors);
     }
 

@@ -1,7 +1,7 @@
-import type { z } from "zod";
 import type { AppRequest } from "./AppRequest.js";
 import type { AppResponse } from "./AppResponse.js";
 import type { AuthHandler } from "./defineConfig.js";
+import type { RequestDefinition } from "./RequestDefinition.js";
 
 /** Supported HTTP methods for an endpoint. */
 export type HttpMethod =
@@ -63,18 +63,25 @@ export interface EndpointDefinition {
   authHandler?: AuthHandler;
 
   /**
-   * A flat Zod shape (the inner record of a `z.object(...)`, not the object
-   * itself). SimAPI wraps it and validates the request body before the handler
-   * runs; results are in `req.errors`.
+   * Validation shapes for the incoming request. SimAPI validates each section
+   * before the handler runs; results are merged into `req.errors`.
    *
    * @example
-   * validator: {
-   *   email:    z.string().email(),
-   *   password: z.string().min(8),
-   *   age:      z.number().int().min(18).optional(),
+   * import { registerRequest } from "@/requests/register.js";
+   * request: registerRequest,
+   *
+   * // or inline:
+   * request: {
+   *   body: {
+   *     email:    z.string().email(),
+   *     password: z.string().min(8),
+   *   },
+   *   query: {
+   *     redirect: z.string().optional(),
+   *   },
    * }
    */
-  validator?: z.ZodRawShape;
+  request?: RequestDefinition;
 
   /**
    * Probability (0–1) that SimAPI returns `500 { message: "Simulated failure" }`

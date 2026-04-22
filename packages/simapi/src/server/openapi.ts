@@ -48,16 +48,24 @@ async function buildOperation(
   }));
   if (pathParams.length > 0) operation.parameters = pathParams;
 
-  if (BODY_METHODS.has(ep.method) && ep.validator) {
+  if (BODY_METHODS.has(ep.method) && ep.request?.body) {
     operation.requestBody = {
       required: true,
       content: {
         "application/json": {
-          schema: zodShapeToJsonSchema(ep.validator as Record<string, unknown>),
+          schema: zodShapeToJsonSchema(
+            ep.request.body as Record<string, unknown>
+          ),
         },
       },
     };
   }
+
+  const hasValidation = !!(
+    ep.request?.body ??
+    ep.request?.query ??
+    ep.request?.headers
+  );
 
   operation.responses = {
     [successStatus]: {
@@ -74,7 +82,7 @@ async function buildOperation(
         : {}),
     },
     ...(ep.type === "secure" ? { "401": { description: "Unauthorized" } } : {}),
-    ...(ep.validator ? { "422": { description: "Validation error" } } : {}),
+    ...(hasValidation ? { "422": { description: "Validation error" } } : {}),
     "500": { description: "Internal server error" },
   };
 

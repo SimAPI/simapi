@@ -1,6 +1,6 @@
 # EndpointDefinition
 
-`EndpointDefinition` is the TypeScript interface for a SimAPI endpoint. Every named export from a file inside `endpoints/` that matches this shape is automatically registered.
+`EndpointDefinition` is the TypeScript interface for a SimAPI endpoint. Every named export from a file inside `src/endpoints/` that matches this shape is automatically registered.
 
 ```ts
 import type { EndpointDefinition } from "@simapi/simapi";
@@ -16,10 +16,16 @@ interface EndpointDefinition {
   title?: string;
   description?: string;
   authHandler?: AuthHandler;
-  validator?: z.ZodRawShape;
+  request?: RequestDefinition;
   failRate?: number;
   delay?: number;
   handler: (req: AppRequest) => AppResponse | Promise<AppResponse>;
+}
+
+interface RequestDefinition {
+  body?: ZodRawShape;
+  query?: ZodRawShape;
+  headers?: ZodRawShape;
 }
 
 type HttpMethod =
@@ -78,19 +84,27 @@ authHandler: (req) => {
 },
 ```
 
-### `validator` — `z.ZodRawShape` *(optional)*
+### `request` — `RequestDefinition` *(optional)*
 
-A flat Zod shape (not a `z.object()` — just the inner record). SimAPI wraps it automatically:
+Validates the incoming request before the handler runs. Results land in `req.errors`.
 
 ```ts
-validator: {
-  email:    z.string().email(),
-  password: z.string().min(8),
-  role:     z.enum(["admin", "member"]).optional(),
+request: {
+  body: {
+    email:    z.string().email(),
+    password: z.string().min(8),
+    role:     z.enum(["admin", "member"]).optional(),
+  },
+  query: {
+    page: z.coerce.number().int().min(1).optional(),
+  },
+  headers: {
+    "x-api-key": z.string().min(1),
+  },
 },
 ```
 
-Validated before the handler runs. Results are in `req.errors`.
+Each sub-field (`body`, `query`, `headers`) is a flat Zod shape — not a `z.object()`. All three are optional; include only what you need. Errors from all three sources are merged into a single `req.errors` bag.
 
 ### `failRate` — `number` *(optional)*
 
@@ -131,7 +145,7 @@ For each incoming request:
 
 1. Auth check (`type: "secure"` → run `authHandler`)
 2. Artificial delay (`delay` ms)
-3. Zod validation (`validator` → populate `req.errors`)
+3. Zod validation (`request` → populate `req.errors`)
 4. Auto-throw validation errors (if `autoThrowValidationErrors` is set in config)
 5. Fail-rate check (`failRate` → maybe return 500)
 6. Handler
@@ -140,7 +154,7 @@ For each incoming request:
 
 ```ts
 import { z, AppResponse, faker, type EndpointDefinition } from "@simapi/simapi";
-import { makePost } from "../models/post.js";
+import { makePost } from "@/models/post.js";
 
 export const createPost: EndpointDefinition = {
   path: "/api/posts",
@@ -148,9 +162,11 @@ export const createPost: EndpointDefinition = {
   type: "secure",
   title: "Create Post",
   description: "Creates a new published post.",
-  validator: {
-    title: z.string().min(3),
-    body:  z.string().min(10),
+  request: {
+    body: {
+      title: z.string().min(3),
+      body:  z.string().min(10),
+    },
   },
   failRate: 0.05,
   delay: 200,

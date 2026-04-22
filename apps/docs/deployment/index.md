@@ -45,7 +45,7 @@ Leave these unset in local development — no auth is applied.
 | [Railway](/deployment/railway)         | Node.js server | Persistent deployments, SQLite logging |
 | [Other hosts](/deployment/other-hosts) | Node.js server | Render, Fly.io, Heroku, VPS, Docker    |
 
-> ℹ️ Serverless vs. Node.js server
+> [!INFO] Serverless vs. Node.js server
 > - **Vercel and Netlify** are serverless - each request invokes a function. SQLite does not persist between invocations (ephemeral filesystem), so set `logEntries: false` in `simapi.config.ts` or use [Turso](https://turso.tech) for cloud SQLite logging.
 > - **Railway and other Node.js hosts** run a long-lived server process. SQLite and all SimAPI features work without modification.
 

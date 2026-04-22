@@ -6,9 +6,9 @@ SimAPI uses [Zod](https://zod.dev) for request validation. Import `z` directly f
 import { z } from "@simapi/simapi";
 ```
 
-## Endpoint validator
+## RequestDefinition
 
-Add a `validator` field to your endpoint definition with a Zod shape:
+Add a `request` field to your endpoint definition with Zod shapes for `body`, `query`, and/or `headers`:
 
 ```ts
 import { z, AppResponse, type AppRequest, type EndpointDefinition } from "@simapi/simapi";
@@ -17,10 +17,12 @@ export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "open",
-  validator: {
-    title: z.string().min(3),
-    body:  z.string(),
-    tags:  z.array(z.string()).optional(),
+  request: {
+    body: {
+      title: z.string().min(3),
+      body:  z.string(),
+      tags:  z.array(z.string()).optional(),
+    },
   },
   handler: (req: AppRequest) => {
     req.errors.throwValidationError("laravel");
@@ -29,7 +31,52 @@ export const createPost: EndpointDefinition = {
 };
 ```
 
-The validator runs before the handler. Results are accessible via `req.errors`.
+All three sub-fields are optional — include only what you need:
+
+```ts
+request: {
+  body: {
+    email: z.string().email(),
+  },
+  query: {
+    page: z.coerce.number().int().min(1).optional(),
+  },
+  headers: {
+    "x-api-key": z.string().min(1),
+  },
+},
+```
+
+Validation runs before the handler. Errors from `body`, `query`, and `headers` are merged into a single `req.errors` bag.
+
+## Shared request definitions
+
+Define a `RequestDefinition` once in `src/requests/` and reuse it across endpoints:
+
+```ts
+// src/requests/postRequest.ts
+import { z, type RequestDefinition } from "@simapi/simapi";
+
+export const postRequest: RequestDefinition = {
+  body: {
+    title: z.string().min(3).max(200),
+    body:  z.string().min(10),
+  },
+};
+```
+
+```ts
+// src/endpoints/posts.ts
+import { postRequest } from "@/requests/postRequest.js";
+
+export const createPost: EndpointDefinition = {
+  path: "/api/posts",
+  method: "POST",
+  type: "secure",
+  request: postRequest,
+  handler: (req) => { ... },
+};
+```
 
 ## `req.errors`
 
@@ -66,6 +113,7 @@ z.string().uuid()       // UUID format
 z.number()              // any number
 z.number().int()        // integer
 z.number().min(0)       // non-negative
+z.coerce.number()       // parse string → number (useful for query params)
 
 z.boolean()             // true | false
 

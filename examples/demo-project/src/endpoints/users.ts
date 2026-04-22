@@ -31,10 +31,12 @@ export const createUser: EndpointDefinition = {
   type: "open",
   title: "Create User",
   description: "Registers a new user account.",
-  validator: {
-    name: z.string().min(2),
-    email: z.string().email(),
-    password: z.string().min(8),
+  request: {
+    body: {
+      name: z.string().min(2),
+      email: z.string().email(),
+      password: z.string().min(8),
+    },
   },
   handler: (req: AppRequest) => {
     req.errors.throwValidationError();

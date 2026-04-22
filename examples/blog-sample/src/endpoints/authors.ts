@@ -40,11 +40,13 @@ export const updateProfile: EndpointDefinition = {
   type: "secure",
   title: "Update Profile",
   description: "Update the authenticated user's author profile.",
-  validator: {
-    name: z.string().min(2).max(100).optional(),
-    bio: z.string().max(500).optional(),
-    website: z.string().url().optional(),
-    twitter: z.string().max(50).optional(),
+  request: {
+    body: {
+      name: z.string().min(2).max(100).optional(),
+      bio: z.string().max(500).optional(),
+      website: z.string().url().optional(),
+      twitter: z.string().max(50).optional(),
+    },
   },
   handler: () => AppResponse.success({ data: makeAuthor() }),
 };

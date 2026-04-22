@@ -42,11 +42,13 @@ export const placeOrder: EndpointDefinition = {
   title: "Place Order",
   description:
     "Converts the current cart into a new order and charges the payment method.",
-  validator: {
-    addressId: z.string(),
-    paymentMethodId: z.string(),
-    notes: z.string().max(500).optional(),
-    couponCode: z.string().optional(),
+  request: {
+    body: {
+      addressId: z.string(),
+      paymentMethodId: z.string(),
+      notes: z.string().max(500).optional(),
+      couponCode: z.string().optional(),
+    },
   },
   delay: 800,
   failRate: 0.05,

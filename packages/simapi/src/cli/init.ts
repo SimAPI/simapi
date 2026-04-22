@@ -11,6 +11,7 @@ import {
   ENV_EXAMPLE,
   fill,
   GITIGNORE,
+  HELLO_WORLD_REQUEST_TS,
   HELLO_WORLD_TS,
   PACKAGE_JSON,
   SIMAPI_CONFIG_TS,
@@ -43,7 +44,9 @@ export async function runInit(name: string | undefined): Promise<void> {
 
   if (existsSync(dir)) {
     const overwrite = await p.confirm({
-      message: `Directory "${projectName as string}" already exists. Continue anyway?`,
+      message: `Directory "${
+        projectName as string
+      }" already exists. Continue anyway?`,
       initialValue: false,
     });
     if (p.isCancel(overwrite) || !overwrite) {
@@ -100,6 +103,7 @@ export async function runInit(name: string | undefined): Promise<void> {
   await Promise.all([
     mkdir(join(dir, "src", "endpoints"), { recursive: true }),
     mkdir(join(dir, "src", "models"), { recursive: true }),
+    mkdir(join(dir, "src", "requests"), { recursive: true }),
   ]);
 
   await Promise.all([
@@ -113,6 +117,10 @@ export async function runInit(name: string | undefined): Promise<void> {
     ),
     writeFile(join(dir, "src", "endpoints", "hello-world.ts"), HELLO_WORLD_TS),
     writeFile(join(dir, "src", "models", "user.ts"), USER_MODEL_TS),
+    writeFile(
+      join(dir, "src", "requests", "hello-world.ts"),
+      HELLO_WORLD_REQUEST_TS
+    ),
     withAuth
       ? writeFile(join(dir, "src", "authHandler.ts"), AUTH_HANDLER_TS)
       : Promise.resolve(),

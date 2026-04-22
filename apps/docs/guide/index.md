@@ -12,15 +12,6 @@ npm run dev
 
 Your mock server is running at **http://localhost:3000**. Edit any file in `src/` and the server restarts automatically.
 
-## Manual setup
-
-Install SimAPI into an existing project:
-
-```sh
-npm install @simapi/simapi
-npx @simapi/simapi@latest init
-```
-
 ## Project structure
 
 A well-organized SimAPI project keeps endpoints and models inside `src/`:
@@ -32,6 +23,9 @@ my-api/
 │   │   ├── posts.ts        # listPosts, getPost, createPost, …
 │   │   ├── users.ts        # listUsers, getUser, createUser, …
 │   │   └── comments.ts     # listComments, createComment, …
+│   ├── requests/           # Zod validation schemas — keeps handlers clean
+│   │   ├── posts.ts        # createPostRequest, …
+│   │   └── users.ts        # registerRequest, …
 │   ├── models/             # Shared data factories — keeps endpoints DRY
 │   │   ├── post.ts         # Post interface + makePost() factory
 │   │   └── user.ts         # User interface + makeUser() factory
@@ -97,9 +91,11 @@ export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "secure",
-  validator: {
-    title: z.string().min(3),
-    body: z.string().min(10),
+  request: {
+    body: {
+      title: z.string().min(3),
+      body: z.string().min(10),
+    },
   },
   handler: (req) => {
     req.errors.throwValidationError();

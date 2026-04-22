@@ -61,6 +61,13 @@ export default defineConfig({
           { text: "Shop API", link: "/examples/shop-sample" },
         ],
       },
+      {
+        text: "Changelog",
+        items: [
+          { text: "@simapi/simapi", link: "/changelog/simapi" },
+          { text: "@simapi/console", link: "/changelog/console" },
+        ],
+      },
     ],
 
     socialLinks: [{ icon: "github", link: "https://github.com/SimAPI/simapi" }],
@@ -68,6 +75,16 @@ export default defineConfig({
     footer: {
       message: "Released under the MIT License.",
       copyright: "Copyright © 2026 - Present MayR Labs",
+    },
+
+    editLink: {
+      pattern: "https://github.com/SimAPI/simapi/edit/main/apps/docs/:path",
+      text: "Edit this page on GitHub",
+    },
+
+    outline: {
+      level: [2, 3],
+      label: "Outline",
     },
   },
 

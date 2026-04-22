@@ -4,7 +4,7 @@ Vercel is a great choice for lightweight SimAPI deployments — free tier, insta
 
 SimAPI is built on [Hono](https://hono.dev) and **auto-detects Vercel's build environment**, compiling to a serverless handler (`api/index.mjs`) instead of a long-running Node.js server.
 
-> 🚧 Serverless platform
+> [!WARNING] Serverless platform
 > Vercel does **not** run a persistent Node.js process. There is no "Start Command". SQLite does not persist between requests (ephemeral filesystem).
 >
 > Set `logEntries: false` in `simapi.config.ts`, or switch to [Turso](https://turso.tech) for persistent request logging.
@@ -47,7 +47,7 @@ The `rewrites` rule routes all incoming requests to `api/index.mjs` — the serv
 
 When Vercel runs the build it sets `VERCEL=1` in the environment. SimAPI detects this and outputs `api/index.mjs` (a Vercel-compatible serverless handler) instead of the default `.simapi/dist/server.mjs`.
 
-> ℹ️ api/index.mjs is a build artifact
+> [!INFO] api/index.mjs is a build artifact
 > `api/index.mjs` is generated during the Vercel build — it is **not** committed to your repository. The `.gitignore` that `simapi init` creates already excludes it.
 
 ## Environment variables

@@ -2,7 +2,7 @@
 
 Railway is the most reliable option for persistent SimAPI deployments. It runs your server as a **long-lived Node.js process** — exactly like running locally — so all SimAPI features work without modification.
 
-> ℹ️ Node.js server
+> [!INFO] Node.js server
 > Railway runs `npm run start` after `npm run build`. SQLite logging persists across requests and the debug console works fully.
 
 ## Deploy steps
@@ -41,5 +41,5 @@ Railway detects the `Dockerfile` in your repo and builds the image instead of us
 | `DATABASE_URL`            | Postgres connection URL (if using Postgres logging)                          |
 | `TURSO_TOKEN`             | Auth token for libSQL/Turso logging                                          |
 
-> ℹ️ PORT is set automatically
+> [!INFO] PORT is set automatically
 > Railway injects `PORT` into your environment. SimAPI reads it automatically — no changes to `simapi.config.ts` needed.

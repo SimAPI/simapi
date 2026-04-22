@@ -62,7 +62,7 @@ const id = req.urlParam("id");
 
 ## req.errors
 
-`req.errors` is a `ValidationErrors` object populated before the handler is called, when the endpoint defines a `validator`. It is always present (empty when no validator or when validation passes).
+`req.errors` is a `ValidationErrors` object populated before the handler is called, when the endpoint defines a `request`. It is always present (empty when no `request` field or when validation passes).
 
 ```ts
 req.errors.throwValidationError("laravel"); // throws 422 only when hasError is true

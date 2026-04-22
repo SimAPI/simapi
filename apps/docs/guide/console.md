@@ -1,5 +1,7 @@
 # Debug Console
 
+<!-- @todo: Add images here -->
+
 `@simapi/console` is an optional browser-based UI for inspecting live requests, browsing your endpoint schema, and firing test requests — all without leaving the browser.
 
 ## Installation
@@ -88,8 +90,8 @@ For the selected endpoint:
 - **Title and description** (if set on the `EndpointDefinition`)
 - **Method, path, and auth type** header
 - **Path parameters** table (name, type, required)
-- **Request body** table — shows every field from the `validator` with its type, required/optional status, and constraints (min/max length, format)
-- **Responses** section — expected status codes (200/201, 401 for secure, 422 when validator present)
+- **Request body** table — shows every field from `request.body` with its type, required/optional status, and constraints (min/max length, format)
+- **Responses** section — expected status codes (200/201, 401 for secure, 422 when `request` is present)
 
 To make schema documentation richer, add `title` and `description` to your endpoints:
 
@@ -100,9 +102,11 @@ export const createPost: EndpointDefinition = {
   type: "secure",
   title: "Create Post",
   description: "Creates a new post and returns it with a generated ID.",
-  validator: {
-    title: z.string().min(3),
-    body:  z.string().min(10),
+  request: {
+    body: {
+      title: z.string().min(3),
+      body:  z.string().min(10),
+    },
   },
   handler: (req) => {
     req.errors.throwValidationError();
@@ -118,7 +122,7 @@ Send a real HTTP request directly from the console:
 1. Select an endpoint from the left list
 2. Fill in **path parameters** (`:id` fields get their own inputs)
 3. Add optional **query parameters**
-4. Edit the **request body** — pre-filled with field names from the `validator` if present
+4. Edit the **request body** — pre-filled with field names from `request.body` if present
 5. Click **Send**
 
 The response status and body appear below the form. All requests go through the full SimAPI pipeline — auth, validation, fake data — exactly as a real client would.

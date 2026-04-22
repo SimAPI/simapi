@@ -37,9 +37,11 @@ export const createPost: EndpointDefinition = {
   type: "secure",
   title: "Create Post",
   description: "Creates a new post. Requires authentication.",
-  validator: {
-    title: z.string().min(3),
-    body: z.string().min(10),
+  request: {
+    body: {
+      title: z.string().min(3),
+      body: z.string().min(10),
+    },
   },
   handler: (req: AppRequest) => {
     req.errors.throwValidationError();

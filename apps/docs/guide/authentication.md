@@ -22,7 +22,7 @@ Any endpoint with `type: "secure"` will run this handler before reaching the rou
 export const listOrders: EndpointDefinition = {
   path: "/api/orders",
   method: "GET",
-  type: "secure",   // ← global authHandler runs here
+  type: "secure",   // ← global authHandler runs here // [!code highlight]
   handler: () => AppResponse.success({ data: [] }),
 };
 ```

@@ -36,10 +36,12 @@ export const addReview: EndpointDefinition = {
   type: "secure",
   title: "Add Review",
   description: "Submit a review for a product you have purchased.",
-  validator: {
-    rating: z.number().int().min(1).max(5),
-    title: z.string().min(3).max(120),
-    body: z.string().min(10).max(2000),
+  request: {
+    body: {
+      rating: z.number().int().min(1).max(5),
+      title: z.string().min(3).max(120),
+      body: z.string().min(10).max(2000),
+    },
   },
   handler: (req: AppRequest) =>
     AppResponse.created({

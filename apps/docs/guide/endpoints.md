@@ -16,9 +16,11 @@ export const myEndpoint: EndpointDefinition = {
   title: "Get Post",
   description: "Returns a single post by ID.",
 
-  // Optional — Zod shape validated before handler runs
-  validator: {
-    title: z.string().min(3),
+  // Optional — Zod shapes validated before handler runs
+  request: {
+    body: {
+      title: z.string().min(3),
+    },
   },
 
   // Optional — probability (0–1) of returning 500 before handler runs
@@ -68,8 +70,9 @@ export const deletePost: EndpointDefinition = {
 
 Define data factories in `src/models/` and import them across endpoints using the `@/` alias:
 
-```ts
-// src/models/post.ts
+::: code-group
+
+```ts [src/models/post.ts]
 import { faker } from "@simapi/simapi";
 
 export interface Post {
@@ -89,12 +92,13 @@ export function makePost(): Post {
 }
 ```
 
-```ts
-// src/endpoints/posts.ts
+```ts [src/endpoints/posts.ts]
 import { makePost } from "@/models/post.js";
 
 handler: () => AppResponse.success({ data: AppResponse.array(5, makePost) }),
 ```
+
+:::
 
 ## Path parameters
 
@@ -106,7 +110,7 @@ export const getPost: EndpointDefinition = {
   method: "GET",
   type: "open",
   handler: (req) => {
-    const id = req.urlParam("id");
+    const id = req.urlParam("id"); // [!code focus]
     return AppResponse.success({ data: { id } });
   },
 };
@@ -131,7 +135,7 @@ const all = req.bodyAll<{ title: string; age: number }>();
 
 ## Validation with Zod
 
-Add a `validator` field — SimAPI runs it before your handler and populates `req.errors`:
+Add a `request` field — SimAPI validates `body`, `query`, and/or `headers` before your handler runs and populates `req.errors`:
 
 ```ts
 import { z, AppResponse, type AppRequest, type EndpointDefinition } from "@simapi/simapi";
@@ -140,14 +144,16 @@ export const createUser: EndpointDefinition = {
   path: "/api/users",
   method: "POST",
   type: "open",
-  validator: {
-    email:    z.string().email(),
-    password: z.string().min(8),
-    age:      z.number().int().min(18).optional(),
-  },
+  request: { // [!code focus]
+    body: { // [!code focus]
+      email:    z.string().email(), // [!code focus]
+      password: z.string().min(8), // [!code focus]
+      age:      z.number().int().min(18).optional(), // [!code focus]
+    }, // [!code focus]
+  }, // [!code focus]
   handler: (req: AppRequest) => {
     // throws 422 only when hasError is true — unconditional call is safe
-    req.errors.throwValidationError("laravel");
+    req.errors.throwValidationError("laravel"); // [!code focus]
     return AppResponse.created({ data: { id: 1 } });
   },
 };
@@ -160,7 +166,7 @@ Skip the manual call by setting `autoThrowValidationErrors` in your config:
 ```ts
 export default defineConfig({
   name: "my-api",
-  autoThrowValidationErrors: "laravel", // or "zod"
+  autoThrowValidationErrors: "laravel", // or "zod" // [!code focus]
 });
 ```
 
@@ -186,24 +192,28 @@ export default defineConfig({
 Import `faker` (powered by faker-js) and `AppResponse.array` for realistic responses:
 
 ```ts
-import { faker, AppResponse, type EndpointDefinition } from "@simapi/simapi";
+import {
+  faker,  // [!code focus]
+  AppResponse,
+  type EndpointDefinition
+} from "@simapi/simapi"; // [!code focus]
 
-export const getPosts: EndpointDefinition = {
+export const getPosts: EndpointDefinition = { // [!code focus]
   path: "/api/posts",
   method: "GET",
   type: "open",
   handler: () =>
     AppResponse.success({
-      data: AppResponse.array(5, () => ({
-        id:        faker.string.ulid(),
-        title:     faker.lorem.sentence(),
-        body:      faker.lorem.paragraph(),
-        published: faker.datatype.boolean(),
-        author:    faker.person.fullName(),
-      })),
+      data: AppResponse.array(5, () => ({ // [!code focus]
+        id:        faker.string.ulid(), // [!code focus]
+        title:     faker.lorem.sentence(), // [!code focus]
+        body:      faker.lorem.paragraph(), // [!code focus]
+        published: faker.datatype.boolean(), // [!code focus]
+        author:    faker.person.fullName(), // [!code focus]
+      })), // [!code focus]
       meta: { total: 5, page: 1, perPage: 20 },
     }),
-};
+}; // [!code focus]
 ```
 
 `AppResponse.array(count, factory)` calls `factory` once per item — every element gets unique values.
@@ -213,14 +223,14 @@ export const getPosts: EndpointDefinition = {
 Set `failRate` and `delay` on the endpoint — SimAPI handles them before your handler runs:
 
 ```ts
-export const getInventory: EndpointDefinition = {
+export const getInventory: EndpointDefinition = { // [!code focus]
   path: "/api/inventory",
   method: "GET",
   type: "open",
-  failRate: 0.2,   // 20% chance of 500 { message: "Simulated failure" }
-  delay: 800,      // always wait 800ms before responding
+  failRate: 0.2,   // 20% chance of 500 { message: "Simulated failure" } // [!code focus]
+  delay: 800,      // always wait 800ms before responding // [!code focus]
   handler: () => AppResponse.success({ data: [] }),
-};
+}; // [!code focus]
 ```
 
 Both fields are applied transparently — your handler code stays clean.
@@ -230,12 +240,12 @@ Both fields are applied transparently — your handler code stays clean.
 Set `type: "secure"` and SimAPI runs your `authHandler` before the handler:
 
 ```ts
-export const deletePost: EndpointDefinition = {
+export const deletePost: EndpointDefinition = { // [!code focus]
   path: "/api/posts/:id",
   method: "DELETE",
-  type: "secure",
+  type: "secure", // [!code focus]
   handler: () => AppResponse.noContent(),
-};
+}; // [!code focus]
 ```
 
 See [Configuration](/guide/config) for how to set up `authHandler`.

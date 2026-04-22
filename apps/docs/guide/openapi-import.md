@@ -4,7 +4,7 @@ SimAPI can round-trip with OpenAPI 3 specs: import a spec to generate endpoint s
 
 ## Import — generate stubs from a spec
 
-If a backend spec already exists but the implementation is still in progress, `simapi import` generates typed endpoint stubs from it — validators already wired from the request body schema.
+If a backend spec already exists but the implementation is still in progress, `simapi import` generates typed endpoint stubs from it — `request.body` already wired from the request body schema.
 
 ```sh
 simapi import openapi.yaml
@@ -44,9 +44,11 @@ export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "open",
-  validator: {
-    title: z.string(),
-    body: z.string().min(10),
+  request: {
+    body: {
+      title: z.string(),
+      body: z.string().min(10),
+    },
   },
   handler: (req) => {
     req.errors.throwValidationError();
@@ -56,7 +58,7 @@ export const createPost: EndpointDefinition = {
 ```
 
 - Endpoints with `security` in the spec get `type: "secure"`.
-- Request body schemas are converted to Zod validators automatically.
+- Request body schemas are converted to Zod `request.body` shapes automatically.
 - `operationId` is used as the handler name when present.
 
 ### Example spec
@@ -115,7 +117,7 @@ simapi export --output api.json --format json
 
 For each endpoint:
 - Path parameters extracted from `:param` segments
-- Request body schema derived from the `validator` Zod shape (field types, min/max, formats)
+- Request body schema derived from the `request.body` Zod shape (field types, min/max, formats)
 - `security` added for `type: "secure"` endpoints
 - Correct response status codes per HTTP method (200 GET, 201 POST, 204 DELETE)
 
