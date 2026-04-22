@@ -27,7 +27,7 @@ export function TryPanel({
   const pathParamNames = extractPathParams(endpoint.path);
 
   const [pathParams, setPathParams] = useState<Record<string, string>>(() =>
-    Object.fromEntries(pathParamNames.map((param) => [param, ""]))
+    Object.fromEntries(pathParamNames.map((param) => [param, ""])),
   );
   const [headerRows, setHeaderRows] = useState<[string, string][]>(() => {
     const saved = localStorage.getItem("simapi-console-headers");
@@ -41,16 +41,16 @@ export function TryPanel({
     return buildDefaultRows(endpoint.headerSchema);
   });
   const [queryRows, setQueryRows] = useState<[string, string][]>(() =>
-    buildDefaultRows(endpoint.querySchema)
+    buildDefaultRows(endpoint.querySchema),
   );
   const [bodyType, setBodyType] = useState<"json" | "form">(() =>
-    endpoint.formSchema && !endpoint.schema ? "form" : "json"
+    endpoint.formSchema && !endpoint.schema ? "form" : "json",
   );
   const [bodyText, setBodyText] = useState(() =>
-    buildDefaultBody(endpoint, "json")
+    buildDefaultBody(endpoint, "json"),
   );
   const [formRows, setFormRows] = useState<[string, string][]>(() =>
-    buildDefaultRows(endpoint.formSchema)
+    buildDefaultRows(endpoint.formSchema),
   );
   const [omittedFields, setOmittedFields] = useState<Set<string>>(new Set());
 
@@ -68,8 +68,8 @@ export function TryPanel({
   useEffect(() => {
     setPathParams(
       Object.fromEntries(
-        extractPathParams(endpoint.path).map((param) => [param, ""])
-      )
+        extractPathParams(endpoint.path).map((param) => [param, ""]),
+      ),
     );
     setHeaderRows(buildDefaultRows(endpoint.headerSchema));
     setQueryRows(buildDefaultRows(endpoint.querySchema));
@@ -95,7 +95,7 @@ export function TryPanel({
       url = url.replace(`:${key}`, encodeURIComponent(value || `:${key}`));
     }
     const queryParams = [...queryRows, ...buildAuthQuery(auth)].filter(
-      ([key]) => key && !omittedFields.has(`query:${key}`)
+      ([key]) => key && !omittedFields.has(`query:${key}`),
     );
     if (queryParams.length > 0) {
       const searchParams = new URLSearchParams(queryParams);
@@ -112,7 +112,9 @@ export function TryPanel({
       let body: unknown;
       let headers: Record<string, string> = buildAuthHeaders(auth);
       const customHeaders = Object.fromEntries(
-        headerRows.filter(([key]) => key && !omittedFields.has(`header:${key}`))
+        headerRows.filter(
+          ([key]) => key && !omittedFields.has(`header:${key}`),
+        ),
       );
       headers = { ...headers, ...customHeaders };
 
@@ -122,8 +124,8 @@ export function TryPanel({
             const parsed = JSON.parse(bodyText);
             const filtered = Object.fromEntries(
               Object.entries(parsed).filter(
-                ([key]) => !omittedFields.has(`body:${key}`)
-              )
+                ([key]) => !omittedFields.has(`body:${key}`),
+              ),
             );
             body = filtered;
           } catch {
@@ -144,7 +146,7 @@ export function TryPanel({
         endpoint.method,
         buildUrl(),
         hasBody ? body : undefined,
-        Object.keys(headers).length > 0 ? headers : undefined
+        Object.keys(headers).length > 0 ? headers : undefined,
       );
       const text = await apiResponse.text();
       setResponse({
@@ -164,25 +166,28 @@ export function TryPanel({
   };
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-[#0d1117] text-zinc-600 dark:text-zinc-300 font-mono text-[13px]">
-      <div className="flex-1 overflow-y-auto p-6 space-y-10 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800">
-        {/* Authentication Section */}
-        <ConsoleSection title="Authentication">
+    <div className="flex flex-col h-full bg-[#fdfdfd] dark:bg-[#090a0b] text-zinc-600 dark:text-zinc-400 font-mono text-[13px] relative overflow-hidden">
+      {/* Dynamic Header Glow */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-linear-to-r from-transparent via-cyan-500/50 to-transparent opacity-50" />
+
+      <div className="flex-1 overflow-y-auto px-8 py-12 space-y-16 scrollbar-none">
+        {/* Authentication Control */}
+        <ConsoleSection title="Identity">
           <AuthSection auth={auth} onChange={onAuthChange} />
         </ConsoleSection>
 
-        {/* Path Parameters */}
+        {/* Path Resolver */}
         {pathParamNames.length > 0 && (
-          <ConsoleSection title="Path Parameters">
-            <div className="space-y-4">
+          <ConsoleSection title="Dynamic Path">
+            <div className="space-y-6">
               {pathParamNames.map((key) => (
-                <div key={key} className="flex items-center gap-4 group">
-                  <span className="w-24 text-zinc-400 dark:text-zinc-500 shrink-0">
+                <div key={key} className="flex items-center gap-6 group">
+                  <span className="w-24 text-[11px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest shrink-0">
                     :{key}
                   </span>
                   <input
-                    className="flex-1 bg-transparent border-b border-zinc-200 dark:border-zinc-800 focus:border-cyan-500 outline-none py-1.5 transition-colors text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
-                    placeholder="value"
+                    className="flex-1 bg-transparent border-b border-zinc-100 dark:border-white/5 focus:border-cyan-500/50 outline-none py-2 transition-all text-zinc-900 dark:text-white placeholder:text-zinc-200 dark:placeholder:text-zinc-800"
+                    placeholder="resolve..."
                     value={pathParams[key] ?? ""}
                     onChange={(event) =>
                       setPathParams((previous) => ({
@@ -197,9 +202,9 @@ export function TryPanel({
           </ConsoleSection>
         )}
 
-        {/* Headers Section */}
+        {/* Header Controller */}
         <ConsoleSection
-          title="Headers"
+          title="Network Headers"
           action={
             <AddButton
               onClick={() => setHeaderRows((prev) => [...prev, ["", ""]])}
@@ -215,9 +220,9 @@ export function TryPanel({
           />
         </ConsoleSection>
 
-        {/* Query Parameters */}
+        {/* Query Controller */}
         <ConsoleSection
-          title="Query Parameters"
+          title="Search Parameters"
           action={
             <AddButton
               onClick={() => setQueryRows((prev) => [...prev, ["", ""]])}
@@ -233,10 +238,10 @@ export function TryPanel({
           />
         </ConsoleSection>
 
-        {/* Body Section */}
+        {/* Request Data Section */}
         {BODY_METHODS.has(endpoint.method) && (
           <ConsoleSection
-            title="Body"
+            title="Payload"
             action={
               <div className="flex items-center gap-4">
                 {bodyType === "form" && (
@@ -244,14 +249,14 @@ export function TryPanel({
                     onClick={() => setFormRows((prev) => [...prev, ["", ""]])}
                   />
                 )}
-                <div className="flex p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
+                <div className="flex p-1 bg-zinc-50 dark:bg-white/3 rounded-xl border border-zinc-100 dark:border-white/5">
                   <button
                     type="button"
                     onClick={() => setBodyType("json")}
-                    className={`px-2 py-1 text-[10px] font-black rounded-md transition-all ${
+                    className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${
                       bodyType === "json"
-                        ? "bg-white dark:bg-zinc-700 text-cyan-600 dark:text-cyan-400 shadow-sm"
-                        : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                        ? "bg-white dark:bg-white/10 text-cyan-600 dark:text-white shadow-sm"
+                        : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                     }`}
                   >
                     JSON
@@ -259,10 +264,10 @@ export function TryPanel({
                   <button
                     type="button"
                     onClick={() => setBodyType("form")}
-                    className={`px-2 py-1 text-[10px] font-black rounded-md transition-all ${
+                    className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${
                       bodyType === "form"
-                        ? "bg-white dark:bg-zinc-700 text-cyan-600 dark:text-cyan-400 shadow-sm"
-                        : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                        ? "bg-white dark:bg-white/10 text-cyan-600 dark:text-white shadow-sm"
+                        : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                     }`}
                   >
                     FORM
@@ -272,12 +277,16 @@ export function TryPanel({
             }
           >
             {bodyType === "json" ? (
-              <textarea
-                className="w-full h-56 bg-zinc-50 dark:bg-[#161b22] rounded-xl p-4 outline-none border border-zinc-200 dark:border-zinc-800 focus:border-cyan-500/30 dark:focus:border-cyan-500/20 resize-none leading-relaxed text-zinc-900 dark:text-zinc-100 transition-all"
-                value={bodyText}
-                onChange={(event) => setBodyText(event.target.value)}
-                spellCheck={false}
-              />
+              <div className="relative group/editor">
+                <div className="absolute -inset-1 bg-cyan-500/10 rounded-2xl blur-xl opacity-0 group-hover/editor:opacity-100 transition duration-500" />
+                <textarea
+                  className="relative w-full h-64 bg-zinc-50 dark:bg-white/2 rounded-2xl p-6 outline-none border border-zinc-100 dark:border-white/5 focus:border-cyan-500/30 resize-none leading-relaxed text-zinc-900 dark:text-zinc-100 transition-all font-mono text-[12px] placeholder:text-zinc-200 dark:placeholder:text-zinc-800"
+                  value={bodyText}
+                  onChange={(event) => setBodyText(event.target.value)}
+                  spellCheck={false}
+                  placeholder={` \"payload\": \"...\" `}
+                />
+              </div>
             ) : (
               <EditableRowList
                 rows={formRows}
@@ -290,69 +299,103 @@ export function TryPanel({
           </ConsoleSection>
         )}
 
-        {/* Response Area */}
+        {/* Terminal Response Area */}
         {response && (
-          <section className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <section className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex items-center justify-between">
-              <ConsoleLabel>Response</ConsoleLabel>
-              <div className="flex items-center gap-3 text-[11px] font-black">
-                <span
-                  className={`px-2 py-0.5 rounded-full ${statusColor(response.status)} bg-current/10`}
-                >
-                  {response.status}
-                </span>
-                <span className="text-zinc-400 dark:text-zinc-500">
-                  {response.elapsed}ms
-                </span>
+              <ConsoleLabel>Output Stream</ConsoleLabel>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-50 dark:bg-white/3 border border-zinc-100 dark:border-white/5">
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full animate-pulse ${statusColor(
+                      response.status,
+                    )} bg-current`}
+                  />
+                  <span
+                    className={`text-[10px] font-black font-mono ${statusColor(
+                      response.status,
+                    )} text-current`}
+                  >
+                    {response.status}
+                  </span>
+                  <span className="w-px h-2.5 bg-zinc-200 dark:bg-zinc-800 mx-1" />
+                  <span className="text-[10px] font-black font-mono text-zinc-400">
+                    {response.elapsed}ms
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setResponse(null)}
-                  className="text-zinc-400 hover:text-red-500 dark:text-zinc-600 dark:hover:text-red-400 transition-colors uppercase tracking-tighter"
+                  className="text-zinc-300 hover:text-red-500 transition-colors"
                 >
-                  Clear
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
+                  </svg>
                 </button>
               </div>
             </div>
-            <div className="relative group">
-              <pre className="w-full bg-zinc-50 dark:bg-[#161b22] rounded-xl p-5 border border-zinc-200 dark:border-zinc-800 overflow-x-auto text-[12px] leading-relaxed text-zinc-800 dark:text-zinc-200 shadow-sm max-h-[500px] scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800">
-                {fmtJson(response.body)}
-              </pre>
-              <button
-                type="button"
-                className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 px-2 py-1 rounded shadow-sm border border-zinc-200 dark:border-zinc-700 text-[10px] font-black uppercase tracking-widest"
-                onClick={() => navigator.clipboard.writeText(response.body)}
-              >
-                Copy
-              </button>
+            <div className="relative group/terminal">
+              <div className="absolute -inset-0.5 bg-linear-to-b from-cyan-500/20 to-transparent rounded-3xl opacity-0 group-hover/terminal:opacity-100 transition duration-500 blur-xl" />
+              <div className="relative bg-zinc-900 dark:bg-black rounded-3xl border border-zinc-800 shadow-2xl overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-3 bg-white/3 border-b border-white/5">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
+                  </div>
+                  <button
+                    type="button"
+                    className="text-[9px] font-black text-zinc-600 hover:text-white transition-colors uppercase tracking-widest"
+                    onClick={() => navigator.clipboard.writeText(response.body)}
+                  >
+                    Copy Stdout
+                  </button>
+                </div>
+                <pre className="p-8 text-[12px] text-zinc-400 font-mono overflow-x-auto leading-relaxed scrollbar-none max-h-[400px]">
+                  {fmtJson(response.body)}
+                </pre>
+              </div>
             </div>
           </section>
         )}
       </div>
 
-      {/* Footer / Send Button */}
-      <div className="p-6 border-t border-zinc-100 dark:border-zinc-800 bg-white/80 dark:bg-[#0d1117]/80 backdrop-blur-xl sticky bottom-0 z-10">
+      {/* Persistence Action Layer */}
+      <div className="px-8 py-8 border-t border-zinc-100 dark:border-white/5 bg-white/80 dark:bg-black/80 backdrop-blur-2xl sticky bottom-0 z-20">
         <button
           type="button"
           onClick={send}
           disabled={loading}
-          className="group w-full h-12 bg-zinc-900 dark:bg-cyan-600 hover:bg-black dark:hover:bg-cyan-500 disabled:bg-zinc-100 dark:disabled:bg-zinc-800 text-white font-black rounded-xl transition-all active:scale-[0.98] shadow-xl shadow-zinc-900/10 dark:shadow-cyan-500/20 flex items-center justify-center gap-3"
+          className="group relative w-full h-14 bg-zinc-900 dark:bg-white text-white dark:text-black font-black rounded-2xl transition-all active:scale-[0.98] shadow-2xl shadow-black/10 flex items-center justify-center gap-4 overflow-hidden"
         >
+          <div className="absolute inset-0 bg-linear-to-r from-cyan-500 to-purple-600 opacity-0 group-hover:opacity-10 transition-opacity" />
+
           {loading ? (
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-white animate-bounce" />
-              <div className="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.2s]" />
-              <div className="w-1.5 h-1.5 rounded-full bg-white animate-bounce [animation-delay:0.4s]" />
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-current animate-bounce" />
+              <div className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:0.2s]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-current animate-bounce [animation-delay:0.4s]" />
             </div>
           ) : (
             <>
-              <span className="tracking-[0.2em] uppercase text-[11px]">
-                Send Request
+              <span className="tracking-[0.3em] uppercase text-[11px]">
+                Execute Request
               </span>
-              <div className="flex items-center gap-1 opacity-40 group-hover:opacity-100 transition-opacity">
-                <span className="text-[10px] border border-white/20 px-1.5 py-0.5 rounded">
-                  ⌘
+              <div className="flex items-center gap-1 opacity-30 group-hover:opacity-100 transition-opacity">
+                <span className="text-[10px] font-mono border border-current/20 px-2 py-0.5 rounded-lg">
+                  CMD
                 </span>
-                <span className="text-[10px] border border-white/20 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-mono border border-current/20 px-2 py-0.5 rounded-lg text-sm">
                   ↵
                 </span>
               </div>
@@ -416,7 +459,9 @@ function EditableRowList({
         return (
           <div
             key={rowId}
-            className={`flex items-center gap-4 group transition-opacity ${isOmitted ? "opacity-40" : "opacity-100"}`}
+            className={`flex items-center gap-4 group transition-opacity ${
+              isOmitted ? "opacity-40" : "opacity-100"
+            }`}
           >
             <input
               className="w-32 bg-transparent border-b border-zinc-200 dark:border-zinc-800 focus:border-cyan-500 outline-none py-1.5 transition-colors text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
@@ -437,7 +482,11 @@ function EditableRowList({
               <button
                 type="button"
                 onClick={() => onToggleOmit(`${type}:${key}`)}
-                className={`p-1.5 rounded-lg transition-colors ${isOmitted ? "text-red-500 bg-red-50 dark:bg-red-500/10" : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"}`}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isOmitted
+                    ? "text-red-500 bg-red-50 dark:bg-red-500/10"
+                    : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                }`}
                 title={isOmitted ? "Include in request" : "Omit from request"}
               >
                 <svg
@@ -502,7 +551,7 @@ function AddButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center gap-1.5 text-[10px] font-black text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-all uppercase tracking-[0.1em] hover:translate-x-0.5 active:scale-95"
+      className="flex items-center gap-1.5 text-[10px] font-black text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-all uppercase tracking-widest hover:translate-x-0.5 active:scale-95"
     >
       <svg
         className="w-3.5 h-3.5"
