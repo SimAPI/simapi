@@ -1,4 +1,5 @@
 import type { EndpointInfo } from "../../../types.js";
+import { JsonView } from "../../../components/ui/JsonView.js";
 import { METHOD_COLORS } from "../_constants.js";
 import { SchemaField } from "./SchemaField.js";
 
@@ -11,11 +12,11 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
         {(endpoint.schema?.properties || endpoint.formSchema?.properties) && (
           <section className="space-y-10">
             <div className="flex items-center gap-6">
-              <h2 className="text-2xl font-black text-zinc-900 dark:text-white tracking-tighter">
+              <h2 className="text-2xl font-black text-foreground tracking-tighter">
                 Request Body
               </h2>
-              <div className="h-px flex-1 bg-zinc-100 dark:bg-white/5" />
-              <span className="text-[10px] font-mono text-zinc-400 dark:text-zinc-600 uppercase tracking-widest bg-zinc-50 dark:bg-white/2 px-3 py-1 rounded-full border border-zinc-100 dark:border-white/5">
+              <div className="h-px flex-1 bg-border/50" />
+              <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest bg-secondary px-3 py-1 rounded-full border border-border">
                 {endpoint.formSchema
                   ? "multipart/form-data"
                   : "application/json"}
@@ -33,7 +34,7 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
                         endpoint.schema?.required?.includes(key) ?? false
                       }
                     />
-                  ),
+                  )
                 )}
               {endpoint.formSchema?.properties &&
                 Object.entries(endpoint.formSchema.properties).map(
@@ -46,7 +47,7 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
                         endpoint.formSchema?.required?.includes(key) ?? false
                       }
                     />
-                  ),
+                  )
                 )}
             </div>
           </section>
@@ -75,7 +76,7 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
                       endpoint.querySchema?.required?.includes(key) ?? false
                     }
                   />
-                ),
+                )
               )}
             </div>
           </section>
@@ -101,7 +102,7 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
                       endpoint.headerSchema?.required?.includes(key) ?? false
                     }
                   />
-                ),
+                )
               )}
             </div>
           </section>
@@ -132,42 +133,20 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
 
         <div className="space-y-8">
           <div className="flex items-center gap-4">
-            <span className="text-[11px] font-black text-zinc-400 dark:text-zinc-600 uppercase tracking-widest">
+            <span className="text-[11px] font-black text-muted-foreground/60 uppercase tracking-widest">
               Expected Success Payload
             </span>
-            <div className="h-px flex-1 bg-zinc-50 dark:bg-white/2" />
+            <div className="h-px flex-1 bg-border/50" />
           </div>
 
           {endpoint.responseExample ? (
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-linear-to-r from-cyan-500 to-purple-600 rounded-3xl opacity-0 group-hover:opacity-10 blur-2xl transition duration-1000" />
-              <div className="relative rounded-3xl bg-zinc-900 dark:bg-[#0d1117] border border-zinc-800 shadow-2xl overflow-hidden">
-                <div className="flex items-center justify-between px-6 py-4 bg-white/2 border-b border-white/5">
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-zinc-800" />
-                  </div>
-                  <button
-                    type="button"
-                    className="text-[10px] font-black text-zinc-500 hover:text-white transition-colors uppercase tracking-widest"
-                    onClick={() =>
-                      navigator.clipboard.writeText(
-                        JSON.stringify(endpoint.responseExample, null, 2),
-                      )
-                    }
-                  >
-                    Copy Prototype
-                  </button>
-                </div>
-                <pre className="p-8 text-[13px] text-zinc-400 font-mono overflow-x-auto leading-relaxed scrollbar-none">
-                  {JSON.stringify(endpoint.responseExample, null, 2)}
-                </pre>
-              </div>
-            </div>
+            <JsonView
+              data={endpoint.responseExample}
+              title="Prototype Response"
+            />
           ) : (
-            <div className="py-12 border-2 border-dashed border-zinc-100 dark:border-white/3 rounded-3xl flex items-center justify-center">
-              <span className="text-[11px] font-black text-zinc-300 dark:text-zinc-800 uppercase tracking-widest">
+            <div className="py-12 border-2 border-dashed border-border/50 rounded-3xl flex items-center justify-center">
+              <span className="text-[11px] font-black text-muted-foreground/30 uppercase tracking-widest">
                 No example available
               </span>
             </div>

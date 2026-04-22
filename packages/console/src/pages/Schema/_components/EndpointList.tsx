@@ -19,13 +19,13 @@ export function EndpointList({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto py-8 bg-[#fafafa] dark:bg-[#0a0b0c] scrollbar-none">
+    <div className="flex-1 overflow-y-auto py-8 bg-background/50 scrollbar-none">
       <div className="px-8 mb-6">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-black text-zinc-400 dark:text-zinc-600 uppercase tracking-[0.3em] select-none">
+          <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em] select-none">
             Endpoints
           </span>
-          <span className="text-[9px] font-mono text-zinc-300 dark:text-zinc-800 bg-zinc-100 dark:bg-white/2 px-2 py-0.5 rounded-full">
+          <span className="text-[9px] font-mono text-muted-foreground bg-secondary px-2 py-0.5 rounded-full border border-border">
             {endpoints.length} Routes
           </span>
         </div>
@@ -43,8 +43,8 @@ export function EndpointList({
               onClick={() => onSelect(endpoint)}
               className={`w-full group relative flex flex-col p-4 rounded-2xl transition-all duration-300 ${
                 isSelected
-                  ? "bg-white dark:bg-white/4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-zinc-100 dark:border-white/8"
-                  : "hover:bg-zinc-100/50 dark:hover:bg-white/2 border border-transparent"
+                  ? "bg-card shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-card-border"
+                  : "hover:bg-secondary/50 border border-transparent"
               }`}
             >
               <div className="flex items-center gap-3 mb-2">
@@ -52,8 +52,8 @@ export function EndpointList({
                   className={`px-2 py-0.5 rounded-md text-[9px] font-black font-mono border transition-all duration-500 uppercase tracking-tighter ${
                     isSelected
                       ? METHOD_COLORS[endpoint.method] ||
-                        "bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700"
-                      : "bg-zinc-50 dark:bg-white/2 text-zinc-400 dark:text-zinc-600 border-zinc-100 dark:border-white/3"
+                        "bg-secondary border-border"
+                      : "bg-secondary text-muted-foreground/60 border-border/50"
                   }`}
                 >
                   {endpoint.method}
@@ -61,8 +61,8 @@ export function EndpointList({
                 <p
                   className={`text-[13px] font-mono truncate tracking-tight transition-colors duration-300 ${
                     isSelected
-                      ? "text-zinc-900 dark:text-white font-bold"
-                      : "text-zinc-500 dark:text-zinc-500"
+                      ? "text-foreground font-bold"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {endpoint.path}
@@ -73,8 +73,8 @@ export function EndpointList({
                 <p
                   className={`text-[11px] truncate leading-tight transition-colors duration-300 pl-px ${
                     isSelected
-                      ? "text-zinc-500 dark:text-zinc-400"
-                      : "text-zinc-400 dark:text-zinc-600"
+                      ? "text-muted-foreground"
+                      : "text-muted-foreground/60"
                   }`}
                 >
                   {endpoint.title}
@@ -82,7 +82,7 @@ export function EndpointList({
               )}
 
               {isSelected && (
-                <div className="absolute -left-1 top-4 bottom-4 w-1 bg-cyan-500 rounded-full blur-[1px]" />
+                <div className="absolute -left-1 top-4 bottom-4 w-1 bg-primary rounded-full blur-[1px]" />
               )}
             </button>
           );

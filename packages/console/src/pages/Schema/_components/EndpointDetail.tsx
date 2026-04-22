@@ -17,16 +17,16 @@ export function EndpointDetail({
   const [activeTab, setActiveTab] = useState<"docs" | "try">("docs");
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-white dark:bg-[#08090a]">
+    <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-background">
       {/* Mobile Floating Action Tab */}
-      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-black/80 dark:bg-white/10 backdrop-blur-2xl px-2 py-2 rounded-2xl border border-white/10 shadow-2xl flex gap-1">
+      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-foreground dark:bg-muted/80 backdrop-blur-2xl px-2 py-2 rounded-2xl border border-border/10 shadow-2xl flex gap-1">
         <button
           type="button"
           onClick={() => setActiveTab("docs")}
           className={`px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
             activeTab === "docs"
-              ? "bg-white text-black shadow-lg"
-              : "text-white/40"
+              ? "bg-background text-foreground shadow-lg"
+              : "text-background/40 dark:text-foreground/40"
           }`}
         >
           Reference
@@ -36,8 +36,8 @@ export function EndpointDetail({
           onClick={() => setActiveTab("try")}
           className={`px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
             activeTab === "try"
-              ? "bg-white text-black shadow-lg"
-              : "text-white/40"
+              ? "bg-background text-foreground shadow-lg"
+              : "text-background/40 dark:text-foreground/40"
           }`}
         >
           Console
@@ -46,7 +46,7 @@ export function EndpointDetail({
 
       {/* Left/Middle Column: High-End Documentation */}
       <div
-        className={`flex-1 overflow-y-auto scrollbar-none bg-white dark:bg-[#08090a] ${
+        className={`flex-1 overflow-y-auto scrollbar-none bg-background ${
           activeTab === "docs" ? "block" : "hidden lg:block"
         }`}
       >
@@ -54,24 +54,24 @@ export function EndpointDetail({
           <header className="relative">
             <div className="absolute -left-8 top-0 bottom-0 w-px bg-linear-to-b from-cyan-500/50 via-transparent to-transparent hidden sm:block" />
             <div className="flex items-center gap-4 mb-8">
-              <span className="text-[10px] font-black text-cyan-600 dark:text-cyan-400 uppercase tracking-[0.4em] px-3 py-1 bg-cyan-50 dark:bg-cyan-500/10 rounded-full">
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.4em] px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
                 Endpoint Reference
               </span>
             </div>
             <div className="space-y-6">
-              <h1 className="text-4xl sm:text-6xl font-black text-zinc-900 dark:text-white tracking-tight leading-[0.9]">
+              <h1 className="text-4xl sm:text-6xl font-black text-foreground tracking-tight leading-[0.9]">
                 {endpoint.title || "Request Interface"}
               </h1>
-              <div className="flex items-center gap-4 py-4 px-6 bg-zinc-50 dark:bg-white/3 rounded-2xl border border-zinc-100 dark:border-white/5 w-fit">
+              <div className="flex items-center gap-4 py-4 px-6 bg-secondary rounded-2xl border border-border w-fit">
                 <span
                   className={`text-[10px] font-black px-2 py-0.5 rounded border uppercase ${
                     METHOD_COLORS[endpoint.method] ||
-                    "text-zinc-400 border-zinc-200"
+                    "text-muted-foreground border-border"
                   }`}
                 >
                   {endpoint.method}
                 </span>
-                <code className="text-sm font-mono text-zinc-500 dark:text-zinc-400">
+                <code className="text-sm font-mono text-muted-foreground">
                   {endpoint.path}
                 </code>
               </div>
@@ -80,8 +80,8 @@ export function EndpointDetail({
 
           <SchemaView endpoint={endpoint} />
 
-          <footer className="pt-24 border-t border-zinc-100 dark:border-white/5">
-            <p className="text-[10px] font-black text-zinc-300 dark:text-zinc-800 uppercase tracking-widest">
+          <footer className="pt-24 border-t border-border/50">
+            <p className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest">
               Generated via SimAPI Engine
             </p>
           </footer>
@@ -90,7 +90,7 @@ export function EndpointDetail({
 
       {/* Right Column: Integrated Overlay Console */}
       <div
-        className={`lg:w-[500px] xl:w-[600px] shrink-0 h-full border-l border-zinc-100 dark:border-white/5 bg-[#fdfdfd] dark:bg-[#090a0b] shadow-[-20px_0_40px_rgba(0,0,0,0.02)] dark:shadow-none z-10 ${
+        className={`lg:w-[500px] xl:w-[600px] shrink-0 h-full border-l border-border bg-background shadow-[-20px_0_40px_rgba(0,0,0,0.02)] dark:shadow-none z-10 ${
           activeTab === "try" ? "block" : "hidden lg:block"
         }`}
       >

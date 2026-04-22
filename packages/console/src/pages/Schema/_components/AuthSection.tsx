@@ -14,7 +14,7 @@ export function AuthSection({
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <label className="text-[10px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest block pl-1">
+        <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
           Security Strategy
         </label>
         <div className="relative group">
@@ -26,13 +26,13 @@ export function AuthSection({
                 preset: event.target.value as AuthPreset,
               })
             }
-            className="w-full bg-zinc-50 dark:bg-white/3 border border-zinc-100 dark:border-white/5 rounded-2xl px-5 py-3 outline-none focus:border-cyan-500/50 appearance-none cursor-pointer text-zinc-900 dark:text-white font-mono text-[12px] transition-all group-hover:bg-zinc-100 dark:group-hover:bg-white/5"
+            className="w-full bg-secondary border border-border rounded-2xl px-5 py-3 outline-none focus:border-primary/50 appearance-none cursor-pointer text-foreground font-mono text-[12px] transition-all group-hover:bg-secondary/80"
           >
             {AUTH_OPTIONS.map((option) => (
               <option
                 key={option.value}
                 value={option.value}
-                className="bg-white dark:bg-[#08090a]"
+                className="bg-background text-foreground"
               >
                 {option.label}
               </option>
@@ -40,7 +40,7 @@ export function AuthSection({
           </select>
           <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
             <svg
-              className="w-3 h-3"
+              className="size-3"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -56,14 +56,14 @@ export function AuthSection({
         </div>
       </div>
 
-      <div className="space-y-6 pt-4 border-t border-zinc-50 dark:border-white/2">
+      <div className="space-y-6 pt-4 border-t border-border/50">
         {auth.preset === "bearer" && (
           <div className="space-y-3">
-            <label className="text-[10px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest block pl-1">
+            <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
               Access Token
             </label>
             <input
-              className="w-full bg-transparent border-b border-zinc-100 dark:border-white/5 focus:border-cyan-500/50 outline-none py-2 transition-all text-zinc-900 dark:text-white font-mono text-[12px] placeholder:text-zinc-200 dark:placeholder:text-zinc-800"
+              className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
               placeholder="ey..."
               value={auth.token}
               onChange={(event) => updateAuth({ token: event.target.value })}
@@ -74,11 +74,11 @@ export function AuthSection({
         {auth.preset === "basic" && (
           <div className="grid grid-cols-2 gap-8">
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest block pl-1">
+              <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
                 Principal
               </label>
               <input
-                className="w-full bg-transparent border-b border-zinc-100 dark:border-white/5 focus:border-cyan-500/50 outline-none py-2 transition-all text-zinc-900 dark:text-white font-mono text-[12px] placeholder:text-zinc-200 dark:placeholder:text-zinc-800"
+                className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
                 placeholder="id"
                 value={auth.username}
                 onChange={(event) =>
@@ -87,11 +87,11 @@ export function AuthSection({
               />
             </div>
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest block pl-1">
+              <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
                 Secret
               </label>
               <input
-                className="w-full bg-transparent border-b border-zinc-100 dark:border-white/5 focus:border-cyan-500/50 outline-none py-2 transition-all text-zinc-900 dark:text-white font-mono text-[12px] placeholder:text-zinc-200 dark:placeholder:text-zinc-800"
+                className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
                 placeholder="pass"
                 type="password"
                 value={auth.password}
@@ -108,11 +108,11 @@ export function AuthSection({
           auth.preset === "cookie") && (
           <div className="grid grid-cols-2 gap-8">
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest block pl-1">
+              <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
                 Field Key
               </label>
               <input
-                className="w-full bg-transparent border-b border-zinc-100 dark:border-white/5 focus:border-cyan-500/50 outline-none py-2 transition-all text-zinc-900 dark:text-white font-mono text-[12px] placeholder:text-zinc-200 dark:placeholder:text-zinc-800"
+                className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
                 placeholder="X-KEY"
                 value={auth.keyName}
                 onChange={(event) =>
@@ -121,11 +121,11 @@ export function AuthSection({
               />
             </div>
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-zinc-300 dark:text-zinc-700 uppercase tracking-widest block pl-1">
+              <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
                 Credential
               </label>
               <input
-                className="w-full bg-transparent border-b border-zinc-100 dark:border-white/5 focus:border-cyan-500/50 outline-none py-2 transition-all text-zinc-900 dark:text-white font-mono text-[12px] placeholder:text-zinc-200 dark:placeholder:text-zinc-800"
+                className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
                 placeholder="value"
                 value={auth.keyValue}
                 onChange={(event) =>
