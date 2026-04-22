@@ -12,10 +12,16 @@ export const PACKAGE_JSON = `{
   "description": "{{description}}",
   "scripts": {
     "serve": "simapi serve",
-    "build": "simapi build",
+    "build:netlify": "simapi build --platform netlify",
+    "build:node": "simapi build --platform node",
+    "build:vercel": "simapi build --platform vercel",
     "start": "simapi start",
     "import": "simapi import",
-    "export": "simapi export"
+    "export": "simapi export",
+    "setup:netlify": "simapi setup netlify",
+    "setup:vercel": "simapi setup vercel",
+    "console:add": "simapi console:add",
+    "console:remove": "simapi console:remove"
   },
   "dependencies": {}
 }
@@ -49,6 +55,10 @@ node_modules
 
 # Vercel
 .vercel
+
+# SimAPI serverless build outputs (generated during platform CI builds)
+/api/index.mjs
+/netlify/functions/api.mjs
 
 # Build Outputs
 out/
@@ -117,6 +127,25 @@ export function authHandler(req: AppRequest) {
 }
 `;
 
+export const VERCEL_JSON = `{
+  "version": 2,
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+}
+`;
+
+export const NETLIFY_TOML = `[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/api"
+  status = 200
+  force = true
+`;
+
 export const DOCKERFILE = `FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
@@ -150,7 +179,7 @@ export function makeUser(): User {
 }
 `;
 
-export const HELLO_WORLD_TS = `import { AppResponse, type EndpointDefinition } from "@simapi/simapi";
+export const HELLO_WORLD_TS = `import { AppResponse, type AppRequest, type EndpointDefinition, z } from "@simapi/simapi";
 
 import { makeUser } from "../models/user.js";
 
@@ -160,10 +189,9 @@ export const helloGet: EndpointDefinition = {
   type: "open",
   title: "Hello World",
   description: "Returns a greeting. No authentication required.",
-  handler: () =>
-    AppResponse.success({
-      message: "Hello, World!",
-    }),
+  handler: (req: AppRequest) => {
+    return AppResponse.success({ message: "Hello, World!" });
+  },
 };
 
 export const helloPost: EndpointDefinition = {
@@ -172,11 +200,17 @@ export const helloPost: EndpointDefinition = {
   type: "secure",
   title: "Hello (Authenticated)",
   description: "Returns a greeting with a sample user. Requires authentication.",
-  handler: () =>
-    AppResponse.created({
-      message: "Hello from behind the wall!",
+  validator: {
+    name: z.string().min(2).max(100).default('John Doe'),
+  },
+  handler: (req: AppRequest) => {
+    const name = req.body<string>('name');
+
+    return AppResponse.created({
+      message: \`Hello \${name} from behind the wall!\`,
       user: makeUser(),
-    }),
+    });
+  },
 };
 `;
 

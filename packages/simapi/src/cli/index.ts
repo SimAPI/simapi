@@ -1,10 +1,11 @@
 import { cac } from "cac";
-import { runBuild } from "./build.js";
+import { type Platform, runBuild } from "./build.js";
 import { runConsoleAdd, runConsoleRemove } from "./console.js";
 import { runExportOpenAPI } from "./export-openapi.js";
 import { runImportOpenAPI } from "./import-openapi.js";
 import { runInit } from "./init.js";
 import { runServe } from "./serve.js";
+import { runSetup } from "./setup.js";
 import { runStart } from "./start.js";
 
 declare const __SIMAPI_VERSION__: string;
@@ -25,14 +26,27 @@ cli
 
 cli
   .command("build [cwd]", "Compile the project to .simapi/dist/")
-  .action((cwd: string | undefined) => {
-    runBuild(cwd).catch(fatal);
+  .option(
+    "--platform <platform>",
+    "Target platform: node, vercel, netlify (default: auto-detect)"
+  )
+  .action((cwd: string | undefined, opts: { platform?: Platform }) => {
+    runBuild(cwd, { platform: opts.platform }).catch(fatal);
   });
 
 cli
   .command("start [cwd]", "Run the compiled production server")
   .action((cwd: string | undefined) => {
     runStart(cwd);
+  });
+
+cli
+  .command(
+    "setup <platform>",
+    "Generate deployment config for a platform (vercel, netlify)"
+  )
+  .action((platform: string) => {
+    runSetup(platform).catch(fatal);
   });
 
 cli

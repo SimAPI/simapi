@@ -32,7 +32,16 @@ export default defineConfig({
           { text: "Configuration", link: "/guide/config" },
           { text: "Debug Console", link: "/guide/console" },
           { text: "OpenAPI Import & Export", link: "/guide/openapi-import" },
-          { text: "Deployment", link: "/guide/deployment" },
+        ],
+      },
+      {
+        text: "Deployment",
+        items: [
+          { text: "Overview", link: "/deployment/" },
+          { text: "Vercel", link: "/deployment/vercel" },
+          { text: "Netlify", link: "/deployment/netlify" },
+          { text: "Railway", link: "/deployment/railway" },
+          { text: "Other Hosts", link: "/deployment/other-hosts" },
         ],
       },
       {

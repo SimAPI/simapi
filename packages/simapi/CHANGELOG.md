@@ -1,5 +1,18 @@
 # @simapi/simapi
 
+## 0.0.5
+
+### Serverless deployment support (Vercel & Netlify)
+
+- `simapi build` now auto-detects the target platform from CI environment variables (`VERCEL=1`, `NETLIFY=true`) and generates the correct output:
+  - **Node.js** (default): `.simapi/dist/server.mjs` — long-running server, unchanged
+  - **Vercel**: `api/index.mjs` — serverless handler using `@hono/node-server/vercel`
+  - **Netlify**: `netlify/functions/api.mjs` — Netlify Functions handler using the Web Fetch API
+- Added `--platform <node|vercel|netlify>` flag to `simapi build` for explicit local testing
+- Added `simapi setup <platform>` command — generates `vercel.json` or `netlify.toml` in the project root
+- Updated `.gitignore` template to exclude `/api/index.mjs` and `/netlify/functions/api.mjs` (serverless build artifacts)
+- Added `NETLIFY_TOML` and `VERCEL_JSON` templates to the internal template library
+
 ## 0.0.4
 
 ### Starter scaffold & port fallback
