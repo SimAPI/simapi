@@ -20,7 +20,7 @@ export function Sidebar({
   onToggleDark: () => void;
 }) {
   return (
-    <aside className="hidden sm:flex w-[72px] shrink-0 flex-col bg-card border-r border-card-border transition-all duration-500 group/sidebar hover:w-64">
+    <aside className="hidden sm:flex w-[72px] shrink-0 flex-col bg-card border-r border-card-border transition-all duration-500 group/sidebar hover:w-4864">
       {/* Branding Dock */}
       <div className="h-20 flex items-center justify-center group-hover/sidebar:justify-start group-hover/sidebar:px-7 transition-all">
         <Logo />

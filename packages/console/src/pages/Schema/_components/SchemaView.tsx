@@ -1,16 +1,15 @@
 import type { EndpointInfo } from "../../../types.js";
 import { JsonView } from "../../../components/ui/JsonView.js";
-import { METHOD_COLORS } from "../_constants.js";
 import { SchemaField } from "./SchemaField.js";
 
 export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
   return (
-    <div className="space-y-32">
+    <div className="space-y-16">
       {/* Request Definition Map */}
-      <div className="space-y-12">
+      <div className="space-y-8">
         {/* Request Body Section */}
         {(endpoint.schema?.properties || endpoint.formSchema?.properties) && (
-          <section className="space-y-10">
+          <section className="space-y-6">
             <div className="flex items-center gap-6">
               <h2 className="text-2xl font-black text-foreground tracking-tighter">
                 Request Body
@@ -55,7 +54,7 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
 
         {/* Query Parameters Section */}
         {endpoint.querySchema?.properties && (
-          <section className="space-y-10">
+          <section className="space-y-6">
             <div className="flex items-center gap-6">
               <h2 className="text-2xl font-black text-foreground tracking-tighter">
                 Parameters
@@ -84,7 +83,7 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
 
         {/* Headers Section */}
         {endpoint.headerSchema?.properties && (
-          <section className="space-y-10">
+          <section className="space-y-6">
             <div className="flex items-center gap-6">
               <h2 className="text-2xl font-black text-foreground tracking-tighter">
                 Headers
@@ -110,7 +109,7 @@ export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {
       </div>
 
       {/* Response Specification */}
-      <section className="space-y-12">
+      <section className="space-y-8">
         <div className="flex items-center justify-between gap-6">
           <h2 className="text-3xl font-black text-foreground tracking-tighter">
             Responses

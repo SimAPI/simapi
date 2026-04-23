@@ -15,42 +15,21 @@ export function EndpointDetail({
   onAuthChange: (auth: AuthState) => void;
 }) {
   const [activeTab, setActiveTab] = useState<"docs" | "try">("docs");
+  const [copied, setCopied] = useState(false);
+
+  const fullUrl = `${window.location.origin}${endpoint.path}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(fullUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row overflow-hidden bg-background">
-      {/* Mobile Floating Action Tab */}
-      <div className="lg:hidden fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-foreground dark:bg-muted/80 backdrop-blur-2xl px-2 py-2 rounded-2xl border border-border/10 shadow-2xl flex gap-1">
-        <button
-          type="button"
-          onClick={() => setActiveTab("docs")}
-          className={`px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-            activeTab === "docs"
-              ? "bg-background text-foreground shadow-lg"
-              : "text-background/40 dark:text-foreground/40"
-          }`}
-        >
-          Reference
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveTab("try")}
-          className={`px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
-            activeTab === "try"
-              ? "bg-background text-foreground shadow-lg"
-              : "text-background/40 dark:text-foreground/40"
-          }`}
-        >
-          Console
-        </button>
-      </div>
-
-      {/* Left/Middle Column: High-End Documentation */}
-      <div
-        className={`flex-1 overflow-y-auto scrollbar-none bg-background ${
-          activeTab === "docs" ? "block" : "hidden lg:block"
-        }`}
-      >
-        <div className="max-w-4xl mx-auto px-8 sm:px-16 py-16 sm:py-24 space-y-24">
+    <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-y-auto scrollbar-none bg-background">
+        <div className="max-w-4xl mx-auto px-8 py-16 sm:py-24 space-y-12">
           <header className="relative">
             <div className="absolute -left-8 top-0 bottom-0 w-px bg-linear-to-b from-primary/50 via-transparent to-transparent hidden sm:block" />
             <div className="flex items-center gap-4 mb-8">
@@ -58,43 +37,99 @@ export function EndpointDetail({
                 Endpoint Reference
               </span>
             </div>
-            <div className="space-y-6">
-              <h1 className="text-4xl sm:text-6xl font-black text-foreground tracking-tight leading-[0.9]">
+            <div className="space-y-8">
+              <h2 className="text-4xl sm:text-5xl font-black text-foreground tracking-tight leading-[0.9]">
                 {endpoint.title || "Request Interface"}
-              </h1>
-              <div className="flex items-center gap-4 py-4 px-6 bg-secondary rounded-2xl border border-border w-fit">
+              </h2>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-secondary rounded-2xl border border-border">
                 <span
-                  className={`text-[10px] font-black px-2 py-0.5 rounded border uppercase ${
+                  className={`w-fit text-[10px] font-black px-2 py-0.5 rounded border uppercase shrink-0 ${
                     METHOD_COLORS[endpoint.method] ||
                     "text-muted-foreground border-border"
                   }`}
                 >
                   {endpoint.method}
                 </span>
-                <code className="text-sm font-mono text-muted-foreground">
-                  {endpoint.path}
-                </code>
+                <div className="flex-1 flex items-center gap-3 min-w-0">
+                  <code className="text-sm font-mono text-muted-foreground overflow-x-auto">
+                    {fullUrl}
+                  </code>
+
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="p-2 hover:bg-background rounded-xl transition-all active:scale-95 shrink-0 group"
+                    title="Copy URL"
+                  >
+                    {copied ? (
+                      <span className="text-[10px] font-black text-success uppercase tracking-widest">
+                        Copied
+                      </span>
+                    ) : (
+                      <svg
+                        className="size-4 text-muted-foreground group-hover:text-foreground transition-colors"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        role="img"
+                        aria-label="Copy"
+                      >
+                        <title>Copy</title>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </header>
 
-          <SchemaView endpoint={endpoint} />
+          {/* Tab Selection */}
+          <div className="flex p-1 bg-secondary rounded-2xl border border-border w-fit">
+            <button
+              type="button"
+              onClick={() => setActiveTab("docs")}
+              className={`px-8 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                activeTab === "docs"
+                  ? "bg-background text-foreground shadow-lg shadow-black/5"
+                  : "text-muted-foreground/60 hover:text-foreground"
+              }`}
+            >
+              Reference
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("try")}
+              className={`px-8 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${
+                activeTab === "try"
+                  ? "bg-background text-foreground shadow-lg shadow-black/5"
+                  : "text-muted-foreground/60 hover:text-foreground"
+              }`}
+            >
+              Console
+            </button>
+          </div>
 
-          <footer className="pt-24 border-t border-border/50">
-            <p className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-widest">
-              Generated via SimAPI Engine
-            </p>
-          </footer>
+          <div className="min-h-[400px]">
+            {activeTab === "docs" ? (
+              <SchemaView endpoint={endpoint} />
+            ) : (
+              <div className="bg-card rounded-3xl border border-border overflow-hidden">
+                <TryPanel
+                  endpoint={endpoint}
+                  auth={auth}
+                  onAuthChange={onAuthChange}
+                />
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-
-      {/* Right Column: Integrated Overlay Console */}
-      <div
-        className={`lg:w-[500px] xl:w-[600px] shrink-0 h-full border-l border-border bg-background shadow-[-20px_0_40px_rgba(0,0,0,0.02)] dark:shadow-none z-10 ${
-          activeTab === "try" ? "block" : "hidden lg:block"
-        }`}
-      >
-        <TryPanel endpoint={endpoint} auth={auth} onAuthChange={onAuthChange} />
       </div>
     </div>
   );

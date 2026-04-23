@@ -90,7 +90,7 @@ export default function Logs() {
       </div>
 
       {/* Table */}
-      <div className="flex-1 overflow-auto bg-background">
+      <div className="flex-1 overflow-auto bg-background px-6">
         {filtered.length === 0 ? (
           <div className="px-4 py-20 text-center">
             <p className="text-border text-3xl mb-3">≡</p>
