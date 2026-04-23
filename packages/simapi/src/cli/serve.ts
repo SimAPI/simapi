@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { consola } from "consola";
 
 import { tsImport } from "tsx/esm/api";
 
@@ -48,8 +49,8 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
     const mod = await tsImport(configPath, { parentURL: import.meta.url });
     config = (mod.default ?? mod) as SimAPIConfig;
   } catch (err) {
-    console.error(`[SimAPI] Failed to load simapi.config.ts from ${cwd}`);
-    console.error(err);
+    consola.error(`[SimAPI] Failed to load simapi.config.ts from ${cwd}`);
+    consola.error(err);
     process.exit(1);
   }
 
@@ -71,8 +72,8 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
 
   startServer(app, port, (actualPort) => {
     if (consoleMounted) {
-      console.log(
-        `  Console at http://localhost:${actualPort}/__simapi/console/\n`
+      consola.info(
+        `Console at http://localhost:${actualPort}/__simapi/console/`
       );
     }
   });
@@ -82,7 +83,7 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
       if (!bus) process.exit(0);
 
       await bus.close().catch((err) => {
-        console.error("[SimAPI] shutdown error:", err);
+        consola.error("[SimAPI] shutdown error:", err);
       });
     });
   }

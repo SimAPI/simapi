@@ -3,8 +3,8 @@ import { mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { extname, join, relative, resolve } from "node:path";
 
 import * as p from "@clack/prompts";
+import consola from "consola";
 import { tsImport } from "tsx/esm/api";
-
 import type { SimAPIConfig } from "../core/defineConfig.js";
 
 export type Platform = "node" | "vercel" | "netlify";
@@ -140,7 +140,7 @@ export async function runBuild(
     }
   } catch (err) {
     s.stop("Build failed");
-    console.error(err);
+    consola.error(err);
     process.exit(1);
   } finally {
     await rm(tmpDir, { recursive: true, force: true });

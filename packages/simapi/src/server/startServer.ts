@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { consola } from "consola";
 import type { Hono } from "hono";
 
 export function startServer(
@@ -22,13 +23,13 @@ function tryPort(
   onStart?: (port: number) => void
 ): void {
   const server = serve({ fetch: app.fetch, port }, (info) => {
-    console.log(`\n  SimAPI running at http://localhost:${info.port}\n`);
+    consola.success(`SimAPI running at http://localhost:${info.port}`);
     onStart?.(info.port);
   });
 
   server.on("error", (err: NodeJS.ErrnoException) => {
     if (err.code === "EADDRINUSE" && attemptsLeft > 1) {
-      console.log(`[SimAPI] Port ${port} in use, trying ${port + 1}…`);
+      consola.warn(`Port ${port} in use, trying ${port + 1}…`);
       tryPort(app, port + 1, attemptsLeft - 1, onStart);
     } else {
       throw err;

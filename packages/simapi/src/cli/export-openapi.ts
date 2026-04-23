@@ -1,8 +1,8 @@
 import { existsSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import consola from "consola";
 import { tsImport } from "tsx/esm/api";
 import { stringify as yamlStringify } from "yaml";
-
 import type { SimAPIConfig } from "../core/defineConfig.js";
 import { discoverEndpoints } from "../server/discovery.js";
 import { buildOpenApiSpec } from "../server/openapi.js";
@@ -26,14 +26,14 @@ export async function runExportOpenAPI(
 
   const endpointsDir = resolve(root, config?.endpointsDir ?? "endpoints");
   if (!existsSync(endpointsDir)) {
-    console.error(`[SimAPI] Endpoints directory not found: ${endpointsDir}`);
+    consola.error(`[SimAPI] Endpoints directory not found: ${endpointsDir}`);
     process.exit(1);
   }
 
   const endpoints = await discoverEndpoints(endpointsDir);
 
   if (endpoints.length === 0) {
-    console.error("[SimAPI] No endpoints found.");
+    consola.error("[SimAPI] No endpoints found.");
     return;
   }
 
@@ -52,5 +52,5 @@ export async function runExportOpenAPI(
       : yamlStringify(spec, { lineWidth: 120 });
 
   writeFileSync(outPath, content, "utf8");
-  console.log(`[SimAPI] Exported ${endpoints.length} endpoint(s) → ${outPath}`);
+  consola.log(`[SimAPI] Exported ${endpoints.length} endpoint(s) → ${outPath}`);
 }

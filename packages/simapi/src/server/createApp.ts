@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { type ZodRawShape, z } from "zod";
@@ -30,14 +31,12 @@ export async function createApp(
     if (err instanceof ValidationError) {
       return c.json(formatValidationError(err), 422);
     }
-    console.error("[SimAPI] Unhandled error:", err);
+    consola.error("Unhandled error:", err);
     return c.json({ message: "Internal server error" }, 500);
   });
 
   const endpoints = await discoverEndpoints(endpointsDir);
-  console.log(
-    `[SimAPI] Loaded ${endpoints.length} endpoint(s) from ${endpointsDir}`
-  );
+  consola.info(`Loaded ${endpoints.length} endpoint(s) from ${endpointsDir}`);
 
   for (const endpoint of endpoints) {
     registerEndpoint(app, endpoint, config, bus);
@@ -136,8 +135,8 @@ function registerEndpoint(
       const durationMs = Date.now() - start;
 
       if (config.consoleLog) {
-        console.log(
-          `[SimAPI] ${endpoint.method} ${c.req.path} → ${logStatus} (${durationMs}ms)`
+        consola.log(
+          `${endpoint.method} ${c.req.path} → ${logStatus} (${durationMs}ms)`
         );
       }
 
@@ -154,7 +153,7 @@ function registerEndpoint(
             durationMs,
             timestamp: new Date().toISOString(),
           })
-          .catch((err) => console.error("[SimAPI] log error:", err));
+          .catch((err) => consola.error("log error:", err));
       }
     }
   });

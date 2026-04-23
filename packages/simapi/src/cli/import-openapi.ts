@@ -1,5 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { extname, join, resolve } from "node:path";
+import consola from "consola";
 import { parse as parseYaml } from "yaml";
 
 type OASchema = {
@@ -147,7 +148,7 @@ export async function runImportOpenAPI(
   try {
     raw = readFileSync(absSpec, "utf8");
   } catch {
-    console.error(`[SimAPI] Cannot read spec: ${absSpec}`);
+    consola.error(`[SimAPI] Cannot read spec: ${absSpec}`);
     process.exit(1);
   }
 
@@ -157,7 +158,7 @@ export async function runImportOpenAPI(
       : parseYaml(raw);
 
   if (!spec.paths || Object.keys(spec.paths).length === 0) {
-    console.error("[SimAPI] No paths found in spec.");
+    consola.error("[SimAPI] No paths found in spec.");
     return;
   }
 
@@ -188,11 +189,11 @@ export async function runImportOpenAPI(
 
     const outPath = join(outputDir, `${resource}.ts`);
     writeFileSync(outPath, file, "utf8");
-    console.log(`[SimAPI] Wrote ${outPath}`);
+    consola.log(`[SimAPI] Wrote ${outPath}`);
     written++;
   }
 
-  console.log(
+  consola.log(
     `[SimAPI] Import complete — ${written} file(s) written to ${outputDir}/`
   );
 }
