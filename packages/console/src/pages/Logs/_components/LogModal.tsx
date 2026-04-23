@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { JsonView } from "../../../components/ui/JsonView.js";
 import { api } from "../../../lib/api.js";
 import type { RequestLog } from "../../../types.js";
 import { METHOD_COLORS } from "../_constants.js";
 import { fmtHeaders, statusColor } from "../_utils.js";
-import { JsonView } from "../../../components/ui/JsonView.js";
 
 export function LogModal({
   log,

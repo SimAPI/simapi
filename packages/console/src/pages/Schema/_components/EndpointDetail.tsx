@@ -1,9 +1,9 @@
 import { useState } from "react";
 import type { EndpointInfo } from "../../../types.js";
+import { METHOD_COLORS } from "../_constants.js";
 import type { AuthState } from "../_types.js";
 import { SchemaView } from "./SchemaView.js";
 import { TryPanel } from "./TryPanel.js";
-import { METHOD_COLORS } from "../_constants.js";
 
 export function EndpointDetail({
   endpoint,

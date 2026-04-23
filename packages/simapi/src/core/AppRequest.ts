@@ -11,9 +11,9 @@ export class AppRequest {
   constructor(
     private readonly _headers: Record<string, string>,
     private readonly _body: Record<string, unknown>,
-    private readonly _form: Record<string, unknown>,
-    private readonly _queryParams: Record<string, string>,
-    private readonly _urlParams: Record<string, string>,
+    private readonly _form: Record<string, unknown> = {},
+    private readonly _queryParams: Record<string, string> = {},
+    private readonly _urlParams: Record<string, string> = {},
     errors?: ValidationErrors
   ) {
     this.errors = errors ?? new ValidationErrors({});

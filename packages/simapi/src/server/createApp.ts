@@ -29,8 +29,9 @@ export async function createApp(
 
   app.onError((err, c) => {
     if (err instanceof ValidationError) {
-      return c.json(formatValidationError(err), 422);
+      return c.json(formatValidationError(err, config), 422);
     }
+
     consola.error("Unhandled error:", err);
     return c.json({ message: "Internal server error" }, 500);
   });

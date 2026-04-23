@@ -1,5 +1,5 @@
-import type { EndpointInfo } from "../../../types.js";
 import { JsonView } from "../../../components/ui/JsonView.js";
+import type { EndpointInfo } from "../../../types.js";
 import { SchemaField } from "./SchemaField.js";
 
 export function SchemaView({ endpoint }: { endpoint: EndpointInfo }) {

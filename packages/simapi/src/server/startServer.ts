@@ -6,14 +6,14 @@ export function startServer(
   app: Hono,
   port: number,
   onStart?: (port: number) => void
-): void {
+): ReturnType<typeof serve> {
   const envPort = Number(process.env.PORT);
   const basePort =
     Number.isInteger(envPort) && envPort >= 1 && envPort <= 65535
       ? envPort
       : port;
 
-  tryPort(app, basePort, 10, onStart);
+  return tryPort(app, basePort, 10, onStart);
 }
 
 function tryPort(
@@ -21,7 +21,7 @@ function tryPort(
   port: number,
   attemptsLeft: number,
   onStart?: (port: number) => void
-): void {
+): ReturnType<typeof serve> {
   const server = serve({ fetch: app.fetch, port }, (info) => {
     consola.success(`SimAPI running at http://localhost:${info.port}`);
     onStart?.(info.port);
@@ -35,4 +35,6 @@ function tryPort(
       throw err;
     }
   });
+
+  return server;
 }

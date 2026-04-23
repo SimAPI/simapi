@@ -235,12 +235,13 @@ for (const endpoint of endpoints) {
     c.req.raw.headers.forEach((v, k) => { headers[k] = v; });
 
     let body: Record<string, unknown> = {};
+    const form: Record<string, unknown> = {};
     const ct = c.req.header("content-type") ?? "";
     if (ct.includes("application/json"))
       body = await c.req.json<Record<string, unknown>>().catch(() => ({}));
-    else if (ct.includes("application/x-www-form-urlencoded")) {
-      const form = await c.req.formData().catch(() => null);
-      form?.forEach((v, k) => { body[k] = v; });
+    else if (ct.includes("application/x-www-form-urlencoded") || ct.includes("multipart/form-data")) {
+      const fd = await c.req.formData().catch(() => null);
+      fd?.forEach((v, k) => { form[k] = v; });
     }
 
     const query: Record<string, string> = {};
@@ -259,12 +260,13 @@ for (const endpoint of endpoints) {
     }
     if (endpoint.request) {
       _collect(endpoint.request.body, body);
+      _collect(endpoint.request.form, form);
       _collect(endpoint.request.query, query);
       _collect(endpoint.request.headers, headers);
     }
     const _errors = new ValidationErrors(_bag);
 
-    const req = new AppRequest(headers, body, query, c.req.param() as Record<string, string>, _errors);
+    const req = new AppRequest(headers, body, form, query, c.req.param() as Record<string, string>, _errors);
 
     if (endpoint.type === "secure") {
       ${authRel ? "const ar = config.authHandler ? config.authHandler(req) : (authHandler(req));" : "const ar = config.authHandler?.(req);"}

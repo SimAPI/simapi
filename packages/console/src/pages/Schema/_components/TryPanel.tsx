@@ -72,7 +72,6 @@ export function TryPanel({
         extractPathParams(endpoint.path).map((param) => [param, ""])
       )
     );
-    setHeaderRows(buildDefaultRows(endpoint.headerSchema));
     setQueryRows(buildDefaultRows(endpoint.querySchema));
     setBodyType(endpoint.formSchema && !endpoint.schema ? "form" : "json");
     setBodyText(buildDefaultBody(endpoint, "json"));

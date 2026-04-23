@@ -70,7 +70,7 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
     // @simapi/console not installed — skip
   }
 
-  startServer(app, port, (actualPort) => {
+  const server = startServer(app, port, (actualPort) => {
     if (consoleMounted) {
       consola.info(
         `Console at http://localhost:${actualPort}/__simapi/console/`
@@ -80,11 +80,15 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
 
   for (const signal of ["SIGINT", "SIGTERM"] as const) {
     process.once(signal, async () => {
-      if (!bus) process.exit(0);
+      server.close();
 
-      await bus.close().catch((err) => {
-        consola.error("[SimAPI] shutdown error:", err);
-      });
+      if (bus) {
+        await bus.close().catch((err) => {
+          consola.error("[SimAPI] shutdown error:", err);
+        });
+      }
+
+      process.exit(0);
     });
   }
 }

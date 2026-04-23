@@ -38,13 +38,19 @@ export const api = {
     body?: unknown,
     headers?: Record<string, string>
   ) => {
+    const isJsonPayload =
+      body !== undefined &&
+      !(body instanceof FormData) &&
+      !(body instanceof Blob) &&
+      typeof body !== "string";
+
     return fetch(path, {
       method,
       headers: {
-        ...(body !== undefined ? { "content-type": "application/json" } : {}),
+        ...(isJsonPayload ? { "content-type": "application/json" } : {}),
         ...(headers ?? {}),
       },
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: isJsonPayload ? JSON.stringify(body) : (body as BodyInit),
     });
   },
 };
