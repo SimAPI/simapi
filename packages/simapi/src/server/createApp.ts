@@ -135,7 +135,7 @@ function registerEndpoint(
       const durationMs = Date.now() - start;
 
       if (config.consoleLog) {
-        consola.log(
+        consola.info(
           `${endpoint.method} ${c.req.path} → ${logStatus} (${durationMs}ms)`
         );
       }
