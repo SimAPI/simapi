@@ -26,15 +26,15 @@ npm run build
 
 All commands below are run from the **monorepo root** unless noted otherwise.
 
-| Command | What it does |
-|---|---|
-| `npm run build` | Build every package (Turborepo) |
-| `npm run dev` | Watch-mode build for all packages |
-| `npm run test` | Run the full test suite (Vitest) |
+| Command               | What it does                       |
+| --------------------- | ---------------------------------- |
+| `npm run build`       | Build every package (Turborepo)    |
+| `npm run dev`         | Watch-mode build for all packages  |
+| `npm run test`        | Run the full test suite (Vitest)   |
 | `npm run check-types` | TypeScript type-check all packages |
-| `npm run lint` | Lint with Biome |
-| `npm run lint:fix` | Lint and auto-fix |
-| `npm run format` | Format all files with Biome |
+| `npm run lint`        | Lint with Biome                    |
+| `npm run lint:fix`    | Lint and auto-fix                  |
+| `npm run format`      | Format all files with Biome        |
 
 To work only on this package:
 

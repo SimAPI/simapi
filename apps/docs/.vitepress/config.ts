@@ -58,17 +58,30 @@ export default defineConfig({
         ],
       },
       {
+        text: "Packages",
+        items: [
+          {
+            text: "@simapi/simapi",
+            items: [
+              { text: "README", link: "/packages/simapi" },
+              { text: "CHANGELOG", link: "/packages/simapi/changelog" },
+              { text: "CONTRIBUTING", link: "/packages/simapi/contributing" },
+            ],
+          },
+          {
+            text: "@simapi/console",
+            items: [
+              { text: "README", link: "/packages/console" },
+              { text: "CHANGELOG", link: "/packages/console/changelog" },
+            ],
+          },
+        ],
+      },
+      {
         text: "Examples",
         items: [
           { text: "Blog API", link: "/examples/blog-sample" },
           { text: "Shop API", link: "/examples/shop-sample" },
-        ],
-      },
-      {
-        text: "Changelog",
-        items: [
-          { text: "@simapi/simapi", link: "/changelog/simapi" },
-          { text: "@simapi/console", link: "/changelog/console" },
         ],
       },
     ],

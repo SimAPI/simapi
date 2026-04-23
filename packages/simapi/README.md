@@ -1,5 +1,5 @@
 <h1 align="center" style="margin-bottom: 0px;">SimAPI</h1>
-<h3 align="center" style="margin: -10px 0 30px 0;">@simapi/simapi</h3>
+<h3 align="center" style="margin: 0 0 30px 0;">@simapi/simapi</h3>
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="160" style="display: block; border-radius: 10px;" />
@@ -16,8 +16,6 @@
 </p>
 
 Build frontend features against real API behavior — before your backend exists. SimAPI lets you define endpoints as plain TypeScript objects, generate realistic fake data with faker-js, validate requests with Zod, and log everything to a database.
-
----
 
 ## Install
 
