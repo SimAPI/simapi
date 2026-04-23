@@ -1,11 +1,11 @@
 import { useState } from "react";
+import { Logo } from "./components/Layout/Logo.js";
+import { MobileNav } from "./components/Layout/MobileNav.js";
+import { Sidebar } from "./components/Layout/Sidebar.js";
 import { useDarkMode } from "./hooks/useDarkMode.js";
 import Logs from "./pages/Logs.js";
 import Overview from "./pages/Overview.js";
 import Schema from "./pages/Schema.js";
-import { Sidebar } from "./components/Layout/Sidebar.js";
-import { MobileNav } from "./components/Layout/MobileNav.js";
-import { Logo } from "./components/Layout/Logo.js";
 
 type Tab = "overview" | "logs" | "schema";
 
@@ -32,7 +32,7 @@ export default function App() {
       <main className="flex-1 overflow-hidden flex flex-col min-w-0 pb-14 sm:pb-0">
         {/* Mobile top bar */}
         <div className="sm:hidden flex items-center justify-between px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
-          <Logo size="sm" />
+          <Logo />
           <button
             type="button"
             onClick={() => setDark(!dark)}

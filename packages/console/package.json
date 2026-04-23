@@ -49,6 +49,7 @@
     "build": "vite build && tsdown",
     "prepublishOnly": "npm run build",
     "dev": "vite",
+    "pkg:dev": "vite",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "type-check": "tsc --noEmit"
