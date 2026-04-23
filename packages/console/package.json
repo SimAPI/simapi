@@ -61,6 +61,7 @@
   "devDependencies": {
     "@hono/node-server": "^1.14.0",
     "@repo/typescript-config": "*",
+    "@tailwindcss/node": "^4.2.4",
     "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^25.6.0",
     "@types/react": "^18.3.0",
