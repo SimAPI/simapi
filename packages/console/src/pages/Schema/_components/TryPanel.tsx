@@ -28,7 +28,7 @@ export function TryPanel({
   const pathParamNames = extractPathParams(endpoint.path);
 
   const [pathParams, setPathParams] = useState<Record<string, string>>(() =>
-    Object.fromEntries(pathParamNames.map((param) => [param, ""])),
+    Object.fromEntries(pathParamNames.map((param) => [param, ""]))
   );
   const [headerRows, setHeaderRows] = useState<[string, string][]>(() => {
     const saved = localStorage.getItem("simapi-console-headers");
@@ -42,16 +42,16 @@ export function TryPanel({
     return buildDefaultRows(endpoint.headerSchema);
   });
   const [queryRows, setQueryRows] = useState<[string, string][]>(() =>
-    buildDefaultRows(endpoint.querySchema),
+    buildDefaultRows(endpoint.querySchema)
   );
   const [bodyType, setBodyType] = useState<"json" | "form">(() =>
-    endpoint.formSchema && !endpoint.schema ? "form" : "json",
+    endpoint.formSchema && !endpoint.schema ? "form" : "json"
   );
   const [bodyText, setBodyText] = useState(() =>
-    buildDefaultBody(endpoint, "json"),
+    buildDefaultBody(endpoint, "json")
   );
   const [formRows, setFormRows] = useState<[string, string][]>(() =>
-    buildDefaultRows(endpoint.formSchema),
+    buildDefaultRows(endpoint.formSchema)
   );
   const [omittedFields, setOmittedFields] = useState<Set<string>>(new Set());
 
@@ -69,8 +69,8 @@ export function TryPanel({
   useEffect(() => {
     setPathParams(
       Object.fromEntries(
-        extractPathParams(endpoint.path).map((param) => [param, ""]),
-      ),
+        extractPathParams(endpoint.path).map((param) => [param, ""])
+      )
     );
     setHeaderRows(buildDefaultRows(endpoint.headerSchema));
     setQueryRows(buildDefaultRows(endpoint.querySchema));
@@ -96,7 +96,7 @@ export function TryPanel({
       url = url.replace(`:${key}`, encodeURIComponent(value || `:${key}`));
     }
     const queryParams = [...queryRows, ...buildAuthQuery(auth)].filter(
-      ([key]) => key && !omittedFields.has(`query:${key}`),
+      ([key]) => key && !omittedFields.has(`query:${key}`)
     );
     if (queryParams.length > 0) {
       const searchParams = new URLSearchParams(queryParams);
@@ -113,9 +113,7 @@ export function TryPanel({
       let body: unknown;
       let headers: Record<string, string> = buildAuthHeaders(auth);
       const customHeaders = Object.fromEntries(
-        headerRows.filter(
-          ([key]) => key && !omittedFields.has(`header:${key}`),
-        ),
+        headerRows.filter(([key]) => key && !omittedFields.has(`header:${key}`))
       );
       headers = { ...headers, ...customHeaders };
 
@@ -125,8 +123,8 @@ export function TryPanel({
             const parsed = JSON.parse(bodyText);
             const filtered = Object.fromEntries(
               Object.entries(parsed).filter(
-                ([key]) => !omittedFields.has(`body:${key}`),
-              ),
+                ([key]) => !omittedFields.has(`body:${key}`)
+              )
             );
             body = filtered;
           } catch {
@@ -147,7 +145,7 @@ export function TryPanel({
         endpoint.method,
         buildUrl(),
         hasBody ? body : undefined,
-        Object.keys(headers).length > 0 ? headers : undefined,
+        Object.keys(headers).length > 0 ? headers : undefined
       );
       const text = await apiResponse.text();
       setResponse({
@@ -173,10 +171,9 @@ export function TryPanel({
   };
 
   return (
-    <div
+    <section
       className="flex flex-col bg-transparent text-muted-foreground font-mono text-[13px] relative focus:outline-none"
       onKeyDown={handleKeyDown}
-      role="region"
       aria-label="API Try Panel"
       tabIndex={-1}
     >
@@ -321,6 +318,6 @@ export function TryPanel({
 
       {/* Persistence Action Layer */}
       <TryActionFooter onSend={send} loading={loading} />
-    </div>
+    </section>
   );
 }

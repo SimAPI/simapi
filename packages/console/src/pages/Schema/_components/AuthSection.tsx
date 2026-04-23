@@ -14,11 +14,15 @@ export function AuthSection({
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
+        <label
+          htmlFor="auth-preset"
+          className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1"
+        >
           Security Strategy
         </label>
         <div className="relative group">
           <select
+            id="auth-preset"
             value={auth.preset}
             onChange={(event) =>
               onChange({
@@ -62,10 +66,14 @@ export function AuthSection({
       <div className="space-y-6 pt-4 border-t border-border/50">
         {auth.preset === "bearer" && (
           <div className="space-y-3">
-            <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
+            <label
+              htmlFor="auth-token"
+              className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1"
+            >
               Access Token
             </label>
             <input
+              id="auth-token"
               className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
               placeholder="ey..."
               value={auth.token}
@@ -77,10 +85,14 @@ export function AuthSection({
         {auth.preset === "basic" && (
           <div className="grid grid-cols-2 gap-8">
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
+              <label
+                htmlFor="auth-username"
+                className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1"
+              >
                 Principal
               </label>
               <input
+                id="auth-username"
                 className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
                 placeholder="id"
                 value={auth.username}
@@ -90,10 +102,14 @@ export function AuthSection({
               />
             </div>
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
+              <label
+                htmlFor="auth-password"
+                className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1"
+              >
                 Secret
               </label>
               <input
+                id="auth-password"
                 className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
                 placeholder="pass"
                 type="password"
@@ -111,10 +127,14 @@ export function AuthSection({
           auth.preset === "cookie") && (
           <div className="grid grid-cols-2 gap-8">
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
+              <label
+                htmlFor="auth-keyname"
+                className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1"
+              >
                 Field Key
               </label>
               <input
+                id="auth-keyname"
                 className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
                 placeholder="X-KEY"
                 value={auth.keyName}
@@ -124,10 +144,14 @@ export function AuthSection({
               />
             </div>
             <div className="space-y-3">
-              <label className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1">
+              <label
+                htmlFor="auth-keyvalue"
+                className="text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest block pl-1"
+              >
                 Credential
               </label>
               <input
+                id="auth-keyvalue"
                 className="w-full bg-transparent border-b border-border focus:border-primary/50 outline-none py-2 transition-all text-foreground font-mono text-[12px] placeholder:text-muted-foreground/30"
                 placeholder="value"
                 value={auth.keyValue}

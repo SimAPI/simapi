@@ -12,7 +12,7 @@ export function JsonView({ data, title, copyable = true }: JsonViewProps) {
   const jsonString = JSON.stringify(
     typeof data === "string" ? JSON.parse(data) : data,
     null,
-    2,
+    2
   );
 
   const handleCopy = () => {
@@ -42,7 +42,7 @@ export function JsonView({ data, title, copyable = true }: JsonViewProps) {
           cls = "text-error"; // null
         }
         return `<span class="${cls}">${match}</span>`;
-      },
+      }
     );
 
   return (
@@ -97,6 +97,7 @@ export function JsonView({ data, title, copyable = true }: JsonViewProps) {
       <div className="max-h-[45vh] p-8 overflow-x-auto scrollbar-none">
         <pre
           className="text-[13px] leading-relaxed font-mono whitespace-pre"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: intentional for syntax highlighting
           dangerouslySetInnerHTML={{ __html: highlighted }}
         />
       </div>

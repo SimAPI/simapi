@@ -20,7 +20,7 @@ export function Sidebar({
   onToggleDark: () => void;
 }) {
   return (
-    <aside className="hidden sm:flex w-[72px] shrink-0 flex-col bg-card border-r border-card-border transition-all duration-500 group/sidebar hover:w-4864">
+    <aside className="hidden sm:flex w-[72px] shrink-0 flex-col bg-card border-r border-card-border transition-all duration-500 group/sidebar hover:w-64">
       {/* Branding Dock */}
       <div className="h-20 flex items-center justify-center group-hover/sidebar:justify-start group-hover/sidebar:px-7 transition-all">
         <Logo />
@@ -76,15 +76,6 @@ export function Sidebar({
           >
             {isDark ? "☀" : "◑"}
           </button>
-
-          <div className="hidden group-hover/sidebar:flex flex-col items-end">
-            <span className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest">
-              Engine
-            </span>
-            <span className="text-[11px] font-mono text-muted-foreground font-bold">
-              v0.0.8
-            </span>
-          </div>
         </div>
       </div>
     </aside>
