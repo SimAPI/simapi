@@ -1,4 +1,5 @@
 import { defineConfig } from "vitepress";
+import { version } from "./../../../packages/simapi/package.json";
 
 export default defineConfig({
   title: "SimAPI Docs",
@@ -16,16 +17,29 @@ export default defineConfig({
     search: { provider: "local" },
 
     nav: [
-      { text: "Guide", link: "/guide/" },
+      { text: "Guide", link: "/guide/introduction" },
       { text: "API", link: "/api/app-request" },
+      {
+        text: `v${version}`,
+        items: [
+          {
+            text: "Changelog",
+            link: "/packages/simapi/changelog",
+          },
+          {
+            text: "Contributing",
+            link: "/packages/simapi/contributing",
+          },
+        ],
+      },
       { text: "GitHub", link: "https://github.com/SimAPI/simapi" },
-      { text: "Team", link: "/team" },
     ],
 
     sidebar: [
       {
         text: "Guide",
         items: [
+          { text: "Introduction", link: "/guide/introduction" },
           { text: "Getting Started", link: "/guide/" },
           { text: "Defining Endpoints", link: "/guide/endpoints" },
           { text: "Authentication", link: "/guide/authentication" },
@@ -93,7 +107,7 @@ export default defineConfig({
     socialLinks: [{ icon: "github", link: "https://github.com/SimAPI/simapi" }],
 
     footer: {
-      message: "Released under the MIT License.",
+      message: `Released under the MIT License. (v${version})`,
       copyright: "Copyright © 2026 - Present MayR Labs",
     },
 

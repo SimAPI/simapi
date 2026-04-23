@@ -3,15 +3,15 @@ layout: home
 
 hero:
   name: SimAPI
-  text: Ship frontend features before the backend exists.
-  tagline: Define real API behaviour in TypeScript. Get a running mock server in seconds. No backend team required.
+  text: Build against reality, not assumptions.
+  tagline: The local-first backend simulator for modern frontend engineering. Define real API behavior in TypeScript and ship your features before the backend exists.
   image:
     src: https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png
     alt: SimAPI
   actions:
     - theme: brand
       text: Get Started in 60s
-      link: /guide/
+      link: /guide/introduction
     - theme: alt
       text: View on GitHub
       link: https://github.com/SimAPI/simapi
@@ -19,28 +19,28 @@ hero:
 features:
   - icon:
       src: /ts-feature.svg
-    title: Plain TypeScript objects
-    details: No decorators, no classes, no framework lock-in. An endpoint is just an exported object with a path, method, and handler.
+    title: Code-First Intelligence
+    details: Define your API as plain TypeScript objects. No decorators, no boilerplate, and no framework lock-in. Just pure, typed logic.
   - icon:
       src: /server-feature.svg
-    title: Zero-config dev server
-    details: "`simapi serve` discovers every endpoint automatically and starts a live-reloading server. No build step, no config."
+    title: Local-First DX
+    details: Instant live-reloading with zero config. `simapi dev` auto-discovers your endpoints and provides a real HTTP server in seconds.
   - icon:
       src: /data-feature.svg
-    title: Realistic fake data
-    details: Powered by faker-js. Generate unique ULIDs, sentences, names, emails, and booleans per request — in one line.
+    title: Realistic Simulation
+    details: Powered by faker-js. Generate dynamic, unique data for every request—from ULIDs and emails to complex user profiles.
   - icon:
       src: /logs-feature.svg
-    title: Built-in request logging
-    details: Every request logged to SQLite, libSQL, or Postgres. Filter, export, and replay from the debug console.
+    title: Deep Observability
+    details: Persistent logging to SQLite, libSQL, or Postgres. Inspect, filter, and replay requests directly from the debug console.
   - icon:
       src: /console-feature.svg
-    title: Validation without boilerplate
-    details: Add a `request` field with Zod shapes for body, query, and headers. SimAPI validates all three before your handler runs and formats errors automatically.
+    title: Professional Validation
+    details: First-class Zod integration. Validate request bodies, queries, and headers instantly and return formatted error bags automatically.
   - icon:
       src: /deploy-feature.svg
-    title: Deploy when you're ready
-    details: "`simapi build` compiles your project to a single Node.js file. Deploy to Railway, Render, Fly.io, or any host."
+    title: Ship Anywhere
+    details: Compiled to a single optimized Node.js entry. Deploy your mock server to Vercel, Netlify, Railway, or Docker with ease.
 ---
 
 ## A full mock API in under a minute
