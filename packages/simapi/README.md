@@ -335,7 +335,7 @@ Then open **http://localhost:3000/__simapi/console/** while `simapi serve` is ru
 
 Version 0.0.8+: The console now persists your Authentication state and custom Headers to `localStorage` and supports switching between JSON and Form inputs for testing.
 
-See [`@simapi/console`](../console) for details.
+See [`@simapi/console`](https://www.npmjs.com/package/@simapi/console) for details.
 
 ---
 
@@ -361,10 +361,10 @@ See [`@simapi/console`](../console) for details.
 
 `@simapi/simapi` is open source and contributions are welcome and appreciated — whether it's a bug report, a feature suggestion, a doc fix, or a pull request.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, development workflow, code style, and how to submit a PR.
+See [CONTRIBUTING.md](https://github.com/SimAPI/simapi/blob/main/packages/simapi/CONTRIBUTING.md) for local setup, development workflow, code style, and how to submit a PR.
 
 ---
 
 ## License
 
-[MIT](../../LICENSE)
+[MIT](https://github.com/SimAPI/simapi/blob/main/LICENSE)

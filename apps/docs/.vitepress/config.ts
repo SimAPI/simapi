@@ -37,6 +37,7 @@ export default defineConfig({
       },
       {
         text: "Deployment",
+        collapsed: false,
         items: [
           { text: "Overview", link: "/deployment/" },
           { text: "Vercel", link: "/deployment/vercel" },
@@ -47,6 +48,7 @@ export default defineConfig({
       },
       {
         text: "API Reference",
+        collapsed: false,
         items: [
           { text: "EndpointDefinition", link: "/api/endpoint-definition" },
           { text: "RequestDefinition", link: "/api/request-definition" },
@@ -59,6 +61,7 @@ export default defineConfig({
       },
       {
         text: "Packages",
+        collapsed: true,
         items: [
           {
             text: "@simapi/simapi",
@@ -79,6 +82,7 @@ export default defineConfig({
       },
       {
         text: "Examples",
+        collapsed: true,
         items: [
           { text: "Blog API", link: "/examples/blog-sample" },
           { text: "Shop API", link: "/examples/shop-sample" },

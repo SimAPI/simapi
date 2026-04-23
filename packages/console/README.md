@@ -45,4 +45,4 @@ Browse to `http://localhost:3000/__simapi/console/` to open it.
 
 ## License
 
-[MIT](../../LICENSE)
+[MIT](https://github.com/SimAPI/simapi/blob/main/LICENSE)
