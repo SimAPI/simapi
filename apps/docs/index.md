@@ -11,7 +11,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started in 60s
-      link: /guide/introduction
+      link: /guide
     - theme: alt
       text: View on GitHub
       link: https://github.com/SimAPI/simapi

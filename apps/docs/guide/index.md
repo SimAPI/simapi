@@ -1,136 +1,47 @@
-# Getting Started
+<h1 align="center" style="margin-bottom: 0px;">SimAPI</h1>
+<h3 align="center" style="margin: 0 0 30px 0;">Introduction</h3>
 
-## Quickstart
+<p align="center">
+  <img src="https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png" alt="SimAPI" width="160" style="display: block; border-radius: 10px;" />
+</p>
 
-The fastest way to start a SimAPI project:
+<p align="center">
+  Mock backends that behave like real ones.
+</p>
 
-```sh
-npx @simapi/simapi@latest init my-api
-cd my-api
-npm run dev
-```
+**SimAPI** is a local-first backend simulator designed to bridge the gap between frontend imagination and backend reality. It allows development teams to build, test, and document their features against real API behavior before a single line of production backend code is ever written.
 
-Your mock server is running at **http://localhost:3000**. Edit any file in `src/` and the server restarts automatically.
+## The Developer's Dilemma
 
-## Project structure
+Modern frontend engineering often outpaces backend development. When the API isn't ready, developers are traditionally forced into three compromised paths:
+1.  **The Waiting Game**: Productivity stalls while waiting for the backend team to ship an endpoint.
+2.  **Hardcoded Lies**: Embedding static JSON directly in your code. It works, but it lies about network latency, authentication flows, and validation errors.
+3.  **Complex Mocking**: Spending hours configuring heavy mocking libraries that are disconnected from your actual repository and version control.
 
-A well-organized SimAPI project keeps endpoints and models inside `src/`:
+**SimAPI gives you a fourth option: Build against reality.**
 
-```
-my-api/
-├── src/
-│   ├── endpoints/          # Grouped by resource — every named export is auto-discovered
-│   │   ├── posts.ts        # listPosts, getPost, createPost, …
-│   │   ├── users.ts        # listUsers, getUser, createUser, …
-│   │   └── comments.ts     # listComments, createComment, …
-│   ├── requests/           # Zod validation schemas — keeps handlers clean
-│   │   ├── posts.ts        # createPostRequest, …
-│   │   └── users.ts        # registerRequest, …
-│   ├── models/             # Shared data factories — keeps endpoints DRY
-│   │   ├── post.ts         # Post interface + makePost() factory
-│   │   └── user.ts         # User interface + makeUser() factory
-│   └── authHandler.ts      # Optional — global auth handler
-├── simapi.config.ts
-└── package.json
-```
+## Build Against Reality, Not Assumptions
 
-You can put as many endpoints as you like in one file. SimAPI discovers every named export from every `.ts` file inside `src/endpoints/` automatically — no registration required.
+SimAPI takes a **code-first, local-first** approach. By defining your API as plain TypeScript objects within your repository, you spin up a real HTTP server that mimics your future production environment with surgical precision.
 
-## Defining models
+### 🛠️ Code-First Architecture
+No decorators, no complex classes, and no proprietary GUI tools. If you can write a TypeScript object, you can build a backend. Enjoy full type safety, autocomplete, and the ability to share models between your mock and your production code.
 
-A model file exports a TypeScript interface and a factory function that generates realistic fake data:
+### 🧪 Realistic Simulation
+True simulation isn't just about successful responses (the "happy path"). SimAPI empowers you to battle-test your frontend against:
+-   **Validation**: Integrated Zod support ensures your requests are strictly validated before your handler ever runs.
+-   **Authentication**: Built-in handlers for Bearer tokens, API keys, and custom logic.
+-   **Latency & Errors**: Use the `delay` property to simulate slow connections and `failRate` to ensure your UI gracefully handles 500 errors.
 
-```ts
-// src/models/post.ts
-import { faker } from "@simapi/simapi";
+### 🔍 Visual Debugging
+The **SimAPI Console** is a professional-grade interface that transforms your mock server from a "black box" into a transparent development environment. Inspect live request logs, browse auto-generated documentation, and test endpoints interactively without leaving your browser.
 
-export interface Post {
-  id: string;
-  title: string;
-  body: string;
-  published: boolean;
-  author: string;
-}
+## Core Philosophy
 
-export function makePost(): Post {
-  return {
-    id: faker.string.ulid(),
-    title: faker.lorem.sentence(),
-    body: faker.lorem.paragraphs(2),
-    published: faker.datatype.boolean(),
-    author: faker.person.fullName(),
-  };
-}
-```
+-   **Code for Humans**: We prioritize readable, predictable patterns. No "clever" abstractions that hide how the server actually works.
+-   **Framework Agnostic**: SimAPI doesn't care if you use React, Vue, Next.js, Flutter, or Swift. If it speaks HTTP, it works with SimAPI.
+-   **Local-First, Always**: Your mocks are versioned alongside your code. No cloud dependencies, no internet required, and no hidden costs.
 
-## Grouping endpoints
+---
 
-Multiple endpoints can live in a single file.
-
-```ts
-// src/endpoints/posts.ts
-import { z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
-import { makePost } from "@/models/post.js";
-
-export const listPosts: EndpointDefinition = {
-  path: "/api/posts",
-  method: "GET",
-  type: "open",
-  handler: () =>
-    AppResponse.success({ data: AppResponse.array(10, makePost) }),
-};
-
-export const getPost: EndpointDefinition = {
-  path: "/api/posts/:id",
-  method: "GET",
-  type: "open",
-  handler: () => AppResponse.success({ data: makePost() }),
-};
-
-export const createPost: EndpointDefinition = {
-  path: "/api/posts",
-  method: "POST",
-  type: "secure",
-  request: {
-    body: {
-      title: z.string().min(3),
-      body: z.string().min(10),
-    },
-  },
-  handler: (req) => {
-    req.errors.throwValidationError();
-    return AppResponse.created({ data: makePost() });
-  },
-};
-```
-
-## Development workflow
-
-```sh
-npm run dev      # Start dev server with file watching — auto-restarts on changes
-npm run serve    # Start dev server once (no watching)
-npm run build    # Compile to .simapi/dist/ for deployment
-npm run start    # Run the compiled production server
-npm run simapi   # Interactive CLI — setup, console, import/export
-```
-
-## Demo project
-
-A complete example with posts, users, and comments is available in the
-[SimAPI repository](https://github.com/SimAPI/simapi/tree/main/examples).
-
-## Adding the console
-
-Install the optional request inspector via the interactive CLI:
-
-```sh
-npm run simapi   # → Console → Add
-```
-
-Or directly:
-
-```sh
-npx simapi console:add
-```
-
-Browse to **http://localhost:3000/__simapi/console/** to inspect live requests, view your schema, and fire test requests interactively.
+Ready to close the gap? **[Start your first project in 60 seconds →](/guide/)**

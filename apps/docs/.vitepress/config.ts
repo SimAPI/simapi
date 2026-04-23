@@ -39,8 +39,8 @@ export default defineConfig({
       {
         text: "Guide",
         items: [
-          { text: "Introduction", link: "/guide/introduction" },
-          { text: "Getting Started", link: "/guide/" },
+          { text: "Introduction", link: "/guide/" },
+          { text: "Getting Started", link: "/guide/getting-started" },
           { text: "Defining Endpoints", link: "/guide/endpoints" },
           { text: "Authentication", link: "/guide/authentication" },
           { text: "Configuration", link: "/guide/config" },
