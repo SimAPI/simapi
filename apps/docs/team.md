@@ -12,9 +12,7 @@ const members = [
   {
     avatar: 'https://www.gravatar.com/avatar/45771b7793feb7b6a95418eeef3748a1',
     name: 'YoungMayor',
-    title: 'Founder & Lead Developer',
-    org: 'MayR Labs',
-    orgLink: 'https://mayrlabs.com',
+    title: 'Author',
     links: [
       { icon: 'github', link: 'https://github.com/YoungMayor' },
       { icon: 'linkedin', link: 'https://linkedin.com/in/meyoron-aghogho' },

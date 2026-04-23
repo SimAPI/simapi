@@ -1,4 +1,4 @@
-import { AppResponse, type EndpointDefinition, z } from "@simapi/simapi";
+import { AppResponse, type EndpointDefinition, faker, z } from "@simapi/simapi";
 
 export const login: EndpointDefinition = {
   path: "/api/auth/login",
@@ -13,17 +13,18 @@ export const login: EndpointDefinition = {
       password: z.string().min(8),
     },
   },
-  handler: () =>
-    AppResponse.success({
-      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo",
+  handler: () => {
+    return AppResponse.success({
+      token: faker.internet.jwt(),
       expiresIn: 3600,
       user: {
-        id: "01HV4Z6K8X1A2B3C4D5E6F7G8H",
-        name: "Jane Doe",
-        email: "jane@example.com",
-        role: "editor",
+        id: faker.string.ulid(),
+        name: faker.person.fullName(),
+        email: faker.internet.email({ provider: "simapi.mayrlabs.com" }),
+        role: faker.helpers.arrayElement(["admin", "editor", "viewer"]),
       },
-    }),
+    });
+  },
 };
 
 export const logout: EndpointDefinition = {
