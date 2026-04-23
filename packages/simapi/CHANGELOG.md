@@ -1,5 +1,14 @@
 # @simapi/simapi
 
+## 0.0.9 - Better OpenAPI Import & Interactive CLI
+ 
+- **Import:** Improved grouping logic — endpoints are now organized by their base path with camelCase normalization (e.g., `authVerification.ts`)
+- **Import:** Intelligent naming — variables now prioritize OpenAPI summaries and operation IDs, falling back to `{method}{Path}` with automatic collision handling
+- **Interactive:** Spec auto-discovery — `simapi interactive` now scans the current directory and lists potential OpenAPI files for quick selection
+- **Docs:** Overhauled documentation — professional introduction, vision statement, and detailed comparison against alternatives
+- **Fix:** Reliable process termination on SIGINT/SIGTERM, ensuring ports are always released
+- **Fix:** Correctly handle `FormData` and `Blob` in `AppRequest` and production builds
+ 
 ## 0.0.8 - Console overhaul & validation improvements
 
 - **Console:** Authenticated state and custom headers are now persisted to `localStorage` — no more re-entering tokens on refresh

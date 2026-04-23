@@ -38,36 +38,62 @@ function oaToHonoPath(path: string): string {
   return path.replace(/\{([^}]+)\}/g, ":$1");
 }
 
-function resourceName(path: string): string {
-  const parts = path.split("/").filter(Boolean);
-  for (let i = parts.length - 1; i >= 0; i--) {
-    const segment = parts[i];
-    if (segment && !segment.startsWith("{")) return segment;
-  }
-  return "endpoints";
+function getFileName(path: string): string {
+  const segments = path
+    .split("/")
+    .filter(Boolean)
+    .filter((s) => !s.startsWith("{"));
+
+  if (segments.length === 0) return "endpoints";
+
+  if (segments.length === 1) return segments[0] || "endpoints";
+
+  // Take all except last, join and camelCase
+  return segments
+    .slice(0, -1)
+    .map((s, i) => {
+      const camel = s.replace(/[-_\s]+(.)/g, (_, c: string) => c.toUpperCase());
+      return i === 0 ? camel : camel.charAt(0).toUpperCase() + camel.slice(1);
+    })
+    .join("");
 }
 
-function toHandlerName(
+function getObjectName(
   method: string,
   path: string,
-  operationId?: string
+  op: OAOperation,
+  existingNames: Set<string>
 ): string {
-  if (operationId) {
-    return operationId
+  let name: string;
+
+  if (op.summary) {
+    name = op.summary
+      .replace(/[-_\s]+(.)/g, (_, c: string) => c.toUpperCase())
+      .replace(/[^a-zA-Z0-9_$]/g, "")
+      .replace(/^(.)/, (c: string) => c.toLowerCase());
+  } else if (op.operationId) {
+    name = op.operationId
       .replace(/[-_\s]+(.)/g, (_, c: string) => c.toUpperCase())
       .replace(/^(.)/, (c: string) => c.toLowerCase());
+  } else {
+    const segments = path
+      .split("/")
+      .filter(Boolean)
+      .filter((s) => !s.startsWith("{"));
+    const lastSegment = segments.at(-1) || "handler";
+    const capLast = lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
+    name = `${method.toLowerCase()}${capLast}`;
   }
-  const resource = resourceName(path);
-  const isItem = /\{[^}]+\}/.test(path.split("/").at(-1) ?? "");
-  const prefix: Record<string, string> = {
-    get: isItem ? "get" : "list",
-    post: "create",
-    put: "update",
-    patch: "patch",
-    delete: "remove",
-  };
-  const cap = resource.charAt(0).toUpperCase() + resource.slice(1);
-  return `${prefix[method] ?? method}${cap}`;
+
+  // Handle duplicates
+  let finalName = name;
+  let counter = 1;
+  while (existingNames.has(finalName)) {
+    finalName = `${name}${counter}`;
+    counter++;
+  }
+  existingNames.add(finalName);
+  return finalName;
 }
 
 function zodFromSchema(schema: OASchema): string {
@@ -92,7 +118,9 @@ function zodFromSchema(schema: OASchema): string {
     case "boolean":
       return "z.boolean()";
     case "array":
-      return `z.array(${schema.items ? zodFromSchema(schema.items) : "z.unknown()"})`;
+      return `z.array(${
+        schema.items ? zodFromSchema(schema.items) : "z.unknown()"
+      })`;
     default:
       return "z.unknown()";
   }
@@ -104,13 +132,20 @@ function buildRequestBlock(schema: OASchema): string | null {
   const lines = Object.entries(schema.properties).map(([key, prop]) => {
     const required = schema.required?.includes(key) ?? false;
     const propName = isIdentifier(key) ? key : `"${key}"`;
-    return `      ${propName}: ${zodFromSchema(prop)}${required ? "" : ".optional()"}`;
+    return `      ${propName}: ${zodFromSchema(prop)}${
+      required ? "" : ".optional()"
+    }`;
   });
   return `  request: {\n    body: {\n${lines.join(",\n")},\n    },\n  },`;
 }
 
-function buildEndpoint(method: string, path: string, op: OAOperation): string {
-  const name = toHandlerName(method, path, op.operationId);
+function buildEndpoint(
+  method: string,
+  path: string,
+  op: OAOperation,
+  existingNames: Set<string>
+): string {
+  const name = getObjectName(method, path, op, existingNames);
   const honoPath = oaToHonoPath(path);
   const authType = op.security ? "secure" : "open";
   const methodUpper = method.toUpperCase();
@@ -163,20 +198,29 @@ export async function runImportOpenAPI(
   }
 
   const groups = new Map<string, string[]>();
+  const groupNames = new Map<string, Set<string>>();
+
   for (const [path, pathItem] of Object.entries(spec.paths)) {
-    const resource = resourceName(path);
-    if (!groups.has(resource)) groups.set(resource, []);
+    const fileName = getFileName(path);
+    if (!groups.has(fileName)) {
+      groups.set(fileName, []);
+      groupNames.set(fileName, new Set());
+    }
+
+    const endpoints = groups.get(fileName);
+    const names = groupNames.get(fileName);
+
     for (const method of HTTP_METHODS) {
       const op = pathItem[method];
-      if (!op) continue;
-      groups.get(resource)?.push(buildEndpoint(method, path, op));
+      if (!op || !endpoints || !names) continue;
+      endpoints.push(buildEndpoint(method, path, op, names));
     }
   }
 
   mkdirSync(outputDir, { recursive: true });
 
   let written = 0;
-  for (const [resource, endpoints] of groups.entries()) {
+  for (const [fileName, endpoints] of groups.entries()) {
     const needsZ = endpoints.some((e) => e.includes("z."));
     const imports: string[] = [];
     if (needsZ) imports.push("z");
@@ -187,7 +231,7 @@ export async function runImportOpenAPI(
       endpoints.join("\n\n") +
       "\n";
 
-    const outPath = join(outputDir, `${resource}.ts`);
+    const outPath = join(outputDir, `${fileName}.ts`);
     writeFileSync(outPath, file, "utf8");
     consola.log(`[SimAPI] Wrote ${outPath}`);
     written++;

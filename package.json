@@ -21,7 +21,7 @@
     "test": "turbo run test",
     "release": "npx changeset publish",
     "prepare": "husky",
-    "cook": "npm run format && npm run lint && npm run changelog:sync && npm run check && npm install && npm run build && npm run test"
+    "cook": "npm run format && npm run lint && npm run check && npm install && npm run build && npm run test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.12",

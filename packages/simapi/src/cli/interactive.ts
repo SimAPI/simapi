@@ -1,3 +1,4 @@
+import { readdirSync } from "node:fs";
 import * as p from "@clack/prompts";
 
 import { runConsoleAdd, runConsoleRemove } from "./console.js";
@@ -66,11 +67,42 @@ export async function runInteractive(
     if (sub === "add") await runConsoleAdd(cwd);
     else await runConsoleRemove(cwd);
   } else if (action === "import") {
-    const spec = await p.text({
-      message: "Path to OpenAPI spec file",
-      placeholder: "openapi.yaml",
-      validate: (v) => (v.trim() ? undefined : "Spec path is required"),
-    });
+    const files = readdirSync(cwd).filter((f) =>
+      [".yaml", ".yml", ".json"].some((ext) => f.endsWith(ext))
+    );
+
+    let spec: string | symbol = "";
+
+    if (files.length > 0) {
+      const selected = await p.select({
+        message: "Select OpenAPI spec file",
+        options: [
+          ...files.map((f) => ({ value: f, label: f })),
+          { value: "other", label: "Other (enter path...)" },
+        ],
+      });
+
+      if (p.isCancel(selected)) {
+        p.cancel("Cancelled.");
+        return;
+      }
+
+      if (selected === "other") {
+        spec = await p.text({
+          message: "Path to OpenAPI spec file",
+          placeholder: "openapi.yaml",
+          validate: (v) => (v.trim() ? undefined : "Spec path is required"),
+        });
+      } else {
+        spec = selected as string;
+      }
+    } else {
+      spec = await p.text({
+        message: "Path to OpenAPI spec file",
+        placeholder: "openapi.yaml",
+        validate: (v) => (v.trim() ? undefined : "Spec path is required"),
+      });
+    }
 
     if (p.isCancel(spec)) {
       p.cancel("Cancelled.");

@@ -1,6 +1,6 @@
 {
   "name": "@simapi/simapi",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Build frontend features against real API behavior — before your backend exists.",
   "keywords": [
     "mock",

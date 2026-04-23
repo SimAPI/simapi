@@ -1,6 +1,10 @@
 # @simapi/console
 
-## 0.0.8 - Persistence, Form Data & Defaults
+## 0.0.9 - Version bump
+ 
+- Bumped in sync with `@simapi/simapi` 0.0.9
+ 
+ ## 0.0.8 - Persistence, Form Data & Defaults
 
 - **Persistence**: Authentication presets and custom headers are now saved to `localStorage` — no more re-entering tokens or keys on refresh
 - **Form Data**: Support for testing `multipart/form-data` and `application/x-www-form-urlencoded` endpoints via a new "Form" toggle in the Try-it panel
