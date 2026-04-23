@@ -22,18 +22,26 @@
     "test": "turbo run test",
     "release": "npx changeset publish",
     "prepare": "husky",
-    "cook": "npm run format && npm run lint && npm run changelog:sync && npm run check && npm install && npm run build"
+    "cook": "npm run format && npm run lint && npm run changelog:sync && npm run check && npm install && npm run build && npm run test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.12",
     "@tailwindcss/node": "^4.2.4",
     "@tailwindcss/vite": "^4.2.4",
+    "@vitest/expect": "^4.1.5",
+    "@vitest/mocker": "^4.1.5",
+    "@vitest/pretty-format": "^4.1.5",
+    "@vitest/runner": "^4.1.5",
+    "@vitest/snapshot": "^4.1.5",
+    "@vitest/spy": "^4.1.5",
+    "@vitest/utils": "^4.1.5",
     "concurrently": "^9.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "tailwindcss": "^4.2.4",
     "turbo": "^2.9.6",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "^4.1.5"
   },
   "engines": {
     "node": ">=20"
