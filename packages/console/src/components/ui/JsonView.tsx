@@ -9,11 +9,20 @@ interface JsonViewProps {
 export function JsonView({ data, title, copyable = true }: JsonViewProps) {
   const [copied, setCopied] = useState(false);
 
-  const jsonString = JSON.stringify(
-    typeof data === "string" ? JSON.parse(data) : data,
-    null,
-    2
-  );
+  let parsedData = data;
+
+  if (typeof data === "string") {
+    try {
+      parsedData = JSON.parse(data);
+    } catch {
+      parsedData = data;
+    }
+  }
+
+  const jsonString =
+    typeof parsedData === "string"
+      ? parsedData
+      : JSON.stringify(parsedData, null, 2);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(jsonString);

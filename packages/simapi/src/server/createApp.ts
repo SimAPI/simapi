@@ -42,9 +42,7 @@ export async function createApp(
     registerEndpoint(app, endpoint, config, bus);
   }
 
-  if (bus) {
-    await registerInternalRoutes(app, endpoints, config, bus);
-  }
+  if (bus) await registerInternalRoutes(app, endpoints, config, bus);
 
   return app;
 }
@@ -60,6 +58,7 @@ function registerEndpoint(
     const raw = await buildRawRequest(c);
 
     const errors = runRequestValidation(endpoint.request, raw);
+
     const request = new AppRequest(
       raw.headers,
       raw.body,
