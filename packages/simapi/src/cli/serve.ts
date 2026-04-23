@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { consola } from "consola";
 
 import { tsImport } from "tsx/esm/api";
 
@@ -48,8 +49,8 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
     const mod = await tsImport(configPath, { parentURL: import.meta.url });
     config = (mod.default ?? mod) as SimAPIConfig;
   } catch (err) {
-    console.error(`[SimAPI] Failed to load simapi.config.ts from ${cwd}`);
-    console.error(err);
+    consola.error(`[SimAPI] Failed to load simapi.config.ts from ${cwd}`);
+    consola.error(err);
     process.exit(1);
   }
 
@@ -60,21 +61,34 @@ export async function runServe(cwd: string = process.cwd()): Promise<void> {
   const endpointsDir = resolve(cwd, config.endpointsDir ?? "src/endpoints");
   const app = await createApp(config, endpointsDir, bus);
 
+  let consoleMounted = false;
   try {
     const { mountConsole } = await import("@simapi/console");
     mountConsole(app);
-    console.log(`  Console at http://localhost:${port}/__simapi/console/\n`);
+    consoleMounted = true;
   } catch {
     // @simapi/console not installed — skip
   }
 
-  startServer(app, port);
+  const server = startServer(app, port, (actualPort) => {
+    if (consoleMounted) {
+      consola.info(
+        `Console at http://localhost:${actualPort}/__simapi/console/`
+      );
+    }
+  });
 
   for (const signal of ["SIGINT", "SIGTERM"] as const) {
-    process.once(signal, () => {
-      bus
-        .close()
-        .catch((err) => console.error("[SimAPI] shutdown error:", err));
+    process.once(signal, async () => {
+      server.close();
+
+      if (bus) {
+        await bus.close().catch((err) => {
+          consola.error("[SimAPI] shutdown error:", err);
+        });
+      }
+
+      process.exit(0);
     });
   }
 }

@@ -1,14 +1,17 @@
 // biome-ignore lint/suspicious/noExplicitAny: Zod _def is internal API
 export function zodTypeToJsonSchema(schema: any): Record<string, unknown> {
   const typeName: string = schema?._def?.typeName ?? "";
+  let result: Record<string, unknown> = {};
 
   switch (typeName) {
     case "ZodOptional":
     case "ZodNullable":
-      return zodTypeToJsonSchema(schema._def.innerType);
+      result = zodTypeToJsonSchema(schema._def.innerType);
+      break;
 
     case "ZodString": {
       const s: Record<string, unknown> = { type: "string" };
+
       for (const check of schema._def.checks ?? []) {
         if (check.kind === "min") s.minLength = check.value;
         if (check.kind === "max") s.maxLength = check.value;
@@ -16,33 +19,60 @@ export function zodTypeToJsonSchema(schema: any): Record<string, unknown> {
         if (check.kind === "uuid") s.format = "uuid";
         if (check.kind === "url") s.format = "uri";
       }
-      return s;
+
+      result = s;
+
+      break;
     }
 
     case "ZodNumber": {
       const s: Record<string, unknown> = { type: "number" };
+
       for (const check of schema._def.checks ?? []) {
         if (check.kind === "int") s.type = "integer";
         if (check.kind === "min") s.minimum = check.value;
         if (check.kind === "max") s.maximum = check.value;
       }
-      return s;
+
+      result = s;
+
+      break;
     }
 
     case "ZodBoolean":
-      return { type: "boolean" };
+      result = { type: "boolean" };
+      break;
 
     case "ZodArray":
-      return { type: "array", items: zodTypeToJsonSchema(schema._def.type) };
+      result = { type: "array", items: zodTypeToJsonSchema(schema._def.type) };
+      break;
 
     case "ZodObject": {
       const shape = schema._def.shape() as Record<string, unknown>;
-      return zodShapeToJsonSchema(shape);
+      result = zodShapeToJsonSchema(shape);
+      break;
     }
 
-    default:
-      return {};
+    case "ZodDefault": {
+      result = zodTypeToJsonSchema(schema._def.innerType);
+      try {
+        result.default = schema._def.defaultValue();
+      } catch {
+        // ignore
+      }
+      break;
+    }
   }
+
+  if (schema?._def?.defaultValue && result.default === undefined) {
+    try {
+      result.default = schema._def.defaultValue();
+    } catch {
+      // ignore
+    }
+  }
+
+  return result;
 }
 
 export function zodShapeToJsonSchema(

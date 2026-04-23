@@ -35,6 +35,7 @@ export default defineConfig({
 | `autoThrowValidationErrors` | `"laravel" \| "zod" \| false` | `false`           | Automatically throw a 422 when `request` validation fails, before the handler runs |
 | `database`                  | `DatabaseConfig`              | —                 | Where to store request logs                                                        |
 | `authHandler`               | `AuthHandler`                 | —                 | Called for every `secure` endpoint                                                 |
+| `validationErrorFormatter`  | `Function`                    | —                 | Custom function to format validation error responses                               |
 
 ## Database adapters
 
@@ -110,3 +111,21 @@ export default defineConfig({
 ```
 
 :::
+
+## Custom Validation Errors
+
+You can customize the structure of validation error responses using `validationErrorFormatter`. This function receives the error bag (a record of field names to arrays of error messages) and should return an object that will be sent as a 422 JSON response.
+
+```ts
+// simapi.config.ts
+export default defineConfig({
+  validationErrorFormatter: (errors) => ({
+    status: "error",
+    message: "The submitted data was invalid.",
+    details: Object.entries(errors).map(([field, messages]) => ({
+      field,
+      message: messages[0]
+    }))
+  })
+});
+```

@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import * as p from "@clack/prompts";
+import consola from "consola";
 
 export async function runConsoleAdd(
   cwd: string = process.cwd()
@@ -29,7 +30,7 @@ export async function runConsoleAdd(
     );
   } catch (err) {
     s.stop("Installation failed");
-    console.error(err);
+    consola.error(err);
     process.exit(1);
   }
 }
@@ -76,7 +77,7 @@ export async function runConsoleRemove(
     p.outro("Console disabled.");
   } catch (err) {
     s.stop("Removal failed");
-    console.error(err);
+    consola.error(err);
     process.exit(1);
   }
 }

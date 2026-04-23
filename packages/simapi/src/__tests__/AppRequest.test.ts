@@ -5,6 +5,7 @@ import { ValidationErrors } from "../core/ValidationErrors.js";
 function makeRequest(overrides?: {
   headers?: Record<string, string>;
   body?: Record<string, unknown>;
+  form?: Record<string, unknown>;
   query?: Record<string, string>;
   urlParams?: Record<string, string>;
   errors?: ValidationErrors;
@@ -12,6 +13,7 @@ function makeRequest(overrides?: {
   return new AppRequest(
     overrides?.headers ?? {},
     overrides?.body ?? {},
+    overrides?.form ?? {},
     overrides?.query ?? {},
     overrides?.urlParams ?? {},
     overrides?.errors

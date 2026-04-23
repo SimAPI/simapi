@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { type ZodRawShape, z } from "zod";
@@ -14,6 +15,7 @@ import type { LogBus } from "./logBus.js";
 interface RawRequest {
   headers: Record<string, string>;
   body: Record<string, unknown>;
+  form: Record<string, unknown>;
   query: Record<string, string>;
   urlParams: Record<string, string>;
 }
@@ -27,24 +29,21 @@ export async function createApp(
 
   app.onError((err, c) => {
     if (err instanceof ValidationError) {
-      return c.json(formatValidationError(err), 422);
+      return c.json(formatValidationError(err, config), 422);
     }
-    console.error("[SimAPI] Unhandled error:", err);
+
+    consola.error("Unhandled error:", err);
     return c.json({ message: "Internal server error" }, 500);
   });
 
   const endpoints = await discoverEndpoints(endpointsDir);
-  console.log(
-    `[SimAPI] Loaded ${endpoints.length} endpoint(s) from ${endpointsDir}`
-  );
+  consola.info(`Loaded ${endpoints.length} endpoint(s) from ${endpointsDir}`);
 
   for (const endpoint of endpoints) {
     registerEndpoint(app, endpoint, config, bus);
   }
 
-  if (bus) {
-    await registerInternalRoutes(app, endpoints, config, bus);
-  }
+  if (bus) await registerInternalRoutes(app, endpoints, config, bus);
 
   return app;
 }
@@ -60,9 +59,11 @@ function registerEndpoint(
     const raw = await buildRawRequest(c);
 
     const errors = runRequestValidation(endpoint.request, raw);
+
     const request = new AppRequest(
       raw.headers,
       raw.body,
+      raw.form,
       raw.query,
       raw.urlParams,
       errors
@@ -127,15 +128,15 @@ function registerEndpoint(
     } catch (err) {
       if (err instanceof ValidationError) {
         logStatus = 422;
-        logBody = formatValidationError(err);
+        logBody = formatValidationError(err, config);
       }
       throw err;
     } finally {
       const durationMs = Date.now() - start;
 
       if (config.consoleLog) {
-        console.log(
-          `[SimAPI] ${endpoint.method} ${c.req.path} → ${logStatus} (${durationMs}ms)`
+        consola.info(
+          `${endpoint.method} ${c.req.path} → ${logStatus} (${durationMs}ms)`
         );
       }
 
@@ -152,7 +153,7 @@ function registerEndpoint(
             durationMs,
             timestamp: new Date().toISOString(),
           })
-          .catch((err) => console.error("[SimAPI] log error:", err));
+          .catch((err) => consola.error("log error:", err));
       }
     }
   });
@@ -181,6 +182,7 @@ function runRequestValidation(
   }
 
   collect(request.body, raw.body);
+  collect(request.form, raw.form);
   collect(request.query, raw.query);
   collect(request.headers, raw.headers);
 
@@ -194,6 +196,7 @@ async function buildRawRequest(c: Context): Promise<RawRequest> {
   });
 
   let body: Record<string, unknown> = {};
+  const form: Record<string, unknown> = {};
   const contentType = c.req.header("content-type") ?? "";
   if (contentType.includes("application/json")) {
     body = await c.req.json<Record<string, unknown>>().catch(() => ({}));
@@ -201,10 +204,10 @@ async function buildRawRequest(c: Context): Promise<RawRequest> {
     contentType.includes("application/x-www-form-urlencoded") ||
     contentType.includes("multipart/form-data")
   ) {
-    const form = await c.req.formData().catch(() => null);
-    if (form) {
-      form.forEach((value, key) => {
-        body[key] = value;
+    const formData = await c.req.formData().catch(() => null);
+    if (formData) {
+      formData.forEach((value, key) => {
+        form[key] = value;
       });
     }
   }
@@ -217,12 +220,20 @@ async function buildRawRequest(c: Context): Promise<RawRequest> {
   return {
     headers,
     body,
+    form,
     query,
     urlParams: c.req.param() as Record<string, string>,
   };
 }
 
-function formatValidationError(err: ValidationError): unknown {
+function formatValidationError(
+  err: ValidationError,
+  config?: SimAPIConfig
+): unknown {
+  if (config?.validationErrorFormatter) {
+    return config.validationErrorFormatter(err.errorBag);
+  }
+
   if (err.format === "laravel") {
     return {
       message: "The given data was invalid.",

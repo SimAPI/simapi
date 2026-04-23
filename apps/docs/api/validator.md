@@ -53,8 +53,9 @@ Validation runs before the handler. Errors from `body`, `query`, and `headers` a
 
 Define a `RequestDefinition` once in `src/requests/` and reuse it across endpoints:
 
-```ts
-// src/requests/postRequest.ts
+::: code-group
+
+```ts [src/requests/postRequest.ts]
 import { z, type RequestDefinition } from "@simapi/simapi";
 
 export const postRequest: RequestDefinition = {
@@ -65,27 +66,28 @@ export const postRequest: RequestDefinition = {
 };
 ```
 
-```ts
-// src/endpoints/posts.ts
-import { postRequest } from "@/requests/postRequest.js";
+```ts [src/endpoints/posts.ts]
+import { postRequest } from "@/requests/postRequest.js"; // [!code focus]
 
 export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "secure",
-  request: postRequest,
+  request: postRequest, // [!code focus]
   handler: (req) => { ... },
 };
 ```
 
+:::
+
 ## `req.errors`
 
-| Property | Type | Description |
-|---|---|---|
-| `hasError` | `boolean` | `true` if any field failed |
-| `errorFields` | `string[]` | Names of failing fields |
-| `errorBag` | `Record<string, string[]>` | Field → error messages |
-| `throwValidationError(format?)` | `void` | Throws 422 **only when `hasError` is true** |
+| Property                        | Type                       | Description                                 |
+| ------------------------------- | -------------------------- | ------------------------------------------- |
+| `hasError`                      | `boolean`                  | `true` if any field failed                  |
+| `errorFields`                   | `string[]`                 | Names of failing fields                     |
+| `errorBag`                      | `Record<string, string[]>` | Field → error messages                      |
+| `throwValidationError(format?)` | `void`                     | Throws 422 **only when `hasError` is true** |
 
 ## Auto-throw
 

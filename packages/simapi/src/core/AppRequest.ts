@@ -11,8 +11,9 @@ export class AppRequest {
   constructor(
     private readonly _headers: Record<string, string>,
     private readonly _body: Record<string, unknown>,
-    private readonly _queryParams: Record<string, string>,
-    private readonly _urlParams: Record<string, string>,
+    private readonly _form: Record<string, unknown> = {},
+    private readonly _queryParams: Record<string, string> = {},
+    private readonly _urlParams: Record<string, string> = {},
     errors?: ValidationErrors
   ) {
     this.errors = errors ?? new ValidationErrors({});
@@ -53,6 +54,29 @@ export class AppRequest {
    */
   bodyAll<T = Record<string, unknown>>(): T {
     return this._body as T;
+  }
+
+  /**
+   * Returns a single field from the parsed form data, typed as `T`.
+   *
+   * @param field  Form field name.
+   * @returns The field value cast to `T`, or `undefined` if not present.
+   *
+   * @example
+   * const name = req.form<string>("name");
+   */
+  form<T = unknown>(field: string): T | undefined {
+    return this._form[field] as T | undefined;
+  }
+
+  /**
+   * Returns the entire parsed form data typed as `T`.
+   *
+   * @example
+   * const data = req.formAll<{ name: string; age: number }>();
+   */
+  formAll<T = Record<string, unknown>>(): T {
+    return this._form as T;
   }
 
   /**

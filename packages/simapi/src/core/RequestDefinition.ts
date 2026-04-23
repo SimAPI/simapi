@@ -28,4 +28,7 @@ export interface RequestDefinition {
 
   /** Zod shape validated against request headers (lowercase keys). */
   headers?: ZodRawShape;
+
+  /** Zod shape validated against form data (multipart or urlencoded). */
+  form?: ZodRawShape;
 }

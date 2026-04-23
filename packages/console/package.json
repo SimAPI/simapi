@@ -1,6 +1,6 @@
 {
   "name": "@simapi/console",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Optional debug console for SimAPI — inspect requests, view schema, and test endpoints interactively.",
   "keywords": [
     "simapi",
@@ -49,7 +49,10 @@
     "build": "vite build && tsdown",
     "prepublishOnly": "npm run build",
     "dev": "vite",
-    "check-types": "tsc --noEmit"
+    "pkg:dev": "vite",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "type-check": "tsc --noEmit"
   },
   "peerDependencies": {
     "@hono/node-server": "^1.x",
@@ -58,6 +61,7 @@
   "devDependencies": {
     "@hono/node-server": "^1.14.0",
     "@repo/typescript-config": "*",
+    "@tailwindcss/node": "^4.2.4",
     "@tailwindcss/vite": "^4.0.0",
     "@types/node": "^25.6.0",
     "@types/react": "^18.3.0",

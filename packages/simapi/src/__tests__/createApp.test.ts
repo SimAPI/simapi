@@ -1,3 +1,4 @@
+import { consola } from "consola";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import type { AppRequest } from "../core/AppRequest.js";
@@ -442,7 +443,7 @@ describe("createApp", () => {
 
   describe("consoleLog", () => {
     it("logs to console when consoleLog is true", async () => {
-      const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+      const spy = vi.spyOn(consola, "info").mockImplementation(() => {});
 
       const app = await buildApp(
         [
@@ -464,7 +465,7 @@ describe("createApp", () => {
     });
 
     it("does not log when consoleLog is false", async () => {
-      const spy = vi.spyOn(console, "log").mockImplementation(() => {});
+      const spy = vi.spyOn(consola, "info").mockImplementation(() => {});
 
       const app = await buildApp(
         [

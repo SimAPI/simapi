@@ -1,7 +1,7 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
-  title: "SimAPI",
+  title: "SimAPI Docs",
   description:
     "A local-first backend simulator for frontend developers — build against real API behavior before your backend exists.",
   head: [["link", { rel: "icon", href: "/favicon.ico" }]],
@@ -11,7 +11,7 @@ export default defineConfig({
   },
 
   themeConfig: {
-    logo: "/simapi.png",
+    logo: "https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png",
 
     search: { provider: "local" },
 
@@ -32,6 +32,7 @@ export default defineConfig({
           { text: "Configuration", link: "/guide/config" },
           { text: "Debug Console", link: "/guide/console" },
           { text: "OpenAPI Import & Export", link: "/guide/openapi-import" },
+          { text: "FAQ", link: "/guide/faq" },
         ],
       },
       {
@@ -48,6 +49,8 @@ export default defineConfig({
         text: "API Reference",
         items: [
           { text: "EndpointDefinition", link: "/api/endpoint-definition" },
+          { text: "RequestDefinition", link: "/api/request-definition" },
+          { text: "AuthHandler", link: "/api/auth-handler" },
           { text: "AppRequest", link: "/api/app-request" },
           { text: "AppResponse", link: "/api/app-response" },
           { text: "Validation", link: "/api/validator" },

@@ -6,7 +6,9 @@
   "description": "Demo project showing SimAPI patterns",
   "scripts": {
     "serve": "simapi serve",
+    "app:serve": "simapi serve",
     "dev": "simapi dev",
+    "app:dev": "simapi dev",
     "build": "simapi build",
     "start": "simapi start",
     "simapi": "simapi interactive"

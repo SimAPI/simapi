@@ -20,7 +20,7 @@ function defaultStatus(method: string): number {
 
 async function getResponseExample(ep: EndpointDefinition): Promise<unknown> {
   try {
-    const req = new AppRequest({}, {}, {}, {}, new ValidationErrors({}));
+    const req = new AppRequest({}, {}, {}, {}, {}, new ValidationErrors({}));
     const result = await ep.handler(req);
     return result.body;
   } catch {

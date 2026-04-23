@@ -6,7 +6,7 @@ hero:
   text: Ship frontend features before the backend exists.
   tagline: Define real API behaviour in TypeScript. Get a running mock server in seconds. No backend team required.
   image:
-    src: /simapi.png
+    src: https://raw.githubusercontent.com/SimAPI/simapi/main/simapi.png
     alt: SimAPI
   actions:
     - theme: brand
@@ -55,43 +55,61 @@ npm run dev
 
 Your API is live at `http://localhost:3000`. Files in `src/` are watched — the server restarts automatically on every save.
 
-## Endpoints are just TypeScript
+## Minimal setup, massive speed
 
-```ts
-// src/endpoints/posts.ts
-import { faker, z, AppResponse, type EndpointDefinition } from "@simapi/simapi";
+Everything you need to build a realistic backend simulation in a few files.
 
-export const listPosts: EndpointDefinition = {
-  path: "/api/posts",
-  method: "GET",
-  type: "open",
-  handler: () =>
-    AppResponse.success({
-      data: AppResponse.array(10, () => ({
-        id:        faker.string.ulid(),
-        title:     faker.lorem.sentence(),
-        published: faker.datatype.boolean(),
-        author:    faker.person.fullName(),
-      })),
-    }),
-};
+::: code-group
+
+```ts [simapi.config.ts]
+import { defineConfig } from "@simapi/simapi";
+
+export default defineConfig({
+  name: "blog-api",
+  autoThrowValidationErrors: "laravel",
+  database: { type: "sqlite", path: "./.simapi/db.sqlite" }
+});
+```
+
+```ts [src/endpoints/posts.ts]
+import { AppResponse, type EndpointDefinition } from "@simapi/simapi";
+import { postRequest } from "@/requests/post.js";
+import { makePost } from "@/models/post.js";
 
 export const createPost: EndpointDefinition = {
   path: "/api/posts",
   method: "POST",
   type: "secure",
-  request: {
-    body: {
-      title: z.string().min(3),
-      body:  z.string().min(10),
-    },
-  },
-  handler: (req) => {
-    req.errors.throwValidationError();
-    return AppResponse.created({ data: { id: faker.string.ulid() } });
-  },
+  request: postRequest,
+  handler: () => AppResponse.created({ data: makePost() }),
 };
 ```
+
+```ts [src/models/post.ts]
+import { faker } from "@simapi/simapi";
+
+export function makePost() {
+  return {
+    id: faker.string.ulid(),
+    title: faker.lorem.sentence(),
+    body: faker.lorem.paragraphs(2),
+    published: faker.datatype.boolean(),
+  };
+}
+```
+
+```ts [src/requests/post.ts]
+import { z, type RequestDefinition } from "@simapi/simapi";
+
+export const postRequest: RequestDefinition = {
+  body: {
+    title: z.string().min(3),
+    body: z.string().min(10),
+  }
+};
+```
+
+:::
 
 Hit `GET /api/posts` — you get 10 unique posts. Hit `POST /api/posts` without a body — you get a formatted 422. No database, no server setup, no waiting.
 

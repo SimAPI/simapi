@@ -1,4 +1,5 @@
 import { cac } from "cac";
+import consola from "consola";
 import { type Platform, runBuild } from "./build.js";
 import { runConsoleAdd, runConsoleRemove } from "./console.js";
 import { runDev } from "./dev.js";
@@ -101,6 +102,6 @@ cli.version(__SIMAPI_VERSION__);
 cli.parse();
 
 function fatal(err: unknown): never {
-  console.error(err);
+  consola.error(err);
   process.exit(1);
 }

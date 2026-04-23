@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vitepress dev",
+    "app:dev": "vitepress dev",
+    "app:serve": "vitepress dev",
     "build": "vitepress build",
     "preview": "vitepress preview"
   },

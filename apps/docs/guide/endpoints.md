@@ -131,6 +131,10 @@ const age   = req.body<number>("age");
 
 // or the full object:
 const all = req.bodyAll<{ title: string; age: number }>();
+
+// Form data (multipart or urlencoded):
+const name = req.form<string>("name");
+const data = req.formAll();
 ```
 
 ## Validation with Zod
@@ -140,7 +144,7 @@ Add a `request` field — SimAPI validates `body`, `query`, and/or `headers` bef
 ```ts
 import { z, AppResponse, type AppRequest, type EndpointDefinition } from "@simapi/simapi";
 
-export const createUser: EndpointDefinition = {
+export const createUser: EndpointDefinition = { // [!code focus]
   path: "/api/users",
   method: "POST",
   type: "open",
@@ -150,13 +154,22 @@ export const createUser: EndpointDefinition = {
       password: z.string().min(8), // [!code focus]
       age:      z.number().int().min(18).optional(), // [!code focus]
     }, // [!code focus]
+    form: { // multipart/form-data or urlencoded // [!code focus]
+      avatar: z.string().url().optional(), // [!code focus]
+    }, // [!code focus]
+    query: { // query string parameters // [!code focus]
+      source: z.string().optional(), // [!code focus]
+    }, // [!code focus]
+    headers: { // request headers (lowercase keys) // [!code focus]
+      "x-client-id": z.string().uuid(), // [!code focus]
+    }, // [!code focus]
   }, // [!code focus]
   handler: (req: AppRequest) => {
     // throws 422 only when hasError is true — unconditional call is safe
-    req.errors.throwValidationError("laravel"); // [!code focus]
+    req.errors.throwValidationError("laravel");
     return AppResponse.created({ data: { id: 1 } });
   },
-};
+}; // [!code focus]
 ```
 
 ### Auto-throw

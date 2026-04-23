@@ -18,8 +18,17 @@ async function getResponseExample(
   endpoint: EndpointDefinition
 ): Promise<unknown> {
   try {
-    const mockReq = new AppRequest({}, {}, {}, {}, new ValidationErrors({}));
+    const mockReq = new AppRequest(
+      {},
+      {},
+      {},
+      {},
+      {},
+      new ValidationErrors({})
+    );
+
     const result = await endpoint.handler(mockReq);
+
     return result.body;
   } catch {
     return undefined;
@@ -51,6 +60,15 @@ export async function registerInternalRoutes(
       description: e.description,
       schema: e.request?.body
         ? zodShapeToJsonSchema(e.request.body as Record<string, unknown>)
+        : undefined,
+      formSchema: e.request?.form
+        ? zodShapeToJsonSchema(e.request.form as Record<string, unknown>)
+        : undefined,
+      headerSchema: e.request?.headers
+        ? zodShapeToJsonSchema(e.request.headers as Record<string, unknown>)
+        : undefined,
+      querySchema: e.request?.query
+        ? zodShapeToJsonSchema(e.request.query as Record<string, unknown>)
         : undefined,
       responseExample: await getResponseExample(e),
     }))

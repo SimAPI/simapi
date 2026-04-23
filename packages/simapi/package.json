@@ -1,6 +1,6 @@
 {
   "name": "@simapi/simapi",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Build frontend features against real API behavior — before your backend exists.",
   "keywords": [
     "mock",
@@ -56,6 +56,7 @@
     "build": "tsdown",
     "prepublishOnly": "npm run build",
     "dev": "tsdown --watch",
+    "pkg:dev": "tsdown --watch",
     "check-types": "tsc --noEmit",
     "lint": "biome lint ./src",
     "test": "vitest run",
@@ -67,6 +68,7 @@
     "@hono/node-server": "^1.14.0",
     "@libsql/client": "^0.17.2",
     "cac": "^6.7.14",
+    "consola": "^3.4.2",
     "drizzle-orm": "^0.45.2",
     "hono": "^4.7.0",
     "pg": "^8.20.0",

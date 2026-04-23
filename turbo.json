@@ -21,7 +21,19 @@
       "cache": false,
       "persistent": true
     },
+    "pkg:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "app:dev": {
+      "cache": false,
+      "persistent": true
+    },
     "serve": {
+      "cache": false,
+      "persistent": true
+    },
+    "app:serve": {
       "cache": false,
       "persistent": true
     }

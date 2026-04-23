@@ -1,15 +1,16 @@
 import { fork } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import consola from "consola";
 
 export function runStart(cwd: string = process.cwd()): void {
   const serverEntry = resolve(cwd, ".simapi", "dist", "server.mjs");
 
   if (!existsSync(serverEntry)) {
-    console.error(
+    consola.error(
       "[SimAPI] No compiled server found at .simapi/dist/server.mjs"
     );
-    console.error("         Run `npm run build` first.");
+    consola.error("         Run `npm run build` first.");
     process.exit(1);
   }
 
@@ -20,7 +21,7 @@ export function runStart(cwd: string = process.cwd()): void {
   });
 
   child.on("error", (err) => {
-    console.error("[SimAPI] Failed to start server:", err);
+    consola.error("[SimAPI] Failed to start server:", err);
     process.exit(1);
   });
 
