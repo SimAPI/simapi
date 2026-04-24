@@ -1,0 +1,404 @@
+openapi: "3.0.3"
+info:
+  title: Auth API
+  version: "1.0.0"
+  description: >
+    A comprehensive authentication API covering registration, login,
+    email/phone verification, password reset, and token refresh.
+
+tags:
+  - name: Authentication
+    description: Register and log in users.
+  - name: Account Verification
+    description: Verify email or phone after registration.
+  - name: Password Reset
+    description: Initiate and complete password reset flows.
+
+components:
+  schemas:
+    AuthUserResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        emailVerifiedAt:
+          type: string
+          format: date-time
+          nullable: true
+        role:
+          type: string
+          enum: [admin, member, guest]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - emailVerifiedAt
+        - role
+        - createdAt
+
+    TokenPair:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        expiresIn:
+          type: integer
+          minimum: 1
+      required:
+        - accessToken
+        - refreshToken
+        - expiresIn
+
+    ValidationProblem:
+      type: object
+      properties:
+        message:
+          type: string
+          const: "The given data was invalid."
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+      required:
+        - message
+        - errors
+
+  responses:
+    AuthenticationException:
+      description: Unauthenticated — no valid token provided.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+
+    ValidationException:
+      description: Unprocessable — request body failed validation.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationProblem"
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /auth/register:
+    post:
+      operationId: registerUser
+      summary: Register
+      description: Create a new user account and return an access token pair.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+                passwordConfirmation:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+              required:
+                - name
+                - email
+                - password
+                - passwordConfirmation
+      responses:
+        "201":
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    const: "Account created successfully."
+                  user:
+                    $ref: "#/components/schemas/AuthUserResource"
+                  tokens:
+                    $ref: "#/components/schemas/TokenPair"
+                required:
+                  - message
+                  - user
+                  - tokens
+        "422":
+          $ref: "#/components/responses/ValidationException"
+
+  /auth/login:
+    post:
+      operationId: loginUser
+      summary: Login
+      description: Authenticate with email and password, returns an access token pair.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+              required:
+                - email
+                - password
+      responses:
+        "200":
+          description: Authenticated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    const: "Logged in successfully."
+                  user:
+                    $ref: "#/components/schemas/AuthUserResource"
+                  tokens:
+                    $ref: "#/components/schemas/TokenPair"
+                required:
+                  - message
+                  - user
+                  - tokens
+        "422":
+          $ref: "#/components/responses/ValidationException"
+
+  /auth/logout:
+    post:
+      operationId: logoutUser
+      summary: Logout
+      description: Invalidate the current access token.
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Logged out — no body returned.
+        "401":
+          $ref: "#/components/responses/AuthenticationException"
+
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      summary: Refresh token
+      description: Exchange a refresh token for a new access + refresh token pair.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+              required:
+                - refreshToken
+      responses:
+        "200":
+          description: New token pair issued.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenPair"
+        "401":
+          $ref: "#/components/responses/AuthenticationException"
+        "422":
+          $ref: "#/components/responses/ValidationException"
+
+  /auth/verification/send:
+    post:
+      operationId: sendVerificationCode
+      summary: Send verification code
+      description: >
+        Send a 6-digit verification code to the authenticated user's email or phone.
+      tags:
+        - Account Verification
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Verification code sent.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    const: "Verification code sent."
+                required:
+                  - message
+        "401":
+          $ref: "#/components/responses/AuthenticationException"
+
+  /auth/verification/verify:
+    post:
+      operationId: verifyAccount
+      summary: Verify account
+      description: >
+        Validate the verification code and mark the user's email or phone as verified.
+      tags:
+        - Account Verification
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  minLength: 6
+                  maxLength: 6
+              required:
+                - code
+      responses:
+        "200":
+          description: Account verified.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    const: "Account verified successfully."
+                  user:
+                    $ref: "#/components/schemas/AuthUserResource"
+                required:
+                  - message
+                  - user
+        "401":
+          $ref: "#/components/responses/AuthenticationException"
+        "422":
+          $ref: "#/components/responses/ValidationException"
+
+  /auth/password/forgot:
+    post:
+      operationId: forgotPassword
+      summary: Forgot password
+      description: Send a password reset link to the provided email address.
+      tags:
+        - Password Reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+                - email
+      responses:
+        "200":
+          description: Reset link dispatched (always succeeds to prevent enumeration).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    const: "If that email exists, a reset link has been sent."
+                required:
+                  - message
+        "422":
+          $ref: "#/components/responses/ValidationException"
+
+  /auth/password/reset:
+    post:
+      operationId: resetPassword
+      summary: Reset password
+      description: Consume the reset token and update the user's password.
+      tags:
+        - Password Reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+                passwordConfirmation:
+                  type: string
+                  minLength: 8
+                  maxLength: 128
+              required:
+                - token
+                - email
+                - password
+                - passwordConfirmation
+      responses:
+        "200":
+          description: Password reset successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    const: "Password reset successfully."
+                required:
+                  - message
+        "422":
+          $ref: "#/components/responses/ValidationException"
+

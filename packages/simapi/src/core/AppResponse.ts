@@ -87,6 +87,33 @@ export class AppResponse {
   }
 
   /**
+   * `status` — return a response with a custom HTTP status code.
+   * Use this when none of the standard factories (success, created, etc.) fit.
+   *
+   * @example
+   * return AppResponse.custom(418, { message: "I'm a teapot" });
+   */
+  static custom(status: number, body?: unknown): AppResponse {
+    return new AppResponse(status, body);
+  }
+
+  /**
+   * `301 | 302 | 307 | 308` — redirect the client to `url`.
+   * The body carries `{ location }` so the server layer can emit a proper
+   * `Location` header and the correct 3xx status.
+   *
+   * @example
+   * return AppResponse.redirect("/dashboard");
+   * return AppResponse.redirect("https://example.com/new-path", 301);
+   */
+  static redirect(
+    url: string,
+    status: 301 | 302 | 307 | 308 = 302
+  ): AppResponse {
+    return new AppResponse(status, { location: url });
+  }
+
+  /**
    * Generates an array of `count` items by calling `factory` once per element.
    * Each call produces independent faker data.
    *

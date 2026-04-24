@@ -1,6 +1,6 @@
 {
   "name": "@simapi/console",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Optional debug console for SimAPI — inspect requests, view schema, and test endpoints interactively.",
   "keywords": [
     "simapi",

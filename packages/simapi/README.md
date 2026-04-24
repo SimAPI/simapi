@@ -40,13 +40,9 @@ npm install @simapi/simapi
 ```
 my-api/
 ├── src/
-│   ├── endpoints/      # Every named export is auto-discovered — no registration
-│   │   ├── posts.ts
-│   │   └── users.ts
-│   ├── models/         # Shared data factories
-│   │   └── post.ts
-│   └── requests/       # Optional — shared RequestDefinition objects
-│       └── postRequest.ts
+│   ├── endpoints/      # Logical endpoint groups (e.g. users.ts, pets.ts)
+│   ├── models/         # TypeScript types and mock factories (e.g. User.ts)
+│   └── requests/       # Zod validation shapes (e.g. UserRequest.ts)
 ├── simapi.config.ts
 └── package.json
 ```
@@ -153,6 +149,7 @@ All responses are created with static factory methods on `AppResponse`:
 AppResponse.success({ data: { id: 1 } })         // 200
 AppResponse.created({ data: { id: 42 } })        // 201
 AppResponse.noContent()                          // 204
+AppResponse.redirect(url, status)                // 301/302/307/308
 AppResponse.unauthenticated({ message: "..." })  // 401
 AppResponse.unauthorised({ message: "..." })     // 403
 AppResponse.notFound({ message: "..." })         // 404
@@ -306,19 +303,23 @@ export default defineConfig({
 
 ## OpenAPI
 
-**Import** — generate typed endpoint stubs from an existing spec:
+SimAPI features a sophisticated OpenAPI 3.0/3.1 engine powered by `@simapi/openapi`.
+
+**Import** — generate a structured architecture of endpoints, requests, and models from a spec:
 
 ```sh
-simapi import openapi.yaml
-simapi import openapi.json --output src/endpoints/
+npx @simapi/openapi import openapi.yaml -o ./src
 ```
 
-**Export** — produce an OpenAPI 3 spec from your endpoints:
+- **Modular Output**: Automatically organizes code into `endpoints/`, `requests/`, and `models/`.
+- **Mock Factories**: Generates recursive `make{Model}` functions using `@faker-js/faker`.
+- **OAS 3.1 Support**: Full support for the latest specs, including complex schema dialects.
+- **Typed Codegen**: Generates Zod validation for constraints like `min`, `max`, `email`, `uuid`.
+
+**Export** — produce a high-quality OpenAPI 3 spec from your endpoints:
 
 ```sh
-simapi export
-simapi export --output docs/api.yaml
-simapi export --output api.json --format json
+npx @simapi/openapi export -o docs/api.yaml
 ```
 
 ---

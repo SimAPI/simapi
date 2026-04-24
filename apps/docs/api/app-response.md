@@ -25,6 +25,17 @@ return AppResponse.noContent();
 // → 204 No Content
 ```
 
+### `AppResponse.redirect(url, status?)`
+
+Returns a `3xx` redirect response. SimAPI automatically handles the `Location` header.
+
+```ts
+return AppResponse.redirect("https://google.com", 301);
+// → 301 Moved Permanently
+```
+
+Defaults to `302 Found` if no status is provided.
+
 ## Error responses
 
 ### `AppResponse.unauthenticated(payload?)`

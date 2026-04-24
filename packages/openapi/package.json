@@ -1,33 +1,23 @@
 {
-  "name": "@simapi/simapi",
+  "name": "@simapi/openapi",
   "version": "0.0.10",
-  "description": "Build frontend features against real API behavior — before your backend exists.",
+  "bin": {
+    "simapi-openapi": "bin/openapi.js"
+  },
+  "description": "OpenAPI import/export utilities for SimAPI.",
   "keywords": [
-    "mock",
-    "api",
-    "server",
-    "typescript",
-    "development",
-    "faker",
-    "hono",
-    "backend",
-    "simulator",
-    "zod"
+    "openapi",
+    "swagger",
+    "simapi",
+    "codegen",
+    "typescript"
   ],
   "license": "MIT",
   "author": "MayR Labs <info@mayrlabs.com> (https://mayrlabs.com)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SimAPI/simapi.git",
-    "directory": "packages/simapi"
-  },
-  "homepage": "https://simapi.mayrlabs.com",
-  "bugs": {
-    "url": "https://github.com/SimAPI/simapi/issues"
-  },
-  "funding": {
-    "type": "github",
-    "url": "https://github.com/sponsors/SimAPI"
+    "directory": "packages/openapi"
   },
   "type": "module",
   "exports": {
@@ -45,16 +35,11 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "bin": {
-    "simapi": "bin/simapi.js"
-  },
   "files": [
-    "dist",
-    "bin"
+    "dist"
   ],
   "scripts": {
     "build": "tsdown",
-    "prepublishOnly": "npm run build",
     "dev": "tsdown --watch",
     "pkg:dev": "tsdown --watch",
     "check-types": "tsc --noEmit",
@@ -63,25 +48,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@clack/prompts": "^0.9.1",
-    "@faker-js/faker": "^9.3.0",
-    "@hono/node-server": "^1.14.0",
-    "@libsql/client": "^0.17.2",
-    "@simapi/openapi": "*",
     "cac": "^6.7.14",
     "consola": "^3.4.2",
-    "drizzle-orm": "^0.45.2",
-    "hono": "^4.7.0",
-    "pg": "^8.20.0",
-    "tsdown": "^0.21.7",
-    "tsx": "^4.19.0",
-    "yaml": "^2.8.3",
-    "zod": "^3.24.0"
+    "yaml": "^2.8.3"
   },
   "devDependencies": {
     "@repo/typescript-config": "*",
     "@types/node": "^25.6.0",
-    "@types/pg": "^8.20.0",
+    "openapi-types": "^12.1.3",
+    "tsdown": "^0.21.7",
     "typescript": "5.9.2",
     "vitest": "^4.1.4"
   }

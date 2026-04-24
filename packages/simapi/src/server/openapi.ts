@@ -2,11 +2,20 @@ import { AppRequest } from "../core/AppRequest.js";
 import type { SimAPIConfig } from "../core/defineConfig.js";
 import type { EndpointDefinition } from "../core/endpoint.js";
 import { ValidationErrors } from "../core/ValidationErrors.js";
-import { zodShapeToJsonSchema } from "./zodSchema.js";
+import { zodShapeToJsonSchema, zodTypeToJsonSchema } from "./zodSchema.js";
 
 declare const __SIMAPI_VERSION__: string;
 
 const BODY_METHODS = new Set(["POST", "PUT", "PATCH"]);
+
+function isOptional(shape: unknown): boolean {
+  if (!shape || typeof shape !== "object" || !("_def" in shape)) return false;
+  const s = shape as { _def: { typeName?: string; innerType?: unknown } };
+  const typeName = s._def.typeName;
+  if (typeName === "ZodOptional" || typeName === "ZodDefault") return true;
+  if (s._def.innerType) return isOptional(s._def.innerType);
+  return false;
+}
 
 function honoToOAPath(path: string): string {
   return path.replace(/:([^/]+)/g, "{$1}");
@@ -59,6 +68,36 @@ async function buildOperation(
         },
       },
     };
+  }
+
+  // Parameters (Query & Headers)
+  const extraParams: Record<string, unknown>[] = [];
+  if (ep.request?.query) {
+    for (const [name, shape] of Object.entries(ep.request.query)) {
+      extraParams.push({
+        name,
+        in: "query",
+        required: !isOptional(shape),
+        schema: zodTypeToJsonSchema(shape),
+      });
+    }
+  }
+  if (ep.request?.headers) {
+    for (const [name, shape] of Object.entries(ep.request.headers)) {
+      extraParams.push({
+        name,
+        in: "header",
+        required: !isOptional(shape),
+        schema: zodTypeToJsonSchema(shape),
+      });
+    }
+  }
+
+  if (extraParams.length > 0) {
+    operation.parameters = [
+      ...((operation.parameters as unknown[]) ?? []),
+      ...extraParams,
+    ];
   }
 
   const hasValidation = !!(
