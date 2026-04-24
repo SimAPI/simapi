@@ -52,6 +52,7 @@ export async function runImportOpenAPI(
       "head",
     ];
     for (const m of methods) {
+      // biome-ignore lint/suspicious/noExplicitAny: OpenAPI methods are dynamic
       const op = (pathObj as any)[m];
       if (!op) continue;
 
@@ -59,9 +60,11 @@ export async function runImportOpenAPI(
       if (!groups.has(fileName)) {
         groups.set(fileName, { endpoints: [], requests: [] });
       }
-      const group = groups.get(fileName)!;
+      const group = groups.get(fileName);
+      if (!group) continue;
 
       const ctx: CodegenContext = { spec, usedModels: new Set() };
+      // biome-ignore lint/suspicious/noExplicitAny: OpenAPI path items have complex unions
       const pathItem = pathObj as any;
       const { code, requestBlock, requestName, usedModels } = buildEndpoint(
         m,
@@ -77,13 +80,16 @@ export async function runImportOpenAPI(
         group.requests.push(requestBlock);
         if (!requestImports.has(fileName))
           requestImports.set(fileName, new Set());
-        requestImports.get(fileName)!.add(requestName);
+        requestImports.get(fileName)?.add(requestName);
       }
 
       if (usedModels.size > 0) {
         if (!modelImports.has(fileName)) modelImports.set(fileName, new Set());
-        for (const model of usedModels) {
-          modelImports.get(fileName)!.add(model);
+        const imports = modelImports.get(fileName);
+        if (imports) {
+          for (const model of usedModels) {
+            imports.add(model);
+          }
         }
       }
     }
@@ -107,8 +113,7 @@ export async function runImportOpenAPI(
       }
     }
 
-    const content =
-      imports.join("\n") + "\n\n" + group.requests.join("\n\n") + "\n";
+    const content = `${imports.join("\n")}\n\n${group.requests.join("\n\n")}\n`;
     writeFileSync(join(requestsDir, `${fileName}.ts`), content, "utf8");
     consola.log(
       `[SimAPI] Wrote requests ${join(requestsDir, `${fileName}.ts`)}`
@@ -135,8 +140,7 @@ export async function runImportOpenAPI(
       }
     }
 
-    const content =
-      imports.join("\n") + "\n\n" + group.endpoints.join("\n\n") + "\n";
+    const content = `${imports.join("\n")}\n\n${group.endpoints.join("\n\n")}\n`;
     writeFileSync(join(endpointsDir, `${fileName}.ts`), content, "utf8");
     consola.log(
       `[SimAPI] Wrote endpoints ${join(endpointsDir, `${fileName}.ts`)}`
@@ -180,7 +184,7 @@ export const make${name} = (overrides?: Partial<${name}>): ${name} => ({
 ${fakerStub
   .slice(2, -2)
   .split("\n")
-  .map((l) => "  " + l.trim())
+  .map((l) => `  ${l.trim()}`)
   .filter((l) => l.trim().length > 0)
   .join("\n")},
   ...overrides,

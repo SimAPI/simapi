@@ -1,5 +1,5 @@
+import type { OASchema, OARef, CodegenContext } from "./types.js";
 import { isRef, resolveSchema } from "./resolver.js";
-import type { CodegenContext, OARef, OASchema } from "./types.js";
 
 export function zodFromSchema(
   rawSchema: OASchema | OARef,
@@ -16,6 +16,7 @@ export function zodFromSchema(
 
   const spec = ctx.spec;
   const schema = resolveSchema(rawSchema, spec);
+  // biome-ignore lint/suspicious/noExplicitAny: OpenAPI schemas have version-specific properties
   const s = schema as any;
 
   // const → z.literal()
@@ -25,16 +26,20 @@ export function zodFromSchema(
 
   // enum → z.enum()
   if (s.enum && s.enum.length > 0) {
-    const values = s.enum.map((v: any) => JSON.stringify(v)).join(", ");
-    if (s.enum.every((v: any) => typeof v === "string")) {
+    const values = s.enum
+      .map((v: unknown) => JSON.stringify(v))
+      .join(", ");
+    if (s.enum.every((v: unknown) => typeof v === "string")) {
       return `z.enum([${values}])`;
     }
-    return `z.union([${s.enum.map((v: any) => `z.literal(${JSON.stringify(v)})`).join(", ")}])`;
+    return `z.union([${s.enum
+      .map((v: unknown) => `z.literal(${JSON.stringify(v)})`)
+      .join(", ")}])`;
   }
 
   // Normalise type (3.1 allows arrays like ["string", "null"])
   const rawType = Array.isArray(schema.type)
-    ? (schema.type.find((t: any) => t !== "null") ?? schema.type[0])
+    ? (schema.type.find((t: unknown) => t !== "null") ?? schema.type[0])
     : schema.type;
 
   const isNullable =
@@ -102,6 +107,7 @@ export function zodFromSchema(
 
     default: {
       if (schema.allOf && schema.allOf.length > 0) {
+        // biome-ignore lint/suspicious/noExplicitAny: allOf elements are schemas
         const schemas = schema.allOf.map((s: any) =>
           zodFromSchema(s, ctx, true)
         );
@@ -117,6 +123,7 @@ export function zodFromSchema(
         break;
       }
       if (schema.anyOf && schema.anyOf.length > 0) {
+        // biome-ignore lint/suspicious/noExplicitAny: anyOf elements are schemas
         const schemas = schema.anyOf.map((s: any) =>
           zodFromSchema(s, ctx, true)
         );
@@ -124,6 +131,7 @@ export function zodFromSchema(
         break;
       }
       if (schema.oneOf && schema.oneOf.length > 0) {
+        // biome-ignore lint/suspicious/noExplicitAny: oneOf elements are schemas
         const schemas = schema.oneOf.map((s: any) =>
           zodFromSchema(s, ctx, true)
         );

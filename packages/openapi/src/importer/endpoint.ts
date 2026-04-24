@@ -47,6 +47,7 @@ export function buildEndpoint(
 
   const handlerBody = buildHandlerBody(
     successStatus,
+    // biome-ignore lint/suspicious/noExplicitAny: complex response union
     rawSuccessResponse as any,
     localCtx,
     hasValidation

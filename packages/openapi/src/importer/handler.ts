@@ -1,4 +1,3 @@
-import { fakerValueFromSchema } from "./faker.js";
 import { isRef, resolveResponse, resolveSchema } from "./resolver.js";
 import type { CodegenContext, OARef, OAResponse } from "./types.js";
 
@@ -61,6 +60,7 @@ export function buildHandlerBody(
 
   const response = rawResponse ? resolveResponse(rawResponse, spec) : undefined;
   const schema = response?.content?.["application/json"]?.schema;
+  // biome-ignore lint/suspicious/noExplicitAny: complex response schema
   const stub = schema ? buildResponseStub(schema as any, ctx) : null;
 
   const prefix = hasValidation
@@ -81,6 +81,7 @@ export function buildResponseStub(
   ctx: CodegenContext
 ): string | null {
   const spec = ctx.spec;
+  // biome-ignore lint/suspicious/noExplicitAny: resolving response schema
   const schema = resolveSchema(rawSchema as any, spec);
 
   if (schema.type !== "object" || !schema.properties) return null;
@@ -91,6 +92,7 @@ export function buildResponseStub(
       const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
         ? key
         : `"${key}"`;
+      // biome-ignore lint/suspicious/noExplicitAny: property schema can be anything
       return `    ${propName}: ${scalarStub(prop as any, ctx)}`;
     });
 
@@ -99,6 +101,7 @@ export function buildResponseStub(
   return `{\n${lines.join(",\n")},\n  }`;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: scalar schema can be anything
 export function scalarStub(rawSchema: any, ctx: CodegenContext): string {
   if (isRef(rawSchema) && rawSchema.$ref.startsWith("#/components/schemas/")) {
     const modelName = rawSchema.$ref.split("/").pop() as string;
@@ -110,6 +113,7 @@ export function scalarStub(rawSchema: any, ctx: CodegenContext): string {
 
   const spec = ctx.spec;
   const schema = resolveSchema(rawSchema, spec);
+  // biome-ignore lint/suspicious/noExplicitAny: schema properties vary by version
   const s = schema as any;
 
   if (s.const !== undefined) return JSON.stringify(s.const);
@@ -128,6 +132,7 @@ export function scalarStub(rawSchema: any, ctx: CodegenContext): string {
     case "boolean":
       return "faker.datatype.boolean()";
     case "array": {
+      // biome-ignore lint/suspicious/noExplicitAny: items only exists on array schema
       const items = (schema as any).items;
       if (items) {
         return `[${scalarStub(items, ctx)}]`;

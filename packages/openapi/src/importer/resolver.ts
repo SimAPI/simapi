@@ -7,12 +7,17 @@ import type {
   OASpec,
 } from "./types.js";
 
-export function isRef(obj: any): obj is OARef {
-  return obj && typeof obj === "object" && "$ref" in obj;
+export function isRef(obj: unknown): obj is OARef {
+  return (
+    obj !== null &&
+    typeof obj === "object" &&
+    "$ref" in (obj as Record<string, unknown>)
+  );
 }
 
 export function resolveRef<T>(ref: string, spec: OASpec): T | undefined {
   const path = ref.replace(/^#\//, "").split("/");
+  // biome-ignore lint/suspicious/noExplicitAny: Traversing complex spec object
   let current: any = spec;
   for (const segment of path) {
     if (current && typeof current === "object" && segment in current) {
