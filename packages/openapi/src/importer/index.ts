@@ -375,10 +375,10 @@ function buildHandlerBody(
   const callExpr = stub ? `${factory}(${stub})` : `${factory}({ data: {} })`;
 
   if (hasValidation) {
-    return `(req) => {\n    ${prefix}return ${callExpr};\n  }`;
+    return `(req: AppRequest) => {\n    ${prefix}return ${callExpr};\n  }`;
   }
 
-  return `() => ${callExpr}`;
+  return `(_req: AppRequest) => ${callExpr}`;
 }
 
 /** Generates a shallow stub object literal from an object schema. */
@@ -715,7 +715,7 @@ export async function runImportOpenAPI(
   for (const [fileName, group] of groups.entries()) {
     const reqNames = requestImports.get(fileName);
     const imports = [
-      'import { AppResponse, type EndpointDefinition } from "@simapi/simapi";',
+      'import { AppResponse, AppRequest, type EndpointDefinition } from "@simapi/simapi";',
     ];
 
     if (reqNames && reqNames.size > 0) {
