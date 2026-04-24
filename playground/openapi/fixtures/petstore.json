@@ -71,34 +71,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100
-                  },
-                  "species": {
-                    "type": "string",
-                    "enum": ["dog", "cat", "bird", "fish", "rabbit", "other"]
-                  },
-                  "status": {
-                    "type": "string",
-                    "enum": ["available", "pending", "sold"]
-                  },
-                  "age": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 30
-                  },
-                  "tags": {
-                    "type": "array",
-                    "items": { "type": "string" }
-                  }
-                },
-                "required": ["name", "species"]
-              }
+              "schema": { "$ref": "#/components/schemas/Pet" }
             }
           }
         },

@@ -1,16 +1,22 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { extname, join, resolve } from "node:path";
+import { dirname, extname, join, resolve } from "node:path";
 import consola from "consola";
 import { parse as parseYaml } from "yaml";
 import type {
   ImportOptions,
   OAOperation,
+  OAParameter,
   OARef,
   OARequestBody,
   OAResponse,
   OASchema,
   OASpec,
 } from "../types.js";
+
+interface CodegenContext {
+  spec: OASpec;
+  usedModels: Set<string>;
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -78,9 +84,31 @@ function resolveRequestBody(
   return resolveRequestBody(resolved, spec);
 }
 
+function resolveParameter(
+  param: OAParameter | OARef,
+  spec: OASpec
+): OAParameter | undefined {
+  if (!isRef(param)) return param;
+
+  const resolved = resolveRef<OAParameter | OARef>(param.$ref, spec);
+  if (!resolved) return undefined;
+
+  return resolveParameter(resolved, spec);
+}
+
 // ─── Zod codegen ─────────────────────────────────────────────────────────────
 
-function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
+function zodFromSchema(
+  rawSchema: OASchema | OARef,
+  ctx: CodegenContext
+): string {
+  if (isRef(rawSchema) && rawSchema.$ref.startsWith("#/components/schemas/")) {
+    const modelName = rawSchema.$ref.split("/").pop() as string;
+    ctx.usedModels.add(modelName);
+    return `${modelName}Schema`;
+  }
+
+  const spec = ctx.spec;
   const schema = resolveSchema(rawSchema, spec);
 
   // const → z.literal()
@@ -139,7 +167,7 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
 
     case "array": {
       const itemSchema = schema.items
-        ? zodFromSchema(schema.items, spec)
+        ? zodFromSchema(schema.items, ctx)
         : "z.unknown()";
       chain = `z.array(${itemSchema})`;
       if (schema.minItems !== undefined) chain += `.min(${schema.minItems})`;
@@ -155,7 +183,7 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
             const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
               ? key
               : `"${key}"`;
-            const zodProp = zodFromSchema(prop, spec);
+            const zodProp = zodFromSchema(prop, ctx);
             return `${propName}: ${zodProp}${required ? "" : ".optional()"}`;
           })
           .join(", ");
@@ -169,7 +197,7 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
     default: {
       // Handle allOf / anyOf / oneOf at the top level
       if (schema.allOf && schema.allOf.length > 0) {
-        const schemas = schema.allOf.map((s) => zodFromSchema(s, spec));
+        const schemas = schema.allOf.map((s) => zodFromSchema(s, ctx));
         chain =
           schemas.length === 1
             ? (schemas[0] as string)
@@ -179,12 +207,12 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
         break;
       }
       if (schema.anyOf && schema.anyOf.length > 0) {
-        const schemas = schema.anyOf.map((s) => zodFromSchema(s, spec));
+        const schemas = schema.anyOf.map((s) => zodFromSchema(s, ctx));
         chain = `z.union([${schemas.join(", ")}])`;
         break;
       }
       if (schema.oneOf && schema.oneOf.length > 0) {
-        const schemas = schema.oneOf.map((s) => zodFromSchema(s, spec));
+        const schemas = schema.oneOf.map((s) => zodFromSchema(s, ctx));
         chain = `z.union([${schemas.join(", ")}])`;
         break;
       }
@@ -200,21 +228,73 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
 // ─── Request block codegen ────────────────────────────────────────────────────
 
 function buildRequestBlock(
-  rawSchema: OASchema | OARef,
-  spec: OASpec
+  op: OAOperation,
+  pathParams: Array<OAParameter | OARef> | undefined,
+  ctx: CodegenContext,
+  requestName: string
 ): string | null {
-  const schema = resolveSchema(rawSchema, spec);
+  const spec = ctx.spec;
+  const sections: string[] = [];
 
-  if (schema.type !== "object" || !schema.properties) return null;
+  // 1. Body
+  const rawRequestBody = op.requestBody;
+  if (rawRequestBody) {
+    const requestBody = resolveRequestBody(rawRequestBody, spec);
+    const bodySchema = requestBody?.content?.["application/json"]?.schema;
+    if (bodySchema) {
+      if (
+        isRef(bodySchema) &&
+        bodySchema.$ref.startsWith("#/components/schemas/")
+      ) {
+        const modelName = bodySchema.$ref.split("/").pop() as string;
+        ctx.usedModels.add(modelName);
+        sections.push(`    body: ${modelName}Schema.shape`);
+      } else {
+        const schema = resolveSchema(bodySchema, spec);
+        if (schema.type === "object" && schema.properties) {
+          const lines = Object.entries(schema.properties).map(([key, prop]) => {
+            const required = schema.required?.includes(key) ?? false;
+            const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
+              ? key
+              : `"${key}"`;
+            const zodProp = zodFromSchema(prop, ctx);
+            return `      ${propName}: ${zodProp}${required ? "" : ".optional()"}`;
+          });
+          sections.push(`    body: {\n${lines.join(",\n")},\n    }`);
+        }
+      }
+    }
+  }
 
-  const lines = Object.entries(schema.properties).map(([key, prop]) => {
-    const required = schema.required?.includes(key) ?? false;
-    const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key) ? key : `"${key}"`;
-    const zodProp = zodFromSchema(prop, spec);
-    return `      ${propName}: ${zodProp}${required ? "" : ".optional()"}`;
-  });
+  // 2. Parameters (Query & Header)
+  const allParams = [...(pathParams ?? []), ...(op.parameters ?? [])];
+  const queryParams: string[] = [];
+  const headerParams: string[] = [];
 
-  return `  request: {\n    body: {\n${lines.join(",\n")},\n    },\n  },`;
+  for (const p of allParams) {
+    const param = resolveParameter(p, spec);
+    if (!param || !param.schema) continue;
+
+    const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(param.name)
+      ? param.name
+      : `"${param.name}"`;
+    const zodProp = zodFromSchema(param.schema, ctx);
+    const line = `      ${propName}: ${zodProp}${param.required ? "" : ".optional()"}`;
+
+    if (param.in === "query") queryParams.push(line);
+    else if (param.in === "header") headerParams.push(line);
+  }
+
+  if (queryParams.length > 0) {
+    sections.push(`    query: {\n${queryParams.join(",\n")},\n    }`);
+  }
+  if (headerParams.length > 0) {
+    sections.push(`    headers: {\n${headerParams.join(",\n")},\n    }`);
+  }
+
+  if (sections.length === 0) return null;
+
+  return `export const ${requestName}: RequestDefinition = {\n${sections.join(",\n")}\n};`;
 }
 
 // ─── Response → AppResponse mapping ─────────────────────────────────────────
@@ -261,10 +341,11 @@ function statusToAppResponse(status: number): string {
 function buildHandlerBody(
   status: number,
   rawResponse: OAResponse | OARef | undefined,
-  spec: OASpec,
+  ctx: CodegenContext,
   hasValidation: boolean
 ): string {
   const factory = statusToAppResponse(status);
+  const spec = ctx.spec;
 
   // Redirect — emit a placeholder URL
   if (status >= 300 && status < 400) {
@@ -285,7 +366,7 @@ function buildHandlerBody(
   // Try to build a stub body from the response schema
   const response = rawResponse ? resolveResponse(rawResponse, spec) : undefined;
   const schema = response?.content?.["application/json"]?.schema;
-  const stub = schema ? buildResponseStub(schema, spec) : null;
+  const stub = schema ? buildResponseStub(schema, ctx) : null;
 
   const prefix = hasValidation
     ? "req.errors.throwValidationError();\n    "
@@ -303,8 +384,9 @@ function buildHandlerBody(
 /** Generates a shallow stub object literal from an object schema. */
 function buildResponseStub(
   rawSchema: OASchema | OARef,
-  spec: OASpec
+  ctx: CodegenContext
 ): string | null {
+  const spec = ctx.spec;
   const schema = resolveSchema(rawSchema, spec);
 
   if (schema.type !== "object" || !schema.properties) return null;
@@ -315,7 +397,7 @@ function buildResponseStub(
       const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
         ? key
         : `"${key}"`;
-      return `    ${propName}: ${scalarStub(prop, spec)}`;
+      return `    ${propName}: ${scalarStub(prop, ctx)}`;
     });
 
   if (lines.length === 0) return null;
@@ -323,7 +405,8 @@ function buildResponseStub(
   return `{\n${lines.join(",\n")},\n  }`;
 }
 
-function scalarStub(rawSchema: OASchema | OARef, spec: OASpec): string {
+function scalarStub(rawSchema: OASchema | OARef, ctx: CodegenContext): string {
+  const spec = ctx.spec;
   const schema = resolveSchema(rawSchema, spec);
 
   if (schema.const !== undefined) return JSON.stringify(schema.const);
@@ -429,23 +512,32 @@ function buildEndpoint(
   method: string,
   path: string,
   op: OAOperation,
-  spec: OASpec,
+  pathParams: Array<OAParameter | OARef> | undefined,
+  ctx: CodegenContext,
   existingNames: Set<string>
-): string {
+): {
+  code: string;
+  usedModels: Set<string>;
+  requestBlock?: string;
+  requestName?: string;
+} {
+  const spec = ctx.spec;
   const name = getObjectName(method, path, op, existingNames);
   const honoPath = oaToHonoPath(path);
   const authType = op.security ? "secure" : "open";
   const methodUpper = method.toUpperCase();
 
-  // Request body
-  const rawRequestBody = op.requestBody;
-  const requestBody = rawRequestBody
-    ? resolveRequestBody(rawRequestBody, spec)
-    : undefined;
-  const bodySchema = requestBody?.content?.["application/json"]?.schema;
-  const validatorBlock = bodySchema
-    ? buildRequestBlock(bodySchema, spec)
-    : null;
+  // Local context to track models used in THIS endpoint
+  const localCtx: CodegenContext = { spec, usedModels: new Set() };
+
+  // Request body + parameters
+  const requestName = `${name}Request`;
+  const validatorBlock = buildRequestBlock(
+    op,
+    pathParams,
+    localCtx,
+    requestName
+  );
   const hasValidation = !!validatorBlock;
 
   // Pick the best success response
@@ -456,7 +548,7 @@ function buildEndpoint(
   const handlerBody = buildHandlerBody(
     successStatus,
     rawSuccessResponse,
-    spec,
+    localCtx,
     hasValidation
   );
 
@@ -469,10 +561,50 @@ function buildEndpoint(
 
   if (op.summary) lines.push(`  title: "${op.summary}",`);
   if (op.description) lines.push(`  description: "${op.description}",`);
-  if (validatorBlock) lines.push(validatorBlock);
+  if (validatorBlock) lines.push(`  request: ${requestName},`);
   lines.push(`  handler: ${handlerBody},`, "};");
 
-  return lines.join("\n");
+  return {
+    code: lines.join("\n"),
+    usedModels: localCtx.usedModels,
+    requestBlock: validatorBlock ?? undefined,
+    requestName: validatorBlock ? requestName : undefined,
+  };
+}
+
+// ─── Model generation ─────────────────────────────────────────────────────────
+
+function generateModels(spec: OASpec, modelsDir: string): void {
+  if (!spec.components?.schemas) return;
+
+  mkdirSync(modelsDir, { recursive: true });
+
+  for (const [name, schema] of Object.entries(spec.components.schemas)) {
+    const ctx: CodegenContext = { spec, usedModels: new Set() };
+    const zodSchema = zodFromSchema(schema, ctx);
+
+    // Filter out self-reference if it exists
+    ctx.usedModels.delete(name);
+
+    const imports: string[] = [];
+    for (const used of ctx.usedModels) {
+      imports.push(`import { ${used}Schema } from "./${used}.js";`);
+    }
+
+    const content = [
+      'import { z } from "@simapi/simapi";',
+      ...imports,
+      "",
+      `export const ${name}Schema = ${zodSchema};`,
+      "",
+      `export type ${name} = z.infer<typeof ${name}Schema>;`,
+      "",
+    ].join("\n");
+
+    const outPath = join(modelsDir, `${name}.ts`);
+    writeFileSync(outPath, content, "utf8");
+    consola.log(`[SimAPI] Wrote model ${outPath}`);
+  }
 }
 
 // ─── Public runner ────────────────────────────────────────────────────────────
@@ -484,7 +616,10 @@ export async function runImportOpenAPI(
 ): Promise<void> {
   const root = resolve(cwd ?? process.cwd());
   const absSpec = resolve(root, specPath);
-  const outputDir = resolve(root, opts.output ?? "src/endpoints");
+  const outputBase = resolve(root, opts.output ?? "src");
+  const endpointsDir = join(outputBase, "endpoints");
+  const modelsDir = join(outputBase, "models");
+  const requestsDir = join(outputBase, "requests");
 
   let raw: string;
   try {
@@ -504,8 +639,13 @@ export async function runImportOpenAPI(
     return;
   }
 
-  const groups = new Map<string, string[]>();
+  // 1. Generate models first
+  generateModels(spec, modelsDir);
+
+  const groups = new Map<string, { endpoints: string[]; requests: string[] }>();
   const groupNames = new Map<string, Set<string>>();
+  const requestImports = new Map<string, Set<string>>();
+  const modelImports = new Map<string, Set<string>>();
 
   for (const [path, pathItem] of Object.entries(spec.paths)) {
     for (const method of HTTP_METHODS) {
@@ -515,38 +655,84 @@ export async function runImportOpenAPI(
       const fileName = getFileName(path, op);
 
       if (!groups.has(fileName)) {
-        groups.set(fileName, []);
+        groups.set(fileName, { endpoints: [], requests: [] });
         groupNames.set(fileName, new Set());
+        requestImports.set(fileName, new Set());
+        modelImports.set(fileName, new Set());
       }
 
-      const endpoints = groups.get(fileName) as string[];
-      const names = groupNames.get(fileName) as Set<string>;
+      const group = groups.get(fileName)!;
+      const names = groupNames.get(fileName)!;
+      const reqModels = modelImports.get(fileName)!;
 
-      endpoints.push(buildEndpoint(method, path, op, spec, names));
+      const ctx: CodegenContext = { spec, usedModels: new Set() };
+      const { code, usedModels, requestBlock, requestName } = buildEndpoint(
+        method,
+        path,
+        op,
+        pathItem.parameters,
+        ctx,
+        names
+      );
+
+      group.endpoints.push(code);
+      if (requestBlock) {
+        group.requests.push(requestBlock);
+        requestImports.get(fileName)!.add(requestName!);
+      }
+      for (const m of usedModels) reqModels.add(m);
     }
   }
 
-  mkdirSync(outputDir, { recursive: true });
+  mkdirSync(endpointsDir, { recursive: true });
+  mkdirSync(requestsDir, { recursive: true });
 
   let written = 0;
-  for (const [fileName, endpoints] of groups.entries()) {
-    const needsZ = endpoints.some((e) => e.includes("z."));
-    const imports: string[] = [];
-    if (needsZ) imports.push("z");
-    imports.push("AppResponse", "type EndpointDefinition");
 
-    const file =
-      `import { ${imports.join(", ")} } from "@simapi/simapi";\n\n` +
-      endpoints.join("\n\n") +
-      "\n";
+  // 2. Write Request files
+  for (const [fileName, group] of groups.entries()) {
+    if (group.requests.length === 0) continue;
 
-    const outPath = join(outputDir, `${fileName}.ts`);
-    writeFileSync(outPath, file, "utf8");
-    consola.log(`[SimAPI] Wrote ${outPath}`);
+    const models = modelImports.get(fileName);
+    const imports = [
+      'import { z, type RequestDefinition } from "@simapi/simapi";',
+    ];
+    if (models) {
+      for (const m of Array.from(models).sort()) {
+        imports.push(`import { ${m}Schema } from "../models/${m}.js";`);
+      }
+    }
+
+    const content =
+      imports.join("\n") + "\n\n" + group.requests.join("\n\n") + "\n";
+    writeFileSync(join(requestsDir, `${fileName}.ts`), content, "utf8");
+    consola.log(
+      `[SimAPI] Wrote requests ${join(requestsDir, `${fileName}.ts`)}`
+    );
+  }
+
+  // 3. Write Endpoint files
+  for (const [fileName, group] of groups.entries()) {
+    const reqNames = requestImports.get(fileName);
+    const imports = [
+      'import { AppResponse, type EndpointDefinition } from "@simapi/simapi";',
+    ];
+
+    if (reqNames && reqNames.size > 0) {
+      const names = Array.from(reqNames).sort().join(", ");
+      imports.push(`import { ${names} } from "../requests/${fileName}.js";`);
+    }
+
+    const content =
+      imports.join("\n") + "\n\n" + group.endpoints.join("\n\n") + "\n";
+    writeFileSync(join(endpointsDir, `${fileName}.ts`), content, "utf8");
+    consola.log(
+      `[SimAPI] Wrote endpoints ${join(endpointsDir, `${fileName}.ts`)}`
+    );
     written++;
   }
 
   consola.success(
-    `[SimAPI] Import complete — ${written} file(s) written to ${outputDir}/`
+    `[SimAPI] Import complete — ${written} file(s) written to ${endpointsDir}/`
   );
 }

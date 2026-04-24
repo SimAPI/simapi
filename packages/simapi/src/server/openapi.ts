@@ -2,7 +2,7 @@ import { AppRequest } from "../core/AppRequest.js";
 import type { SimAPIConfig } from "../core/defineConfig.js";
 import type { EndpointDefinition } from "../core/endpoint.js";
 import { ValidationErrors } from "../core/ValidationErrors.js";
-import { zodShapeToJsonSchema } from "./zodSchema.js";
+import { zodShapeToJsonSchema, zodTypeToJsonSchema } from "./zodSchema.js";
 
 declare const __SIMAPI_VERSION__: string;
 
@@ -59,6 +59,40 @@ async function buildOperation(
         },
       },
     };
+  }
+
+  // Parameters (Query & Headers)
+  const extraParams: Record<string, unknown>[] = [];
+  if (ep.request?.query) {
+    for (const [name, shape] of Object.entries(ep.request.query)) {
+      extraParams.push({
+        name,
+        in: "query",
+        required:
+          (shape as { _def?: { typeName?: string } })?._def?.typeName !==
+          "ZodOptional",
+        schema: zodTypeToJsonSchema(shape),
+      });
+    }
+  }
+  if (ep.request?.headers) {
+    for (const [name, shape] of Object.entries(ep.request.headers)) {
+      extraParams.push({
+        name,
+        in: "header",
+        required:
+          (shape as { _def?: { typeName?: string } })?._def?.typeName !==
+          "ZodOptional",
+        schema: zodTypeToJsonSchema(shape),
+      });
+    }
+  }
+
+  if (extraParams.length > 0) {
+    operation.parameters = [
+      ...((operation.parameters as unknown[]) ?? []),
+      ...extraParams,
+    ];
   }
 
   const hasValidation = !!(
