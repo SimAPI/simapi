@@ -67,6 +67,7 @@
     "@faker-js/faker": "^9.3.0",
     "@hono/node-server": "^1.14.0",
     "@libsql/client": "^0.17.2",
+    "@simapi/openapi": "*",
     "cac": "^6.7.14",
     "consola": "^3.4.2",
     "drizzle-orm": "^0.45.2",

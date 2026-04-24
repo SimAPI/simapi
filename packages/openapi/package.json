@@ -1,0 +1,50 @@
+{
+  "name": "@simapi/openapi",
+  "version": "0.0.1",
+  "description": "OpenAPI import/export utilities for SimAPI.",
+  "keywords": ["openapi", "swagger", "simapi", "codegen", "typescript"],
+  "license": "MIT",
+  "author": "MayR Labs <info@mayrlabs.com> (https://mayrlabs.com)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SimAPI/simapi.git",
+    "directory": "packages/openapi"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "pkg:dev": "tsdown --watch",
+    "check-types": "tsc --noEmit",
+    "lint": "biome lint ./src",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "consola": "^3.4.2",
+    "yaml": "^2.8.3"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "*",
+    "@types/node": "^25.6.0",
+    "tsdown": "^0.21.7",
+    "typescript": "5.9.2",
+    "vitest": "^4.1.4"
+  }
+}

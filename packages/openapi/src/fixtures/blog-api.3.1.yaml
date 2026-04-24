@@ -1,0 +1,578 @@
+openapi: "3.1.0"
+info:
+  title: Blog API
+  version: "2.0.0"
+  description: >
+    A blog platform API demonstrating OAS 3.1 features — nullable via type arrays,
+    $defs, webhooks, 301 redirects, and rich pagination patterns.
+
+jsonSchemaDialect: "https://spec.openapis.org/oas/3.1/dialect/base"
+
+tags:
+  - name: Posts
+    description: Manage blog posts.
+  - name: Comments
+    description: Manage comments on posts.
+  - name: Authors
+    description: Author profiles.
+  - name: Media
+    description: File upload and media management.
+
+components:
+  schemas:
+    PostStatus:
+      type: string
+      enum: [draft, published, archived]
+
+    Author:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        bio:
+          type: ["string", "null"]
+        avatarUrl:
+          type: ["string", "null"]
+          format: uri
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - bio
+        - avatarUrl
+        - createdAt
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        slug:
+          type: string
+        excerpt:
+          type: ["string", "null"]
+        body:
+          type: string
+        status:
+          $ref: "#/components/schemas/PostStatus"
+        author:
+          $ref: "#/components/schemas/Author"
+        tags:
+          type: array
+          items:
+            type: string
+        publishedAt:
+          type: ["string", "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - slug
+        - excerpt
+        - body
+        - status
+        - author
+        - tags
+        - publishedAt
+        - createdAt
+        - updatedAt
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        postId:
+          type: string
+          format: uuid
+        author:
+          $ref: "#/components/schemas/Author"
+        body:
+          type: string
+        parentId:
+          type: ["string", "null"]
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - postId
+        - author
+        - body
+        - parentId
+        - createdAt
+
+    PaginationMeta:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          minimum: 1
+        perPage:
+          type: integer
+          minimum: 1
+          maximum: 100
+        total:
+          type: integer
+          minimum: 0
+        lastPage:
+          type: integer
+          minimum: 1
+        from:
+          type: ["integer", "null"]
+        to:
+          type: ["integer", "null"]
+      required:
+        - currentPage
+        - perPage
+        - total
+        - lastPage
+        - from
+        - to
+
+    PaginatedPosts:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+      required:
+        - data
+        - meta
+
+    PaginatedComments:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+      required:
+        - data
+        - meta
+
+  responses:
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+
+    Unauthorized:
+      description: Missing or invalid credentials.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+
+    ValidationError:
+      description: Validation failed.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                const: "The given data was invalid."
+              errors:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: string
+            required:
+              - message
+              - errors
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /posts:
+    get:
+      operationId: listPosts
+      summary: List posts
+      description: Return a paginated list of published blog posts.
+      tags:
+        - Posts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: perPage
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/PostStatus"
+        - name: tag
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Paginated list of posts.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedPosts"
+
+    post:
+      operationId: createPost
+      summary: Create post
+      description: Create a new blog post. Requires authentication.
+      tags:
+        - Posts
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 3
+                  maxLength: 200
+                body:
+                  type: string
+                  minLength: 10
+                tags:
+                  type: array
+                  items:
+                    type: string
+                status:
+                  $ref: "#/components/schemas/PostStatus"
+              required:
+                - title
+                - body
+      responses:
+        "201":
+          description: Post created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Post"
+                required:
+                  - data
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /posts/{slug}:
+    get:
+      operationId: getPost
+      summary: Get post
+      description: Retrieve a single post by its slug.
+      tags:
+        - Posts
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post details.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Post"
+                required:
+                  - data
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      operationId: updatePost
+      summary: Update post
+      description: Replace a post's content. Requires authentication.
+      tags:
+        - Posts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 3
+                  maxLength: 200
+                body:
+                  type: string
+                  minLength: 10
+                tags:
+                  type: array
+                  items:
+                    type: string
+                status:
+                  $ref: "#/components/schemas/PostStatus"
+              required:
+                - title
+                - body
+      responses:
+        "200":
+          description: Updated post.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Post"
+                required:
+                  - data
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+    delete:
+      operationId: deletePost
+      summary: Delete post
+      description: Permanently delete a post. Requires authentication.
+      tags:
+        - Posts
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Post deleted.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /posts/{slug}/comments:
+    get:
+      operationId: listComments
+      summary: List comments
+      description: Return a paginated list of comments for a post.
+      tags:
+        - Comments
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: Paginated comments.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedComments"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    post:
+      operationId: createComment
+      summary: Create comment
+      description: Post a comment on a blog post.
+      tags:
+        - Comments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+                parentId:
+                  type: string
+                  format: uuid
+              required:
+                - body
+      responses:
+        "201":
+          description: Comment created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Comment"
+                required:
+                  - data
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+
+  /posts/{id}:
+    get:
+      operationId: getPostById
+      summary: Get post by ID (legacy redirect)
+      description: >
+        Legacy endpoint — redirects to the canonical slug-based URL.
+        Kept for backwards compatibility.
+      tags:
+        - Posts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "301":
+          description: Permanent redirect to /posts/{slug}.
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /authors/{id}:
+    get:
+      operationId: getAuthor
+      summary: Get author
+      description: Retrieve an author profile.
+      tags:
+        - Authors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Author profile.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Author"
+                required:
+                  - data
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /media/upload:
+    post:
+      operationId: uploadMedia
+      summary: Upload media
+      description: Upload an image or document. Returns a temporary redirect to the uploaded file URL.
+      tags:
+        - Media
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filename:
+                  type: string
+                mimeType:
+                  type: string
+                sizeBytes:
+                  type: integer
+                  minimum: 1
+              required:
+                - filename
+                - mimeType
+                - sizeBytes
+      responses:
+        "302":
+          description: Redirect to the uploaded media URL.
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+

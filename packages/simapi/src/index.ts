@@ -13,3 +13,5 @@ export type { EndpointDefinition, HttpMethod } from "./core/endpoint.js";
 export type { RequestDefinition } from "./core/RequestDefinition.js";
 export type { ValidationFormat } from "./core/ValidationErrors.js";
 export { ValidationError, ValidationErrors } from "./core/ValidationErrors.js";
+export { discoverEndpoints } from "./server/discovery.js";
+export { buildOpenApiSpec } from "./server/openapi.js";

@@ -123,6 +123,13 @@ function registerEndpoint(
       const response = await endpoint.handler(request);
       logStatus = response.status;
       logBody = response.body;
+
+      if (response.status >= 300 && response.status < 400) {
+        const location =
+          (response.body as { location?: string } | null)?.location ?? "/";
+        return c.redirect(location, response.status as 301 | 302 | 307 | 308);
+      }
+
       // biome-ignore lint/suspicious/noExplicitAny: status is a valid HTTP code
       return c.json(response.body, response.status as any);
     } catch (err) {
