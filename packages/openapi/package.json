@@ -2,7 +2,13 @@
   "name": "@simapi/openapi",
   "version": "0.0.1",
   "description": "OpenAPI import/export utilities for SimAPI.",
-  "keywords": ["openapi", "swagger", "simapi", "codegen", "typescript"],
+  "keywords": [
+    "openapi",
+    "swagger",
+    "simapi",
+    "codegen",
+    "typescript"
+  ],
   "license": "MIT",
   "author": "MayR Labs <info@mayrlabs.com> (https://mayrlabs.com)",
   "repository": {
@@ -26,7 +32,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",

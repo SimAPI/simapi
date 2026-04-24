@@ -1,7 +1,5 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { createRequire } from "node:module";
-import { dirname, extname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { extname, join, resolve } from "node:path";
 import consola from "consola";
 import { parse as parseYaml } from "yaml";
 import type {
@@ -101,7 +99,7 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
 
   // Normalise type (3.1 allows arrays like ["string", "null"])
   const rawType = Array.isArray(schema.type)
-    ? schema.type.find((t) => t !== "null") ?? schema.type[0]
+    ? (schema.type.find((t) => t !== "null") ?? schema.type[0])
     : schema.type;
 
   const isNullable =
@@ -128,8 +126,10 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
     case "number": {
       chain = "z.number()";
       if (rawType === "integer") chain += ".int()";
-      if (typeof schema.minimum === "number") chain += `.min(${schema.minimum})`;
-      if (typeof schema.maximum === "number") chain += `.max(${schema.maximum})`;
+      if (typeof schema.minimum === "number")
+        chain += `.min(${schema.minimum})`;
+      if (typeof schema.maximum === "number")
+        chain += `.max(${schema.maximum})`;
       break;
     }
 
@@ -172,8 +172,10 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
         const schemas = schema.allOf.map((s) => zodFromSchema(s, spec));
         chain =
           schemas.length === 1
-            ? schemas[0]!
-            : schemas.slice(1).reduce((acc, s) => `${acc}.and(${s})`, schemas[0]!);
+            ? (schemas[0] as string)
+            : schemas
+                .slice(1)
+                .reduce((acc, s) => `${acc}.and(${s})`, schemas[0] as string);
         break;
       }
       if (schema.anyOf && schema.anyOf.length > 0) {
@@ -197,7 +199,10 @@ function zodFromSchema(rawSchema: OASchema | OARef, spec: OASpec): string {
 
 // ─── Request block codegen ────────────────────────────────────────────────────
 
-function buildRequestBlock(rawSchema: OASchema | OARef, spec: OASpec): string | null {
+function buildRequestBlock(
+  rawSchema: OASchema | OARef,
+  spec: OASpec
+): string | null {
   const schema = resolveSchema(rawSchema, spec);
 
   if (schema.type !== "object" || !schema.properties) return null;
@@ -286,9 +291,7 @@ function buildHandlerBody(
     ? "req.errors.throwValidationError();\n    "
     : "";
 
-  const callExpr = stub
-    ? `${factory}(${stub})`
-    : `${factory}({ data: {} })`;
+  const callExpr = stub ? `${factory}(${stub})` : `${factory}({ data: {} })`;
 
   if (hasValidation) {
     return `(req) => {\n    ${prefix}return ${callExpr};\n  }`;
@@ -351,7 +354,7 @@ function scalarStub(rawSchema: OASchema | OARef, spec: OASpec): string {
 function getFileName(path: string, op: OAOperation): string {
   // Prefer tags
   if (op.tags && op.tags.length > 0) {
-    const tag = op.tags[0]!;
+    const tag = op.tags[0] as string;
     return tag
       .replace(/[-_\s]+(.)/g, (_, c: string) => c.toUpperCase())
       .replace(/[^a-zA-Z0-9_$]/g, "")
@@ -440,7 +443,9 @@ function buildEndpoint(
     ? resolveRequestBody(rawRequestBody, spec)
     : undefined;
   const bodySchema = requestBody?.content?.["application/json"]?.schema;
-  const validatorBlock = bodySchema ? buildRequestBlock(bodySchema, spec) : null;
+  const validatorBlock = bodySchema
+    ? buildRequestBlock(bodySchema, spec)
+    : null;
   const hasValidation = !!validatorBlock;
 
   // Pick the best success response
@@ -514,8 +519,8 @@ export async function runImportOpenAPI(
         groupNames.set(fileName, new Set());
       }
 
-      const endpoints = groups.get(fileName)!;
-      const names = groupNames.get(fileName)!;
+      const endpoints = groups.get(fileName) as string[];
+      const names = groupNames.get(fileName) as Set<string>;
 
       endpoints.push(buildEndpoint(method, path, op, spec, names));
     }

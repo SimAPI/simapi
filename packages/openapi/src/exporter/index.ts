@@ -28,10 +28,7 @@ export async function runExportOpenAPI(
     const { tsImport } = await import("tsx/esm/api");
 
     // Resolve the simapi package relative to cwd so we pick up the user's copy.
-    const simapiPath = join(
-      root,
-      "node_modules/@simapi/simapi/dist/index.mjs"
-    );
+    const simapiPath = join(root, "node_modules/@simapi/simapi/dist/index.mjs");
 
     if (!existsSync(simapiPath)) {
       consola.error(
@@ -67,9 +64,7 @@ export async function runExportOpenAPI(
     const endpointsDir = resolve(root, config.endpointsDir ?? "endpoints");
 
     if (!existsSync(endpointsDir)) {
-      consola.error(
-        `[SimAPI] Endpoints directory not found: ${endpointsDir}`
-      );
+      consola.error(`[SimAPI] Endpoints directory not found: ${endpointsDir}`);
       process.exit(1);
     }
 

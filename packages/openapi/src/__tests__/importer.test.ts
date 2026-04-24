@@ -1,12 +1,11 @@
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { parse as parseYaml } from "yaml";
 import { beforeAll, describe, expect, it } from "vitest";
-import type { OASpec } from "../types.js";
+import { parse as parseYaml } from "yaml";
 import { runImportOpenAPI } from "../importer/index.js";
-import { mkdtempSync, rmSync, readdirSync } from "node:fs";
-import { tmpdir } from "node:os";
+import type { OASpec } from "../types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const FIXTURES = join(__dirname, "../fixtures");
@@ -26,10 +25,7 @@ function tmpDir(): string {
 }
 
 /** Run the importer and return a map of { filename → file content }. */
-async function importToTemp(
-  specFile: string,
-  isJson = false
-): Promise<Map<string, string>> {
+async function importToTemp(specFile: string): Promise<Map<string, string>> {
   const outDir = tmpDir();
   const specPath = join(FIXTURES, specFile);
 
@@ -60,7 +56,7 @@ describe("auth-api.3.0.yaml", () => {
   it("parses without error", () => {
     expect(spec.openapi).toBe("3.0.3");
     expect(spec.paths).toBeDefined();
-    expect(Object.keys(spec.paths!).length).toBeGreaterThan(0);
+    expect(Object.keys(spec.paths || {}).length).toBeGreaterThan(0);
   });
 
   it("generates files grouped by tag", () => {
@@ -71,45 +67,45 @@ describe("auth-api.3.0.yaml", () => {
   });
 
   it("maps 201 response → AppResponse.created", () => {
-    const auth = files.get("authentication.ts")!;
+    const auth = files.get("authentication.ts") as string;
     expect(auth).toContain("AppResponse.created");
   });
 
   it("maps 200 response → AppResponse.success", () => {
-    const auth = files.get("authentication.ts")!;
+    const auth = files.get("authentication.ts") as string;
     expect(auth).toContain("AppResponse.success");
   });
 
   it("maps 204 response → AppResponse.noContent", () => {
-    const auth = files.get("authentication.ts")!;
+    const auth = files.get("authentication.ts") as string;
     expect(auth).toContain("AppResponse.noContent");
   });
 
   it("generates const → literal value in response stub for 'message' fields", () => {
-    const verification = files.get("accountVerification.ts")!;
+    const verification = files.get("accountVerification.ts") as string;
     // The response stub for verifyAccount inlines the const value as a string literal
     expect(verification).toContain('"Account verified successfully."');
   });
 
   it("generates request validation block for body schemas", () => {
-    const verification = files.get("accountVerification.ts")!;
+    const verification = files.get("accountVerification.ts") as string;
     expect(verification).toContain("request:");
     expect(verification).toContain("body:");
     expect(verification).toContain("z.string().min(6).max(6)");
   });
 
   it("marks secure endpoints with type: 'secure'", () => {
-    const verification = files.get("accountVerification.ts")!;
+    const verification = files.get("accountVerification.ts") as string;
     expect(verification).toContain('type: "secure"');
   });
 
   it("marks open endpoints with type: 'open'", () => {
-    const auth = files.get("authentication.ts")!;
+    const auth = files.get("authentication.ts") as string;
     expect(auth).toContain('type: "open"');
   });
 
   it("generates throwValidationError() in handlers with request blocks", () => {
-    const verification = files.get("accountVerification.ts")!;
+    const verification = files.get("accountVerification.ts") as string;
     expect(verification).toContain("req.errors.throwValidationError()");
   });
 
@@ -122,12 +118,12 @@ describe("auth-api.3.0.yaml", () => {
   });
 
   it("generates email format → z.string().email()", () => {
-    const auth = files.get("authentication.ts")!;
+    const auth = files.get("authentication.ts") as string;
     expect(auth).toContain("z.string().email()");
   });
 
   it("resolves $ref for response body schema (verifyAccount returns user)", () => {
-    const verification = files.get("accountVerification.ts")!;
+    const verification = files.get("accountVerification.ts") as string;
     // The 200 response references AuthUserResource via $ref
     // The stub should at minimum produce a body
     expect(verification).toContain("AppResponse.success");
@@ -158,32 +154,32 @@ describe("blog-api.3.1.yaml", () => {
   });
 
   it("maps 301 response → AppResponse.redirect", () => {
-    const posts = files.get("posts.ts")!;
+    const posts = files.get("posts.ts") as string;
     expect(posts).toContain("AppResponse.redirect");
   });
 
   it("maps 302 response → AppResponse.redirect", () => {
-    const media = files.get("media.ts")!;
+    const media = files.get("media.ts") as string;
     expect(media).toContain("AppResponse.redirect");
   });
 
   it("maps 204 DELETE → AppResponse.noContent", () => {
-    const posts = files.get("posts.ts")!;
+    const posts = files.get("posts.ts") as string;
     expect(posts).toContain("AppResponse.noContent");
   });
 
   it("maps 201 POST → AppResponse.created", () => {
-    const posts = files.get("posts.ts")!;
+    const posts = files.get("posts.ts") as string;
     expect(posts).toContain("AppResponse.created");
   });
 
   it("generates z.enum() for PostStatus field with tags", () => {
-    const posts = files.get("posts.ts")!;
+    const posts = files.get("posts.ts") as string;
     expect(posts).toContain('z.enum(["draft", "published", "archived"])');
   });
 
   it("generates request block with minLength/maxLength for title", () => {
-    const posts = files.get("posts.ts")!;
+    const posts = files.get("posts.ts") as string;
     expect(posts).toContain("z.string().min(3).max(200)");
   });
 
@@ -192,7 +188,7 @@ describe("blog-api.3.1.yaml", () => {
     // buildResponseStub will fall through to scalarStub which returns 0 for integer
     // The nullable type is handled in zodFromSchema (used for request blocks).
     // Here we verify the file parses and is generated without error.
-    const posts = files.get("posts.ts")!;
+    const posts = files.get("posts.ts") as string;
     // The listPosts handler returns a stub including meta object
     expect(posts).toContain("meta: {}");
   });
@@ -220,36 +216,36 @@ describe("petstore-minimal.3.0.json", () => {
   });
 
   it("generates z.enum() for species field", () => {
-    const pets = files.get("pets.ts")!;
+    const pets = files.get("pets.ts") as string;
     expect(pets).toContain(
       'z.enum(["dog", "cat", "bird", "fish", "rabbit", "other"])'
     );
   });
 
   it("generates z.number().int() for integer body fields (quantity in orders)", () => {
-    const orders = files.get("orders.ts")!;
+    const orders = files.get("orders.ts") as string;
     // quantity: integer, minimum: 1 → z.number().int().min(1)
     expect(orders).toContain("z.number().int().min(1)");
   });
 
   it("maps 204 DELETE → AppResponse.noContent", () => {
-    const pets = files.get("pets.ts")!;
+    const pets = files.get("pets.ts") as string;
     expect(pets).toContain("AppResponse.noContent");
   });
 
   it("maps 201 POST → AppResponse.created", () => {
-    const pets = files.get("pets.ts")!;
+    const pets = files.get("pets.ts") as string;
     expect(pets).toContain("AppResponse.created");
   });
 
   it("generates validation block with enum constraint", () => {
-    const pets = files.get("pets.ts")!;
+    const pets = files.get("pets.ts") as string;
     expect(pets).toContain("request:");
     expect(pets).toContain("body:");
   });
 
   it("marks apiKey-secured endpoints as type: 'secure'", () => {
-    const pets = files.get("pets.ts")!;
+    const pets = files.get("pets.ts") as string;
     expect(pets).toContain('type: "secure"');
   });
 });
@@ -285,7 +281,9 @@ describe("importer edge cases", () => {
     const { writeFileSync } = await import("node:fs");
     writeFileSync(specPath, JSON.stringify(spec));
 
-    await runImportOpenAPI(specPath, undefined, { output: join(outDir, "out") });
+    await runImportOpenAPI(specPath, undefined, {
+      output: join(outDir, "out"),
+    });
 
     const content = readFileSync(join(outDir, "out", "things.ts"), "utf8");
 
@@ -314,7 +312,9 @@ describe("importer edge cases", () => {
     const { writeFileSync } = await import("node:fs");
     writeFileSync(specPath, JSON.stringify(spec));
 
-    await runImportOpenAPI(specPath, undefined, { output: join(outDir, "out") });
+    await runImportOpenAPI(specPath, undefined, {
+      output: join(outDir, "out"),
+    });
 
     // File name comes from path segment before {id} = "widgets"
     const files = readdirSync(join(outDir, "out"));
@@ -327,7 +327,14 @@ describe("importer edge cases", () => {
     const outDir = tmpDir();
     const specPath = join(outDir, "empty.json");
     const { writeFileSync } = await import("node:fs");
-    writeFileSync(specPath, JSON.stringify({ openapi: "3.0.3", info: { title: "Empty", version: "1.0.0" }, paths: {} }));
+    writeFileSync(
+      specPath,
+      JSON.stringify({
+        openapi: "3.0.3",
+        info: { title: "Empty", version: "1.0.0" },
+        paths: {},
+      })
+    );
 
     // Should not throw, just log and return
     await expect(
@@ -370,7 +377,9 @@ describe("importer edge cases", () => {
     const { writeFileSync } = await import("node:fs");
     writeFileSync(specPath, JSON.stringify(spec));
 
-    await runImportOpenAPI(specPath, undefined, { output: join(outDir, "out") });
+    await runImportOpenAPI(specPath, undefined, {
+      output: join(outDir, "out"),
+    });
 
     const content = readFileSync(join(outDir, "out", "items.ts"), "utf8");
     expect(content).toContain("z.unknown()");
@@ -412,7 +421,9 @@ describe("importer edge cases", () => {
     const { writeFileSync } = await import("node:fs");
     writeFileSync(specPath, JSON.stringify(spec));
 
-    await runImportOpenAPI(specPath, undefined, { output: join(outDir, "out") });
+    await runImportOpenAPI(specPath, undefined, {
+      output: join(outDir, "out"),
+    });
 
     const content = readFileSync(join(outDir, "out", "profile.ts"), "utf8");
     expect(content).toContain("z.string().nullable()");
