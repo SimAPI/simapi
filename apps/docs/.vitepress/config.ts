@@ -17,7 +17,7 @@ export default defineConfig({
     search: { provider: "local" },
 
     nav: [
-      { text: "Guide", link: "/guide/introduction" },
+      { text: "Guide", link: "/guide" },
       { text: "API", link: "/api/app-request" },
       {
         text: `v${version}`,

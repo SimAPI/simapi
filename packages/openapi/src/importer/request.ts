@@ -28,23 +28,21 @@ export function buildRequestBlock(
       ) {
         const modelName = bodySchema.$ref.split("/").pop() as string;
         ctx.usedModels.add(modelName);
-        sections.push(`    body: ${modelName}Schema.shape`);
+        sections.push(`  body: ${modelName}Schema.shape`);
       } else {
-        const zodProp = zodFromSchema(bodySchema, ctx, true);
-        sections.push(`    body: ${zodProp}`);
+        const zodProp = zodFromSchema(bodySchema, ctx, true, true);
+        sections.push(`  body: ${zodProp}`);
       }
     }
   }
 
-  // 2. Query/Headers/Params
+  // 2. Query/Headers (Params are not in RequestDefinition)
   const allParams = [...(pathParams ?? []), ...(op.parameters ?? [])];
   const query = buildRequestParams(allParams, "query", ctx);
   const headers = buildRequestParams(allParams, "header", ctx);
-  const params = buildRequestParams(allParams, "path", ctx);
 
-  if (query) sections.push(`    query: ${query}`);
-  if (headers) sections.push(`    headers: ${headers}`);
-  if (params) sections.push(`    params: ${params}`);
+  if (query) sections.push(`  query: ${query}`);
+  if (headers) sections.push(`  headers: ${headers}`);
 
   if (sections.length === 0) return null;
 
@@ -67,8 +65,8 @@ function buildRequestParams(
     const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name)
       ? p.name
       : `"${p.name}"`;
-    return `      ${propName}: ${schema}${p.required ? "" : ".optional()"}`;
+    return `    ${propName}: ${schema}${p.required ? "" : ".optional()"}`;
   });
 
-  return `{\n${lines.join(",\n")},\n    }`;
+  return `{\n${lines.join(",\n")},\n  }`;
 }

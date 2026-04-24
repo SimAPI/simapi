@@ -4,7 +4,8 @@ import type { CodegenContext, OARef, OASchema } from "./types.js";
 export function zodFromSchema(
   rawSchema: OASchema | OARef,
   ctx: CodegenContext,
-  isProperty = false
+  isProperty = false,
+  onlyShape = false
 ): string {
   if (isRef(rawSchema) && rawSchema.$ref.startsWith("#/components/schemas/")) {
     const modelName = rawSchema.$ref.split("/").pop() as string;
@@ -96,9 +97,10 @@ export function zodFromSchema(
           return `  ${propName}: ${zodProp}${required ? "" : ".optional()"}`;
         });
         const indent = isProperty ? "  " : "";
-        chain = `z.object({\n${props.join(",\n")}\n${indent}})`;
+        const shape = `{\n${props.join(",\n")}\n${indent}}`;
+        chain = onlyShape ? shape : `z.object(${shape})`;
       } else {
-        chain = "z.record(z.unknown())";
+        chain = onlyShape ? "{}" : "z.record(z.unknown())";
       }
       break;
     }
