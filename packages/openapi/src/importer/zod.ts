@@ -1,5 +1,5 @@
-import type { OASchema, OARef, CodegenContext } from "./types.js";
 import { isRef, resolveSchema } from "./resolver.js";
+import type { CodegenContext, OARef, OASchema } from "./types.js";
 
 export function zodFromSchema(
   rawSchema: OASchema | OARef,
@@ -26,9 +26,7 @@ export function zodFromSchema(
 
   // enum → z.enum()
   if (s.enum && s.enum.length > 0) {
-    const values = s.enum
-      .map((v: unknown) => JSON.stringify(v))
-      .join(", ");
+    const values = s.enum.map((v: unknown) => JSON.stringify(v)).join(", ");
     if (s.enum.every((v: unknown) => typeof v === "string")) {
       return `z.enum([${values}])`;
     }

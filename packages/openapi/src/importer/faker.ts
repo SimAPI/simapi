@@ -26,7 +26,11 @@ export function fakerValueFromSchema(
   switch (rawType) {
     case "string":
       if (schema.format === "email") return "faker.internet.email()";
-      if (schema.format === "date-time") return "faker.date.past().toISOString()";
+
+      if (schema.format === "date-time") {
+        return "faker.date.past().toISOString()";
+      }
+
       return "faker.string.alphanumeric()";
     case "number":
     case "integer":
