@@ -36,7 +36,7 @@ export function buildRequestBlock(
     }
   }
 
-  // 2. Query/Headers (Params are not in RequestDefinition)
+  // 2. Query/Headers
   const allParams = [...(pathParams ?? []), ...(op.parameters ?? [])];
   const query = buildRequestParams(allParams, "query", ctx);
   const headers = buildRequestParams(allParams, "header", ctx);

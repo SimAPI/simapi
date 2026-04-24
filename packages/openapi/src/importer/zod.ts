@@ -57,7 +57,8 @@ export function zodFromSchema(
       else if (schema.format === "date-time") chain += ".datetime()";
       if (schema.minLength !== undefined) chain += `.min(${schema.minLength})`;
       if (schema.maxLength !== undefined) chain += `.max(${schema.maxLength})`;
-      if (schema.pattern) chain += `.regex(/${schema.pattern}/)`;
+      if (schema.pattern)
+        chain += `.regex(new RegExp(${JSON.stringify(schema.pattern)}))`;
       break;
     }
 

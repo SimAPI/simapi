@@ -70,6 +70,36 @@ describe("createApp", () => {
       const res = await app.request("/not-found");
       expect(res.status).toBe(404);
     });
+
+    it("handles redirects with Location header", async () => {
+      const app = await buildApp([
+        {
+          path: "/old",
+          method: "GET",
+          type: "open",
+          handler: () => AppResponse.redirect("/new", 301),
+        },
+      ]);
+      const res = await app.request("/old");
+
+      expect(res.status).toBe(301);
+      expect(res.headers.get("Location")).toBe("/new");
+    });
+
+    it("handles non-redirect 3xx status codes correctly", async () => {
+      const app = await buildApp([
+        {
+          path: "/not-modified",
+          method: "GET",
+          type: "open",
+          handler: () => AppResponse.custom(304, {}),
+        },
+      ]);
+      const res = await app.request("/not-modified");
+
+      expect(res.status).toBe(304);
+      expect(res.headers.get("Location")).toBeNull();
+    });
   });
 
   describe("secure endpoints", () => {

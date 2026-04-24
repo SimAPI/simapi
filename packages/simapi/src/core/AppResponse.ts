@@ -87,6 +87,17 @@ export class AppResponse {
   }
 
   /**
+   * `status` — return a response with a custom HTTP status code.
+   * Use this when none of the standard factories (success, created, etc.) fit.
+   *
+   * @example
+   * return AppResponse.custom(418, { message: "I'm a teapot" });
+   */
+  static custom(status: number, body?: unknown): AppResponse {
+    return new AppResponse(status, body);
+  }
+
+  /**
    * `301 | 302 | 307 | 308` — redirect the client to `url`.
    * The body carries `{ location }` so the server layer can emit a proper
    * `Location` header and the correct 3xx status.

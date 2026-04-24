@@ -23,9 +23,13 @@ cli
 cli
   .command("export", "Export endpoints to an OpenAPI specification")
   .option("-o, --output <file>", "Output file path (YAML or JSON)")
+  .option("--format <fmt>", "Output format: yaml or json")
   .action(async (options) => {
     try {
-      await runExportOpenAPI(process.cwd(), options.output);
+      await runExportOpenAPI(process.cwd(), {
+        output: options.output,
+        format: options.format,
+      });
     } catch (err) {
       consola.error("Export failed:", err);
       process.exit(1);

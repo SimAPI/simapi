@@ -149,7 +149,7 @@ All responses are created with static factory methods on `AppResponse`:
 AppResponse.success({ data: { id: 1 } })         // 200
 AppResponse.created({ data: { id: 42 } })        // 201
 AppResponse.noContent()                          // 204
-AppResponse.redirect(url, status)                // 301/302
+AppResponse.redirect(url, status)                // 301/302/307/308
 AppResponse.unauthenticated({ message: "..." })  // 401
 AppResponse.unauthorised({ message: "..." })     // 403
 AppResponse.notFound({ message: "..." })         // 404

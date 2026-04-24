@@ -124,13 +124,24 @@ function registerEndpoint(
       logStatus = response.status;
       logBody = response.body;
 
-      if (response.status >= 300 && response.status < 400) {
-        const location =
-          (response.body as { location?: string } | null)?.location ?? "/";
-        return c.redirect(location, response.status as 301 | 302 | 307 | 308);
+      if (
+        (response.status === 301 ||
+          response.status === 302 ||
+          response.status === 307 ||
+          response.status === 308) &&
+        typeof (response.body as any)?.location === "string"
+      ) {
+        return c.redirect(
+          (response.body as any).location,
+          response.status as any
+        );
       }
 
       // biome-ignore lint/suspicious/noExplicitAny: status is a valid HTTP code
+      if (response.status === 204 || response.status === 304) {
+        return c.body(null, response.status as any);
+      }
+
       return c.json(response.body, response.status as any);
     } catch (err) {
       if (err instanceof ValidationError) {

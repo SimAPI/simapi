@@ -8,6 +8,14 @@ declare const __SIMAPI_VERSION__: string;
 
 const BODY_METHODS = new Set(["POST", "PUT", "PATCH"]);
 
+function isOptional(shape: any): boolean {
+  if (!shape || !shape._def) return false;
+  const typeName = shape._def.typeName;
+  if (typeName === "ZodOptional" || typeName === "ZodDefault") return true;
+  if (shape._def.innerType) return isOptional(shape._def.innerType);
+  return false;
+}
+
 function honoToOAPath(path: string): string {
   return path.replace(/:([^/]+)/g, "{$1}");
 }
@@ -68,9 +76,7 @@ async function buildOperation(
       extraParams.push({
         name,
         in: "query",
-        required:
-          (shape as { _def?: { typeName?: string } })?._def?.typeName !==
-          "ZodOptional",
+        required: !isOptional(shape),
         schema: zodTypeToJsonSchema(shape),
       });
     }
@@ -80,9 +86,7 @@ async function buildOperation(
       extraParams.push({
         name,
         in: "header",
-        required:
-          (shape as { _def?: { typeName?: string } })?._def?.typeName !==
-          "ZodOptional",
+        required: !isOptional(shape),
         schema: zodTypeToJsonSchema(shape),
       });
     }
