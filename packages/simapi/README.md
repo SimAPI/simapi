@@ -40,13 +40,9 @@ npm install @simapi/simapi
 ```
 my-api/
 ├── src/
-│   ├── endpoints/      # Every named export is auto-discovered — no registration
-│   │   ├── posts.ts
-│   │   └── users.ts
-│   ├── models/         # Shared data factories
-│   │   └── post.ts
-│   └── requests/       # Optional — shared RequestDefinition objects
-│       └── postRequest.ts
+│   ├── endpoints/      # Logical endpoint groups (e.g. users.ts, pets.ts)
+│   ├── models/         # TypeScript types and mock factories (e.g. User.ts)
+│   └── requests/       # Zod validation shapes (e.g. UserRequest.ts)
 ├── simapi.config.ts
 └── package.json
 ```
@@ -307,24 +303,23 @@ export default defineConfig({
 
 ## OpenAPI
 
-SimAPI features a sophisticated OpenAPI 3.0/3.1 engine (powered by `@simapi/openapi`).
+SimAPI features a sophisticated OpenAPI 3.0/3.1 engine powered by `@simapi/openapi`.
 
-**Import** — generate typed endpoint stubs from an existing spec:
+**Import** — generate a structured architecture of endpoints, requests, and models from a spec:
 
 ```sh
-simapi import openapi.yaml
-simapi import openapi.json --output src/endpoints/
+npx @simapi/openapi import openapi.yaml -o ./src
 ```
 
-- **Smart Grouping**: Automatically organizes endpoints into files based on OpenAPI **tags**.
-- **OAS 3.1 Support**: Full support for the latest specs, including webhooks and complex schema dialects.
-- **Advanced Codegen**: Generates Zod validation for constraints like `min`, `max`, `email`, `uuid`, and even `nullable` type arrays.
+- **Modular Output**: Automatically organizes code into `endpoints/`, `requests/`, and `models/`.
+- **Mock Factories**: Generates recursive `make{Model}` functions using `@faker-js/faker`.
+- **OAS 3.1 Support**: Full support for the latest specs, including complex schema dialects.
+- **Typed Codegen**: Generates Zod validation for constraints like `min`, `max`, `email`, `uuid`.
 
 **Export** — produce a high-quality OpenAPI 3 spec from your endpoints:
 
 ```sh
-simapi export
-simapi export --output docs/api.yaml
+npx @simapi/openapi export -o docs/api.yaml
 ```
 
 ---

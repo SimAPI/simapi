@@ -19,17 +19,9 @@ A well-organized SimAPI project keeps endpoints and models inside `src/`:
 ```
 my-api/
 ├── src/
-│   ├── endpoints/          # Grouped by resource — every named export is auto-discovered
-│   │   ├── posts.ts        # listPosts, getPost, createPost, …
-│   │   ├── users.ts        # listUsers, getUser, createUser, …
-│   │   └── comments.ts     # listComments, createComment, …
+│   ├── endpoints/          # Grouped by resource (e.g. users.ts, pets.ts)
 │   ├── requests/           # Zod validation schemas — keeps handlers clean
-│   │   ├── posts.ts        # createPostRequest, …
-│   │   └── users.ts        # registerRequest, …
-│   ├── models/             # Shared data factories — keeps endpoints DRY
-│   │   ├── post.ts         # Post interface + makePost() factory
-│   │   └── user.ts         # User interface + makeUser() factory
-│   └── authHandler.ts      # Optional — global auth handler
+│   └── models/             # TypeScript types and mock factories
 ├── simapi.config.ts
 └── package.json
 ```
