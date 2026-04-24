@@ -173,6 +173,16 @@ function generateModels(spec: OASpec, modelsDir: string): void {
       );
     }
 
+    const fakerLines = fakerStub.split("\n");
+
+    const fakerBody =
+      fakerLines.length > 2
+        ? fakerLines
+            .slice(1, -1)
+            .map((l) => `  ${l.trim()}`)
+            .join("\n")
+        : "";
+
     const content = `import { z, faker } from "@simapi/simapi";
 ${imports.join("\n")}
 
@@ -181,12 +191,7 @@ export const ${name}Schema = ${zodSchema};
 export type ${name} = z.infer<typeof ${name}Schema>;
 
 export const make${name} = (overrides?: Partial<${name}>): ${name} => ({
-${fakerStub
-  .slice(2, -2)
-  .split("\n")
-  .map((l) => `  ${l.trim()}`)
-  .filter((l) => l.trim().length > 0)
-  .join("\n")},
+${fakerBody}${fakerBody ? "," : ""}
   ...overrides,
 });`;
 

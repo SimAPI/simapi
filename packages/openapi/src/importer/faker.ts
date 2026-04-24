@@ -26,11 +26,8 @@ export function fakerValueFromSchema(
   switch (rawType) {
     case "string":
       if (schema.format === "email") return "faker.internet.email()";
-
-      if (schema.format === "date-time") {
+      if (schema.format === "date-time")
         return "faker.date.past().toISOString()";
-      }
-
       return "faker.string.alphanumeric()";
     case "number":
     case "integer":
@@ -44,8 +41,18 @@ export function fakerValueFromSchema(
       }
       return "[]";
     }
-    case "object":
+    case "object": {
+      if (schema.properties) {
+        const props = Object.entries(schema.properties).map(([key, prop]) => {
+          const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
+            ? key
+            : `"${key}"`;
+          return `  ${propName}: ${fakerValueFromSchema(prop, ctx)}`;
+        });
+        return `{\n${props.join(",\n")}\n}`;
+      }
       return "{}";
+    }
     default:
       return "null";
   }
