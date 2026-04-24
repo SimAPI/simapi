@@ -37,12 +37,12 @@ export function getObjectName(
 
   if (op.summary) {
     name = op.summary
-      .replace(/[-_\s]+(.)/g, (_, c: string) => c.toUpperCase())
+      .replace(/[-_\s]+(.)/g, (_: string, c: string) => c.toUpperCase())
       .replace(/[^a-zA-Z0-9_$]/g, "")
       .replace(/^(.)/, (c: string) => c.toLowerCase());
   } else if (op.operationId) {
     name = op.operationId
-      .replace(/[-_\s]+(.)/g, (_, c: string) => c.toUpperCase())
+      .replace(/[-_\s]+(.)/g, (_: string, c: string) => c.toUpperCase())
       .replace(/^(.)/, (c: string) => c.toLowerCase());
   } else {
     const segments = path

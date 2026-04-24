@@ -61,7 +61,7 @@ export function buildHandlerBody(
 
   const response = rawResponse ? resolveResponse(rawResponse, spec) : undefined;
   const schema = response?.content?.["application/json"]?.schema;
-  const stub = schema ? buildResponseStub(schema, ctx) : null;
+  const stub = schema ? buildResponseStub(schema as any, ctx) : null;
 
   const prefix = hasValidation
     ? "req.errors.throwValidationError();\n    "
@@ -77,7 +77,7 @@ export function buildHandlerBody(
 }
 
 export function buildResponseStub(
-  rawSchema: OAResponse | OARef, // Wait, this should be OASchema | OARef
+  rawSchema: OAResponse | OARef,
   ctx: CodegenContext
 ): string | null {
   const spec = ctx.spec;
@@ -102,16 +102,19 @@ export function buildResponseStub(
 export function scalarStub(rawSchema: any, ctx: CodegenContext): string {
   if (isRef(rawSchema) && rawSchema.$ref.startsWith("#/components/schemas/")) {
     const modelName = rawSchema.$ref.split("/").pop() as string;
-    ctx.usedModels.add(modelName);
-    return `make${modelName}()`;
+    if (ctx.spec.components?.schemas?.[modelName]) {
+      ctx.usedModels.add(modelName);
+      return `make${modelName}()`;
+    }
   }
 
   const spec = ctx.spec;
   const schema = resolveSchema(rawSchema, spec);
+  const s = schema as any;
 
-  if (schema.const !== undefined) return JSON.stringify(schema.const);
-  if (schema.enum && schema.enum.length > 0)
-    return `faker.helpers.arrayElement(${JSON.stringify(schema.enum)})`;
+  if (s.const !== undefined) return JSON.stringify(s.const);
+  if (s.enum && s.enum.length > 0)
+    return `faker.helpers.arrayElement(${JSON.stringify(s.enum)})`;
 
   const rawType = Array.isArray(schema.type) ? schema.type[0] : schema.type;
 
@@ -125,7 +128,7 @@ export function scalarStub(rawSchema: any, ctx: CodegenContext): string {
     case "boolean":
       return "faker.datatype.boolean()";
     case "array": {
-      const items = schema.items;
+      const items = (schema as any).items;
       if (items) {
         return `[${scalarStub(items, ctx)}]`;
       }

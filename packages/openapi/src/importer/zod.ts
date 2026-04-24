@@ -8,35 +8,38 @@ export function zodFromSchema(
 ): string {
   if (isRef(rawSchema) && rawSchema.$ref.startsWith("#/components/schemas/")) {
     const modelName = rawSchema.$ref.split("/").pop() as string;
-    ctx.usedModels.add(modelName);
-    return `${modelName}Schema`;
+    if (ctx.spec.components?.schemas?.[modelName]) {
+      ctx.usedModels.add(modelName);
+      return `${modelName}Schema`;
+    }
   }
 
   const spec = ctx.spec;
   const schema = resolveSchema(rawSchema, spec);
+  const s = schema as any;
 
   // const → z.literal()
-  if (schema.const !== undefined) {
-    return `z.literal(${JSON.stringify(schema.const)})`;
+  if (s.const !== undefined) {
+    return `z.literal(${JSON.stringify(s.const)})`;
   }
 
   // enum → z.enum()
-  if (schema.enum && schema.enum.length > 0) {
-    const values = schema.enum.map((v) => JSON.stringify(v)).join(", ");
-    if (schema.enum.every((v) => typeof v === "string")) {
+  if (s.enum && s.enum.length > 0) {
+    const values = s.enum.map((v: any) => JSON.stringify(v)).join(", ");
+    if (s.enum.every((v: any) => typeof v === "string")) {
       return `z.enum([${values}])`;
     }
-    return `z.union([${schema.enum.map((v) => `z.literal(${JSON.stringify(v)})`).join(", ")}])`;
+    return `z.union([${s.enum.map((v: any) => `z.literal(${JSON.stringify(v)})`).join(", ")}])`;
   }
 
   // Normalise type (3.1 allows arrays like ["string", "null"])
   const rawType = Array.isArray(schema.type)
-    ? (schema.type.find((t) => t !== "null") ?? schema.type[0])
+    ? (schema.type.find((t: any) => t !== "null") ?? schema.type[0])
     : schema.type;
 
   const isNullable =
     (Array.isArray(schema.type) && schema.type.includes("null")) ||
-    schema.nullable === true;
+    s.nullable === true;
 
   let chain: string;
 
@@ -70,8 +73,8 @@ export function zodFromSchema(
       break;
 
     case "array": {
-      const itemSchema = schema.items
-        ? zodFromSchema(schema.items, ctx, true)
+      const itemSchema = s.items
+        ? zodFromSchema(s.items, ctx, true)
         : "z.unknown()";
       chain = `z.array(${itemSchema})`;
       if (schema.minItems !== undefined) chain += `.min(${schema.minItems})`;
@@ -99,22 +102,31 @@ export function zodFromSchema(
 
     default: {
       if (schema.allOf && schema.allOf.length > 0) {
-        const schemas = schema.allOf.map((s) => zodFromSchema(s, ctx, true));
+        const schemas = schema.allOf.map((s: any) =>
+          zodFromSchema(s, ctx, true)
+        );
         chain =
           schemas.length === 1
             ? (schemas[0] as string)
             : schemas
                 .slice(1)
-                .reduce((acc, s) => `${acc}.and(${s})`, schemas[0] as string);
+                .reduce(
+                  (acc: string, s: string) => `${acc}.and(${s})`,
+                  schemas[0] as string
+                );
         break;
       }
       if (schema.anyOf && schema.anyOf.length > 0) {
-        const schemas = schema.anyOf.map((s) => zodFromSchema(s, ctx, true));
+        const schemas = schema.anyOf.map((s: any) =>
+          zodFromSchema(s, ctx, true)
+        );
         chain = `z.union([${schemas.join(", ")}])`;
         break;
       }
       if (schema.oneOf && schema.oneOf.length > 0) {
-        const schemas = schema.oneOf.map((s) => zodFromSchema(s, ctx, true));
+        const schemas = schema.oneOf.map((s: any) =>
+          zodFromSchema(s, ctx, true)
+        );
         chain = `z.union([${schemas.join(", ")}])`;
         break;
       }

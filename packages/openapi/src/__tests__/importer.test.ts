@@ -1,4 +1,11 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import {
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -24,7 +31,7 @@ function tmpDir(): string {
   return mkdtempSync(join(tmpdir(), "simapi-openapi-test-"));
 }
 
-/** Run the importer and return a map of { filename → file content }. */
+/** Run the importer and return a map of { relativePath → file content }. */
 async function importToTemp(specFile: string): Promise<Map<string, string>> {
   const outDir = tmpDir();
   const specPath = join(FIXTURES, specFile);
@@ -32,9 +39,21 @@ async function importToTemp(specFile: string): Promise<Map<string, string>> {
   await runImportOpenAPI(specPath, undefined, { output: outDir });
 
   const files = new Map<string, string>();
-  for (const f of readdirSync(outDir)) {
-    files.set(f, readFileSync(join(outDir, f), "utf8"));
+
+  function scan(dir: string, base: string) {
+    if (!existsSync(dir)) return;
+    for (const f of readdirSync(dir)) {
+      const full = join(dir, f);
+      const rel = join(base, f);
+      if (statSync(full).isDirectory()) {
+        scan(full, rel);
+      } else {
+        files.set(rel, readFileSync(full, "utf8"));
+      }
+    }
   }
+
+  scan(outDir, "");
 
   // Clean up
   rmSync(outDir, { recursive: true, force: true });
@@ -61,69 +80,78 @@ describe("auth-api.3.0.yaml", () => {
 
   it("generates files grouped by tag", () => {
     // Tags: Authentication, Account Verification, Password Reset
-    expect(files.has("authentication.ts")).toBe(true);
-    expect(files.has("accountVerification.ts")).toBe(true);
-    expect(files.has("passwordReset.ts")).toBe(true);
+    expect(files.has("endpoints/authentication.ts")).toBe(true);
+    expect(files.has("endpoints/accountVerification.ts")).toBe(true);
+    expect(files.has("endpoints/passwordReset.ts")).toBe(true);
   });
 
   it("maps 201 response → AppResponse.created", () => {
-    const auth = files.get("authentication.ts") as string;
+    const auth = files.get("endpoints/authentication.ts") as string;
     expect(auth).toContain("AppResponse.created");
   });
 
   it("maps 200 response → AppResponse.success", () => {
-    const auth = files.get("authentication.ts") as string;
+    const auth = files.get("endpoints/authentication.ts") as string;
     expect(auth).toContain("AppResponse.success");
   });
 
   it("maps 204 response → AppResponse.noContent", () => {
-    const auth = files.get("authentication.ts") as string;
+    const auth = files.get("endpoints/authentication.ts") as string;
     expect(auth).toContain("AppResponse.noContent");
   });
 
   it("generates const → literal value in response stub for 'message' fields", () => {
-    const verification = files.get("accountVerification.ts") as string;
+    const verification = files.get(
+      "endpoints/accountVerification.ts"
+    ) as string;
     // The response stub for verifyAccount inlines the const value as a string literal
     expect(verification).toContain('"Account verified successfully."');
   });
 
   it("generates request validation block for body schemas", () => {
-    const verification = files.get("accountVerification.ts") as string;
-    expect(verification).toContain("request:");
+    const verification = files.get("requests/accountVerification.ts") as string;
     expect(verification).toContain("body:");
     expect(verification).toContain("z.string().min(6).max(6)");
   });
 
   it("marks secure endpoints with type: 'secure'", () => {
-    const verification = files.get("accountVerification.ts") as string;
+    const verification = files.get(
+      "endpoints/accountVerification.ts"
+    ) as string;
     expect(verification).toContain('type: "secure"');
   });
 
   it("marks open endpoints with type: 'open'", () => {
-    const auth = files.get("authentication.ts") as string;
+    const auth = files.get("endpoints/authentication.ts") as string;
     expect(auth).toContain('type: "open"');
   });
 
   it("generates throwValidationError() in handlers with request blocks", () => {
-    const verification = files.get("accountVerification.ts") as string;
+    const verification = files.get(
+      "endpoints/accountVerification.ts"
+    ) as string;
     expect(verification).toContain("req.errors.throwValidationError()");
   });
 
   it("imports AppResponse and EndpointDefinition from @simapi/simapi", () => {
-    for (const content of files.values()) {
-      expect(content).toContain('from "@simapi/simapi"');
-      expect(content).toContain("AppResponse");
-      expect(content).toContain("EndpointDefinition");
+    for (const [path, content] of files.entries()) {
+      if (path.startsWith("endpoints/")) {
+        expect(content).toContain('from "@simapi/simapi"');
+        expect(content).toContain("AppResponse");
+        expect(content).toContain("EndpointDefinition");
+      }
     }
   });
 
   it("generates email format → z.string().email()", () => {
-    const auth = files.get("authentication.ts") as string;
+    const auth = files.get("requests/authentication.ts") as string;
     expect(auth).toContain("z.string().email()");
   });
 
   it("resolves $ref for response body schema (verifyAccount returns user)", () => {
-    const verification = files.get("accountVerification.ts") as string;
+    const verification = files.get(
+      "endpoints/accountVerification.ts"
+    ) as string;
     // The 200 response references AuthUserResource via $ref
     // The stub should at minimum produce a body
     expect(verification).toContain("AppResponse.success");
@@ -147,39 +175,39 @@ describe("blog-api.3.1.yaml", () => {
   });
 
   it("groups by tag: posts, comments, authors, media", () => {
-    expect(files.has("posts.ts")).toBe(true);
-    expect(files.has("comments.ts")).toBe(true);
-    expect(files.has("authors.ts")).toBe(true);
-    expect(files.has("media.ts")).toBe(true);
+    expect(files.has("endpoints/posts.ts")).toBe(true);
+    expect(files.has("endpoints/comments.ts")).toBe(true);
+    expect(files.has("endpoints/authors.ts")).toBe(true);
+    expect(files.has("endpoints/media.ts")).toBe(true);
   });
 
   it("maps 301 response → AppResponse.redirect", () => {
-    const posts = files.get("posts.ts") as string;
+    const posts = files.get("endpoints/posts.ts") as string;
     expect(posts).toContain("AppResponse.redirect");
   });
 
   it("maps 302 response → AppResponse.redirect", () => {
-    const media = files.get("media.ts") as string;
+    const media = files.get("endpoints/media.ts") as string;
     expect(media).toContain("AppResponse.redirect");
   });
 
   it("maps 204 DELETE → AppResponse.noContent", () => {
-    const posts = files.get("posts.ts") as string;
+    const posts = files.get("endpoints/posts.ts") as string;
     expect(posts).toContain("AppResponse.noContent");
   });
 
   it("maps 201 POST → AppResponse.created", () => {
-    const posts = files.get("posts.ts") as string;
+    const posts = files.get("endpoints/posts.ts") as string;
     expect(posts).toContain("AppResponse.created");
   });
 
   it("generates z.enum() for PostStatus field with tags", () => {
-    const posts = files.get("posts.ts") as string;
-    expect(posts).toContain('z.enum(["draft", "published", "archived"])');
+    const status = files.get("models/PostStatus.ts") as string;
+    expect(status).toContain('z.enum(["draft", "published", "archived"])');
   });
 
   it("generates request block with minLength/maxLength for title", () => {
-    const posts = files.get("posts.ts") as string;
+    const posts = files.get("requests/posts.ts") as string;
     expect(posts).toContain("z.string().min(3).max(200)");
   });
 
@@ -188,9 +216,9 @@ describe("blog-api.3.1.yaml", () => {
     // buildResponseStub will fall through to scalarStub which returns 0 for integer
     // The nullable type is handled in zodFromSchema (used for request blocks).
     // Here we verify the file parses and is generated without error.
-    const posts = files.get("posts.ts") as string;
+    const posts = files.get("endpoints/posts.ts") as string;
     // The listPosts handler returns a stub including meta object
-    expect(posts).toContain("meta: {}");
+    expect(posts).toContain("meta: makePaginationMeta()");
   });
 });
 
@@ -211,41 +239,40 @@ describe("petstore-minimal.3.0.json", () => {
   });
 
   it("groups by tag: pets, orders", () => {
-    expect(files.has("pets.ts")).toBe(true);
-    expect(files.has("orders.ts")).toBe(true);
+    expect(files.has("endpoints/pets.ts")).toBe(true);
+    expect(files.has("endpoints/orders.ts")).toBe(true);
   });
 
   it("generates z.enum() for species field", () => {
-    const pets = files.get("pets.ts") as string;
+    const pets = files.get("models/Pet.ts") as string;
     expect(pets).toContain(
       'z.enum(["dog", "cat", "bird", "fish", "rabbit", "other"])'
     );
   });
 
   it("generates z.number().int() for integer body fields (quantity in orders)", () => {
-    const orders = files.get("orders.ts") as string;
+    const orders = files.get("requests/orders.ts") as string;
     // quantity: integer, minimum: 1 → z.number().int().min(1)
     expect(orders).toContain("z.number().int().min(1)");
   });
 
   it("maps 204 DELETE → AppResponse.noContent", () => {
-    const pets = files.get("pets.ts") as string;
+    const pets = files.get("endpoints/pets.ts") as string;
     expect(pets).toContain("AppResponse.noContent");
   });
 
   it("maps 201 POST → AppResponse.created", () => {
-    const pets = files.get("pets.ts") as string;
+    const pets = files.get("endpoints/pets.ts") as string;
     expect(pets).toContain("AppResponse.created");
   });
 
   it("generates validation block with enum constraint", () => {
-    const pets = files.get("pets.ts") as string;
-    expect(pets).toContain("request:");
+    const pets = files.get("requests/pets.ts") as string;
     expect(pets).toContain("body:");
   });
 
   it("marks apiKey-secured endpoints as type: 'secure'", () => {
-    const pets = files.get("pets.ts") as string;
+    const pets = files.get("endpoints/pets.ts") as string;
     expect(pets).toContain('type: "secure"');
   });
 });
@@ -285,7 +312,10 @@ describe("importer edge cases", () => {
       output: join(outDir, "out"),
     });
 
-    const content = readFileSync(join(outDir, "out", "things.ts"), "utf8");
+    const content = readFileSync(
+      join(outDir, "out", "endpoints", "things.ts"),
+      "utf8"
+    );
 
     // Should have both getItem and getItem1
     expect(content).toContain("const getItem:");
@@ -317,8 +347,9 @@ describe("importer edge cases", () => {
     });
 
     // File name comes from path segment before {id} = "widgets"
-    const files = readdirSync(join(outDir, "out"));
-    expect(files).toContain("widgets.ts");
+    expect(existsSync(join(outDir, "out", "endpoints", "widgets.ts"))).toBe(
+      true
+    );
 
     rmSync(outDir, { recursive: true, force: true });
   });
@@ -381,7 +412,10 @@ describe("importer edge cases", () => {
       output: join(outDir, "out"),
     });
 
-    const content = readFileSync(join(outDir, "out", "items.ts"), "utf8");
+    const content = readFileSync(
+      join(outDir, "out", "requests", "items.ts"),
+      "utf8"
+    );
     expect(content).toContain("z.unknown()");
 
     rmSync(outDir, { recursive: true, force: true });
@@ -425,7 +459,10 @@ describe("importer edge cases", () => {
       output: join(outDir, "out"),
     });
 
-    const content = readFileSync(join(outDir, "out", "profile.ts"), "utf8");
+    const content = readFileSync(
+      join(outDir, "out", "requests", "profile.ts"),
+      "utf8"
+    );
     expect(content).toContain("z.string().nullable()");
     expect(content).toContain("z.number().int().min(0).nullable()");
 

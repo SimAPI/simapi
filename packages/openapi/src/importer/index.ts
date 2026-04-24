@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import consola from "consola";
+import { parse } from "yaml";
 import { buildEndpoint } from "./endpoint.js";
 import { fakerValueFromSchema } from "./faker.js";
 import type { CodegenContext, OASpec } from "./types.js";
@@ -27,7 +28,7 @@ export async function runImportOpenAPI(
     throw err;
   }
 
-  const spec = JSON.parse(raw) as OASpec;
+  const spec = parse(raw) as OASpec;
 
   // 1. Generate Models
   generateModels(spec, modelsDir);
@@ -61,11 +62,12 @@ export async function runImportOpenAPI(
       const group = groups.get(fileName)!;
 
       const ctx: CodegenContext = { spec, usedModels: new Set() };
+      const pathItem = pathObj as any;
       const { code, requestBlock, requestName, usedModels } = buildEndpoint(
         m,
         path,
         op,
-        pathObj.parameters,
+        pathItem.parameters,
         ctx,
         existingNames
       );
