@@ -129,19 +129,21 @@ function registerEndpoint(
           response.status === 302 ||
           response.status === 307 ||
           response.status === 308) &&
-        typeof (response.body as any)?.location === "string"
+        typeof (response.body as Record<string, unknown>)?.location === "string"
       ) {
         return c.redirect(
-          (response.body as any).location,
+          (response.body as { location: string }).location,
+          // biome-ignore lint/suspicious/noExplicitAny: status is a valid 3xx code
           response.status as any
         );
       }
 
-      // biome-ignore lint/suspicious/noExplicitAny: status is a valid HTTP code
       if (response.status === 204 || response.status === 304) {
+        // biome-ignore lint/suspicious/noExplicitAny: status is a valid HTTP code
         return c.body(null, response.status as any);
       }
 
+      // biome-ignore lint/suspicious/noExplicitAny: status is a valid HTTP code
       return c.json(response.body, response.status as any);
     } catch (err) {
       if (err instanceof ValidationError) {

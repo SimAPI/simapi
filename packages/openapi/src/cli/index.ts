@@ -1,4 +1,3 @@
-import { resolve } from "node:path";
 import { cac } from "cac";
 import consola from "consola";
 import { runExportOpenAPI } from "../exporter/index.js";
