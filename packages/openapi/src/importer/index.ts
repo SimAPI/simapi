@@ -161,7 +161,7 @@ function generateModels(spec: OASpec, modelsDir: string): void {
   for (const [name, schema] of Object.entries(spec.components.schemas)) {
     const ctx: CodegenContext = { spec, usedModels: new Set() };
     const zodSchema = zodFromSchema(schema, ctx);
-    const fakerStub = fakerValueFromSchema(schema, spec);
+    const fakerStub = fakerValueFromSchema(schema, ctx);
 
     // Filter out self-reference if it exists
     ctx.usedModels.delete(name);
