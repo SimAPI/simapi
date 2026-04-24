@@ -100,7 +100,8 @@ function resolveParameter(
 
 function zodFromSchema(
   rawSchema: OASchema | OARef,
-  ctx: CodegenContext
+  ctx: CodegenContext,
+  isProperty = false
 ): string {
   if (isRef(rawSchema) && rawSchema.$ref.startsWith("#/components/schemas/")) {
     const modelName = rawSchema.$ref.split("/").pop() as string;
@@ -167,7 +168,7 @@ function zodFromSchema(
 
     case "array": {
       const itemSchema = schema.items
-        ? zodFromSchema(schema.items, ctx)
+        ? zodFromSchema(schema.items, ctx, true)
         : "z.unknown()";
       chain = `z.array(${itemSchema})`;
       if (schema.minItems !== undefined) chain += `.min(${schema.minItems})`;
@@ -177,17 +178,16 @@ function zodFromSchema(
 
     case "object": {
       if (schema.properties) {
-        const props = Object.entries(schema.properties)
-          .map(([key, prop]) => {
-            const required = schema.required?.includes(key) ?? false;
-            const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
-              ? key
-              : `"${key}"`;
-            const zodProp = zodFromSchema(prop, ctx);
-            return `${propName}: ${zodProp}${required ? "" : ".optional()"}`;
-          })
-          .join(", ");
-        chain = `z.object({ ${props} })`;
+        const props = Object.entries(schema.properties).map(([key, prop]) => {
+          const required = schema.required?.includes(key) ?? false;
+          const propName = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key)
+            ? key
+            : `"${key}"`;
+          const zodProp = zodFromSchema(prop, ctx, true);
+          return `  ${propName}: ${zodProp}${required ? "" : ".optional()"}`;
+        });
+        const indent = isProperty ? "  " : "";
+        chain = `z.object({\n${props.join(",\n")}\n${indent}})`;
       } else {
         chain = "z.record(z.unknown())";
       }
@@ -197,7 +197,7 @@ function zodFromSchema(
     default: {
       // Handle allOf / anyOf / oneOf at the top level
       if (schema.allOf && schema.allOf.length > 0) {
-        const schemas = schema.allOf.map((s) => zodFromSchema(s, ctx));
+        const schemas = schema.allOf.map((s) => zodFromSchema(s, ctx, true));
         chain =
           schemas.length === 1
             ? (schemas[0] as string)
@@ -207,12 +207,12 @@ function zodFromSchema(
         break;
       }
       if (schema.anyOf && schema.anyOf.length > 0) {
-        const schemas = schema.anyOf.map((s) => zodFromSchema(s, ctx));
+        const schemas = schema.anyOf.map((s) => zodFromSchema(s, ctx, true));
         chain = `z.union([${schemas.join(", ")}])`;
         break;
       }
       if (schema.oneOf && schema.oneOf.length > 0) {
-        const schemas = schema.oneOf.map((s) => zodFromSchema(s, ctx));
+        const schemas = schema.oneOf.map((s) => zodFromSchema(s, ctx, true));
         chain = `z.union([${schemas.join(", ")}])`;
         break;
       }
@@ -406,29 +406,88 @@ function buildResponseStub(
 }
 
 function scalarStub(rawSchema: OASchema | OARef, ctx: CodegenContext): string {
+  if (isRef(rawSchema) && rawSchema.$ref.startsWith("#/components/schemas/")) {
+    const modelName = rawSchema.$ref.split("/").pop() as string;
+    ctx.usedModels.add(modelName);
+    return `make${modelName}()`;
+  }
+
   const spec = ctx.spec;
   const schema = resolveSchema(rawSchema, spec);
 
   if (schema.const !== undefined) return JSON.stringify(schema.const);
   if (schema.enum && schema.enum.length > 0)
-    return JSON.stringify(schema.enum[0]);
+    return `faker.helpers.arrayElement(${JSON.stringify(schema.enum)})`;
 
   const rawType = Array.isArray(schema.type) ? schema.type[0] : schema.type;
 
   switch (rawType) {
     case "string":
-      return '"example"';
+      if (schema.format === "date-time") return "new Date().toISOString()";
+      return "faker.string.alphanumeric()";
     case "number":
     case "integer":
-      return "0";
+      return "faker.number.int()";
     case "boolean":
-      return "false";
-    case "array":
+      return "faker.datatype.boolean()";
+    case "array": {
+      const items = schema.items;
+      if (items) {
+        return `[${scalarStub(items, ctx)}]`;
+      }
       return "[]";
+    }
     case "object":
       return "{}";
     default:
       return "null";
+  }
+}
+
+function fakerValueFromSchema(
+  rawSchema: OASchema | OARef,
+  spec: OASpec
+): string {
+  if (isRef(rawSchema) && rawSchema.$ref.startsWith("#/components/schemas/")) {
+    const modelName = rawSchema.$ref.split("/").pop() as string;
+    return `make${modelName}()`;
+  }
+
+  const schema = resolveSchema(rawSchema, spec);
+
+  if (schema.enum) {
+    return `faker.helpers.arrayElement(${JSON.stringify(schema.enum)})`;
+  }
+
+  switch (schema.type) {
+    case "string":
+      if (schema.format === "date-time")
+        return "faker.date.past().toISOString()";
+      if (schema.format === "date")
+        return "faker.date.past().toISOString().split('T')[0]";
+      if (schema.format === "email") return "faker.internet.email()";
+      return "faker.string.alphanumeric()";
+    case "integer":
+      return "faker.number.int()";
+    case "number":
+      return "faker.number.float()";
+    case "boolean":
+      return "faker.datatype.boolean()";
+    case "array": {
+      const item = schema.items
+        ? fakerValueFromSchema(schema.items, spec)
+        : "{}";
+      return `[${item}]`;
+    }
+    case "object": {
+      if (!schema.properties) return "{}";
+      const props = Object.entries(schema.properties).map(([key, prop]) => {
+        return `  ${key}: ${fakerValueFromSchema(prop, spec)}`;
+      });
+      return `{\n${props.join(",\n")}\n}`;
+    }
+    default:
+      return "{}";
   }
 }
 
@@ -582,24 +641,34 @@ function generateModels(spec: OASpec, modelsDir: string): void {
   for (const [name, schema] of Object.entries(spec.components.schemas)) {
     const ctx: CodegenContext = { spec, usedModels: new Set() };
     const zodSchema = zodFromSchema(schema, ctx);
+    const fakerStub = fakerValueFromSchema(schema, spec);
 
     // Filter out self-reference if it exists
     ctx.usedModels.delete(name);
 
     const imports: string[] = [];
-    for (const used of ctx.usedModels) {
-      imports.push(`import { ${used}Schema } from "./${used}.js";`);
+    for (const used of Array.from(ctx.usedModels).sort()) {
+      imports.push(
+        `import { ${used}Schema, make${used} } from "./${used}.js";`
+      );
     }
 
-    const content = [
-      'import { z } from "@simapi/simapi";',
-      ...imports,
-      "",
-      `export const ${name}Schema = ${zodSchema};`,
-      "",
-      `export type ${name} = z.infer<typeof ${name}Schema>;`,
-      "",
-    ].join("\n");
+    const content = `import { z, faker } from "@simapi/simapi";
+${imports.join("\n")}
+
+export const ${name}Schema = ${zodSchema};
+
+export type ${name} = z.infer<typeof ${name}Schema>;
+
+export const make${name} = (overrides?: Partial<${name}>): ${name} => ({
+${fakerStub
+  .slice(2, -2)
+  .split("\n")
+  .map((l) => "  " + l.trim())
+  .filter((l) => l.trim().length > 0)
+  .join("\n")},
+  ...overrides,
+});`;
 
     const outPath = join(modelsDir, `${name}.ts`);
     writeFileSync(outPath, content, "utf8");
@@ -714,13 +783,21 @@ export async function runImportOpenAPI(
   // 3. Write Endpoint files
   for (const [fileName, group] of groups.entries()) {
     const reqNames = requestImports.get(fileName);
+    const models = modelImports.get(fileName);
+    const needsFaker = group.endpoints.some((e) => e.includes("faker."));
     const imports = [
-      'import { AppResponse, AppRequest, type EndpointDefinition } from "@simapi/simapi";',
+      `import { AppResponse, AppRequest${needsFaker ? ", faker" : ""}, type EndpointDefinition } from "@simapi/simapi";`,
     ];
 
     if (reqNames && reqNames.size > 0) {
       const names = Array.from(reqNames).sort().join(", ");
       imports.push(`import { ${names} } from "../requests/${fileName}.js";`);
+    }
+
+    if (models) {
+      for (const m of Array.from(models).sort()) {
+        imports.push(`import { make${m} } from "../models/${m}.js";`);
+      }
     }
 
     const content =
