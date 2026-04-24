@@ -66,6 +66,24 @@ export const deletePost: EndpointDefinition = {
 };
 ```
 
+## Redirects
+
+Use `AppResponse.redirect(url, status)` to return a `3xx` response. SimAPI automatically handles the `Location` header and server-side redirect logic.
+
+```ts
+export const legacyRedirect: EndpointDefinition = {
+  path: "/old-posts/:id",
+  method: "GET",
+  type: "open",
+  handler: (req) => {
+    const id = req.urlParam("id");
+    return AppResponse.redirect(`/posts/${id}`, 301);
+  },
+};
+```
+
+Defaults to `302 Found` if no status code is provided.
+
 ## Models
 
 Define data factories in `src/models/` and import them across endpoints using the `@/` alias:

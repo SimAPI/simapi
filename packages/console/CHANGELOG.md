@@ -1,5 +1,9 @@
 # @simapi/console
 
+## 0.0.10 - Version bump
+ 
+- Bumped in sync with `@simapi/simapi` 0.0.10
+
 ## 0.0.9 - Version bump
  
 - Bumped in sync with `@simapi/simapi` 0.0.9

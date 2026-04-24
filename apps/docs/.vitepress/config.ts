@@ -80,7 +80,7 @@ export default defineConfig({
           {
             text: "@simapi/simapi",
             items: [
-              { text: "README", link: "/packages/simapi" },
+              { text: "README", link: "/packages/simapi/" },
               { text: "CHANGELOG", link: "/packages/simapi/changelog" },
               { text: "CONTRIBUTING", link: "/packages/simapi/contributing" },
             ],
@@ -88,8 +88,15 @@ export default defineConfig({
           {
             text: "@simapi/console",
             items: [
-              { text: "README", link: "/packages/console" },
+              { text: "README", link: "/packages/console/" },
               { text: "CHANGELOG", link: "/packages/console/changelog" },
+            ],
+          },
+          {
+            text: "@simapi/openapi",
+            items: [
+              { text: "README", link: "/packages/openapi/" },
+              { text: "CHANGELOG", link: "/packages/openapi/changelog" },
             ],
           },
         ],

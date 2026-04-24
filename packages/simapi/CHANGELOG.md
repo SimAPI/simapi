@@ -1,5 +1,15 @@
 # @simapi/simapi
 
+## 0.0.10 - Native Redirects & Decoupled OpenAPI
+
+- **Core:** Added `AppResponse.redirect(url, status)` for native 3xx response support
+- **Core:** Decoupled OpenAPI logic into `@simapi/openapi` for better modularity and reduced bundle size
+- **Server:** Added native Hono redirect handling for `3xx` status codes in `createApp.ts`
+- **Import:** Switched to the new sophisticated `@simapi/openapi` engine with support for OAS 3.1, tag-based file grouping, and better Zod codegen
+- **Export:** Switched to the decoupled `@simapi/openapi` exporter with dynamic dependency resolution
+- **Fix:** Fixed a naming conflict in the CLI `export-openapi` shim
+- **Fix:** Resolved all linting warnings and improved type safety in server internals
+
 ## 0.0.9 - Better OpenAPI Import & Interactive CLI
  
 - **Import:** Improved grouping logic — endpoints are now organized by their base path with camelCase normalization (e.g., `authVerification.ts`)

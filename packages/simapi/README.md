@@ -153,6 +153,7 @@ All responses are created with static factory methods on `AppResponse`:
 AppResponse.success({ data: { id: 1 } })         // 200
 AppResponse.created({ data: { id: 42 } })        // 201
 AppResponse.noContent()                          // 204
+AppResponse.redirect(url, status)                // 301/302
 AppResponse.unauthenticated({ message: "..." })  // 401
 AppResponse.unauthorised({ message: "..." })     // 403
 AppResponse.notFound({ message: "..." })         // 404
@@ -306,6 +307,8 @@ export default defineConfig({
 
 ## OpenAPI
 
+SimAPI features a sophisticated OpenAPI 3.0/3.1 engine (powered by `@simapi/openapi`).
+
 **Import** — generate typed endpoint stubs from an existing spec:
 
 ```sh
@@ -313,12 +316,15 @@ simapi import openapi.yaml
 simapi import openapi.json --output src/endpoints/
 ```
 
-**Export** — produce an OpenAPI 3 spec from your endpoints:
+- **Smart Grouping**: Automatically organizes endpoints into files based on OpenAPI **tags**.
+- **OAS 3.1 Support**: Full support for the latest specs, including webhooks and complex schema dialects.
+- **Advanced Codegen**: Generates Zod validation for constraints like `min`, `max`, `email`, `uuid`, and even `nullable` type arrays.
+
+**Export** — produce a high-quality OpenAPI 3 spec from your endpoints:
 
 ```sh
 simapi export
 simapi export --output docs/api.yaml
-simapi export --output api.json --format json
 ```
 
 ---

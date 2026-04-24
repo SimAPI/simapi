@@ -11,7 +11,7 @@ simapi import openapi.yaml
 simapi import openapi.json --output src/endpoints/
 ```
 
-Both YAML and JSON specs are supported.
+Both YAML and JSON specs are supported, including **OpenAPI 3.0.x** and **OpenAPI 3.1.x**.
 
 | Option           | Default          | Description                        |
 | ---------------- | ---------------- | ---------------------------------- |
@@ -19,10 +19,13 @@ Both YAML and JSON specs are supported.
 
 ### What gets generated
 
-Given a spec with `/api/posts` and `/api/users`, SimAPI creates:
+SimAPI uses the **Tags** defined in your OpenAPI spec to group endpoints into logical files. For example, endpoints tagged with `Authentication` go into `authentication.ts`.
+
+If no tags are present, SimAPI falls back to using the base path segment (e.g., `/api/posts/1` → `posts.ts`).
 
 ```
 src/endpoints/
+├── authentication.ts
 ├── posts.ts
 └── users.ts
 ```
@@ -59,7 +62,9 @@ export const createPost: EndpointDefinition = {
 
 - Endpoints with `security` in the spec get `type: "secure"`.
 - Request body schemas are converted to Zod `request.body` shapes automatically.
-- `operationId` is used as the handler name when present.
+- `operationId` is used as the handler name when present, with automatic collision handling (e.g., `listPosts`, `listPosts1`).
+- Support for complex Zod types: `const` (mapped to `z.literal`), `enum`, `nullable` type arrays, and rich constraints (`min`, `max`, `email`, `uuid`).
+- Intelligent response mapping: 200/201/204 and even 3xx redirects are automatically mapped to the correct `AppResponse` patterns.
 
 ### Example spec
 
