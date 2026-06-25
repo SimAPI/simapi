@@ -1,5 +1,16 @@
 # @simapi/simapi
 
+## 0.0.11
+
+### Patch Changes
+
+- 2bb1251: Bugfix:
+
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '~/.npm/\_npx/63f494113a035271/node_modules/@simapi/openapi/dist/index.mjs' imported from ~/.npm/\_npx/63f494113a035271/node_modules/@simapi/simapi/dist/cli.mjs
+
+- Updated dependencies [2bb1251]
+  - @simapi/openapi@0.0.11
+
 ## 0.0.10 - Native Redirects & Decoupled OpenAPI
 
 - **Core:** Added `AppResponse.redirect(url, status)` for native 3xx response support
@@ -11,14 +22,14 @@
 - **Fix:** Resolved all linting warnings and improved type safety in server internals
 
 ## 0.0.9 - Better OpenAPI Import & Interactive CLI
- 
+
 - **Import:** Improved grouping logic — endpoints are now organized by their base path with camelCase normalization (e.g., `authVerification.ts`)
 - **Import:** Intelligent naming — variables now prioritize OpenAPI summaries and operation IDs, falling back to `{method}{Path}` with automatic collision handling
 - **Interactive:** Spec auto-discovery — `simapi interactive` now scans the current directory and lists potential OpenAPI files for quick selection
 - **Docs:** Overhauled documentation — professional introduction, vision statement, and detailed comparison against alternatives
 - **Fix:** Reliable process termination on SIGINT/SIGTERM, ensuring ports are always released
 - **Fix:** Correctly handle `FormData` and `Blob` in `AppRequest` and production builds
- 
+
 ## 0.0.8 - Console overhaul & validation improvements
 
 - **Console:** Authenticated state and custom headers are now persisted to `localStorage` — no more re-entering tokens on refresh
@@ -73,6 +84,7 @@ request: {
 ## 0.0.6 - src directory structure, dev mode & interactive CLI
 
 **Project structure**
+
 - `simapi init` now scaffolds endpoints and models inside a `src/` directory: `src/endpoints/` and `src/models/`
 - Auth handler is now scaffolded at `src/authHandler.ts`
 - Generated `tsconfig.json` now includes `baseUrl` and `paths` configuration enabling `@/` imports (e.g. `import { makeUser } from "@/models/user.js"`)
@@ -80,10 +92,12 @@ request: {
 - `simapi serve`, `simapi build`, and `simapi import` default `endpointsDir` updated to `"src/endpoints"`; `simapi build` looks for auth handler at `src/authHandler.ts`
 
 **Dev mode**
+
 - Added `simapi dev [cwd]` — watches `src/` and `simapi.config.ts` for changes and automatically restarts the server (debounced 300 ms)
 - Scaffolded `package.json` now includes `"dev": "simapi dev"` script
 
 **Interactive mode**
+
 - Added `simapi interactive` — menu-driven CLI for common operations:
   - **Setup**: configure deployment platform (Docker, Vercel, Netlify)
   - **Console**: install or remove `@simapi/console`
@@ -93,6 +107,7 @@ request: {
 - Removed `import`, `export`, `setup:netlify`, `setup:vercel`, `console:add`, `console:remove` scripts from scaffolded `package.json`; all are accessible via `npm run simapi`
 
 **Docker setup**
+
 - `simapi setup docker` now generates a `Dockerfile` in the project root
 - Available both via `simapi setup docker` directly and through `npm run simapi` → Setup → Docker
 
