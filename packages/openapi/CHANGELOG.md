@@ -1,5 +1,13 @@
 # @simapi/openapi
 
+## 0.0.11
+
+### Patch Changes
+
+- 2bb1251: Bugfix:
+
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '~/.npm/\_npx/63f494113a035271/node_modules/@simapi/openapi/dist/index.mjs' imported from ~/.npm/\_npx/63f494113a035271/node_modules/@simapi/simapi/dist/cli.mjs
+
 ## 0.0.10 - Initial Decoupled Release
 
 This is the first standalone release of the OpenAPI utilities, migrated from the core SimAPI package and significantly enhanced.

@@ -1,14 +1,22 @@
 # @simapi/console
 
+## 0.0.11
+
+### Patch Changes
+
+- 2bb1251: Bugfix:
+
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find module '~/.npm/\_npx/63f494113a035271/node_modules/@simapi/openapi/dist/index.mjs' imported from ~/.npm/\_npx/63f494113a035271/node_modules/@simapi/simapi/dist/cli.mjs
+
 ## 0.0.10 - Version bump
- 
+
 - Bumped in sync with `@simapi/simapi` 0.0.10
 
 ## 0.0.9 - Version bump
- 
+
 - Bumped in sync with `@simapi/simapi` 0.0.9
- 
- ## 0.0.8 - Persistence, Form Data & Defaults
+
+## 0.0.8 - Persistence, Form Data & Defaults
 
 - **Persistence**: Authentication presets and custom headers are now saved to `localStorage` — no more re-entering tokens or keys on refresh
 - **Form Data**: Support for testing `multipart/form-data` and `application/x-www-form-urlencoded` endpoints via a new "Form" toggle in the Try-it panel
