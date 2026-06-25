@@ -40,6 +40,7 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "prepublishOnly": "npm run build",
     "dev": "tsdown --watch",
     "pkg:dev": "tsdown --watch",
     "check-types": "tsc --noEmit",
